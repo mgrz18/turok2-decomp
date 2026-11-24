@@ -1697,3 +1697,41 @@ module). "Start evidence" is why the module starts there.
 | Cont | vm1 | Cont_InitAll | Cont_ResetSlot | 0x00430070 | 2 | 552 | pad |
 | CEngineApp#2 | vm1 | Render_InitUnitQuad | CEngineApp__StartGame | 0x004302A0 | 4 | 604 | pad |
 | Automap | vm1 | Automap_ClearBuffers | Automap_ClearBuffers | 0x00430500 | 1 | 680 | pad |
+
+## Round 29, part r2: SndVoice, VM, vm1/Pak
+
+**Merged (3 directories, 103 files):** `code/SndVoice` (41 -> `SndVoice.c`), `code/VM` (20 -> `VM.c`), `vm1/Pak`
+(42 -> `Pak.c`, its own vm1 text). After each: `asm_diff --base b8217720` 0 on the files, the merged file
+through clang with the port's flags and `-Wimplicit-function-declaration` (no implicit declaration), `make verify`.
+
+- *`code/SndVoice`*: `SndVoice_Setup` (`func_00273EC0.c`, the whole Rage Wars type dump) and `SndVoice_InitPitch`
+  (`ViewRecAtB0`/`ControllerCode802591C0`) rewritten over `structs/sound.h` (`SndVoice`, `SoundEffectInfo`, `SndEnv`;
+  the map in the file comments, from `port/audio/t2audio_world.c`); `Sound_DistanceAttenuation` on `SndVoiceParams`
+  and `CCamera`; `Sound_CalcPan(CVector3 *, CCamera *)` as the port's copy (was `sptr, u8 *`). New `protos/half.h`:
+  `f32 HalfToFloat(s32)`, `u16 FloatToHalf(f32)` (the definitions' forms; `u16`/`s16` views gave the same code).
+  Calls that differ from the definition are cast at the call: `SndVoice_InitVolume` with 3 arguments (the ROM
+  passes a2), `SndVoicePool_FindSlot` with `s16` arguments and result (it is defined before `AllocVoice` in the
+  merged file). The 26 `T2_LINK_REPLACED` functions (incl. `Sound_CalcPan`, which `t2audio_world.c` also defines)
+  are under `#ifndef TARGET_PORT` (`tools/portwrap.py`).
+- *`code/VM`*: every Rage Wars view rewritten over `structs/pager.h`/`globals/pager.h`: `B09SlotA` = `PageEntry`
+  (a = team, b = slot), `B09LNode`/`Mapping`/`Link_func_8023CC08_de`/`ResourcePageMapping` = `PageMapping`, `B09List`
+  = `gPager.chain`, `Node_func_*` = `PageRegion`, `PagerState` = `Pager`. Additive types in `structs/pager.h`:
+  `PagerStats` (`VM_GetStats`), `PageRegionRequest`/`PageFreeRequest` (the manager thread's type 3/2 requests; it
+  casts at the calls), `FaultedThread` (moved from `VM_HandleTLBMiss`). New `protos/vm.h`: `func_0028EE40` in one
+  form (osMapTLB's arguments: `void *vaddr`), `func_0028EEC0`, `VM_FindRegion` returning `PageRegion *`.
+  `CLoader__LoadSync` as `CLoader` defines it (casts at the calls). Register trap: `VM_AcquireNextTLB` needs one base
+  for `gPager.expanded`/`mapped` (`s16 *cursor = &gPager_expanded; cursor[1]`), `gPager.mapped` alone gives two
+  `%hi/%lo` pairs. Merged with `--rodata-free`: the ROM has `VM_Alloc`'s `"Virtual Region"` (0xAAE10) before
+  `VM_HandleTLBMiss`'s float constants (0xAAE20); in plain source order cc1 emits them the other way round
+  (`make verify` failed by swapped 0x10-byte halves), so the string is a `static const char sVirtualRegionTag[]`
+  defined before `VM_HandleTLBMiss` (under `#ifndef TARGET_PORT`: only the wrapped `VM_Alloc` uses it). The
+  `DEFERRED` route (`--inline` tail `--before` `func_0028E068`) changes code: `VM_FindRegion` is then inlined.
+  4 port-replaced functions wrapped. The pager's address arithmetic still warns under clang (TLB addresses as
+  `u32`; it never runs on the port).
+- *`vm1/Pak`*: header work on its own vm1 text (no vm2 text): the CCache calls through `protos/cache.h` (a
+  `CMemEntry *` handle, `CCache__Flush` cast at the call with the `0` the ROM passes), `Controller_Lock` `s32` and
+  `osMotorInit` with the SDK's types everywhere, `Pak_Repair`/`Pak_RepairIfDamaged` index `gPakFileSystems` as
+  `OSPfs` (was `arg0 * 0x68` into a `char` view: wrong on the host, whose `OSPfs` is larger),
+  `Str_ToLower` without `rw/abu_protos.h` (the source of the `Pak_Mount`/`Pak_DecodeText`/`Str_Compare` clashes).
+  q3's recipe as given: `T` = `func_004263DC`..`func_00427164` (35 stems), `merge_module.py --rodata-free --inline
+  $T --before $T:func_00426164`. No pak header added (part r3 owns `protos/pak.h`).
