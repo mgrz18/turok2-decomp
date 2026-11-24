@@ -2,12 +2,9 @@
 #include "structs/game_object.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "structs/twin_totemdefense.h"
 
 
-typedef struct {
-    /* 0x00 */ u8 pad00[0x44];
-    /* 0x44 */ s16 limit;
-} TargetDef;
 
 typedef struct {
     /* 0x0 */ void *target;

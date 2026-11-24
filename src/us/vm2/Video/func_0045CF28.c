@@ -6,44 +6,15 @@
 #include "globals/libultra.h"
 #include "globals/render.h"
 #include "protos/ultra.h"
+#include "structs/twin_pakmenu.h"
 
 /* Resizes the selected VI mode around its original horizontal and field centres, keeping the original lower
  * screen limits, then applies it. */
 
 /* A packed pair register (hStart, vStart, yScale): the high half and the low half. */
-typedef union {
-    u32 w;
-    struct {
-        s16 start;
-        s16 end;
-    } h;
-} Span;
 
-typedef struct {
-    /* 0x00 */ u32 ctrl;
-    /* 0x04 */ u32 width;
-    /* 0x08 */ u32 burst;
-    /* 0x0C */ u32 vSync;
-    /* 0x10 */ u32 hSync;
-    /* 0x14 */ u32 leap;
-    /* 0x18 */ Span hStart;
-    /* 0x1C */ u32 xScale;
-    /* 0x20 */ u32 vCurrent;
-} ViCommonRegs;
 
-typedef struct {
-    /* 0x00 */ u32 origin;
-    /* 0x04 */ Span yScale;
-    /* 0x08 */ Span vStart;
-    /* 0x0C */ u32 vBurst;
-    /* 0x10 */ u32 vIntr;
-} ViFieldRegs;
 
-typedef struct {
-    /* 0x00 */ u8 type;
-    /* 0x04 */ ViCommonRegs comRegs;
-    /* 0x28 */ ViFieldRegs fldRegs[2];
-} ViMode; /* OSViMode, 0x50 */
 
 
 extern ViMode sResizedViMode;

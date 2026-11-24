@@ -60,6 +60,7 @@
  * (deleted before allocation, so they leave no temporary). Only arms that survive to reload do it. */
 #include "common.h"
 #include "protos/player.h"
+#include "structs/twin_motherboss.h"
 
 void MotherBoss_StartSpotAnims(void *obj, void *src, s32 mask);
 
@@ -401,10 +402,6 @@ void MotherBoss_UpdateSpotsAndPickups(MotherBossState *s) {
     }
 }
 
-typedef struct {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ s32 type;
-} AnimEvent;
 typedef struct {
     s16 a;
     s16 b;

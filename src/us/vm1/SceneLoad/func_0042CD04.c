@@ -2,18 +2,9 @@
 #include "globals/scene.h"
 #include "protos/iset.h"
 #include "structs/world.h"
+#include "structs/twin_sceneload.h"
 
-typedef struct ListItem {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 ref; /* an index, made a pointer into the level's table */
-    /* 0x10 */ u8 data[0xC];
-} ListItem; /* 0x1C */
 
-typedef struct ItemList {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 count;
-    /* 0x08 */ ListItem items[1];
-} ItemList;
 
 typedef struct Entry {
     u8 data[0x20];

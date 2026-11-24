@@ -173,6 +173,7 @@
 /* Second-module copy of MotherBoss_OnPhase1CinemaDone (src/us/code/MotherBoss_OnPhase1CinemaDone.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "protos/player.h"
+#include "structs/twin_motherboss.h"
 
 void MotherBoss_StartSpotAnims_2(void *obj, void *src, s32 mask);
 
@@ -492,10 +493,6 @@ void MotherBoss_UpdateSpotsAndPickups_2(MotherBossState *state) {
     }
 }
 
-typedef struct {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ s32 type;
-} AnimEvent;
 typedef struct {
     s16 a;
     s16 b;
