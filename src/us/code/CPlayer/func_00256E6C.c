@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/game.h"
 
 typedef struct {
     char pad0[0x24];
@@ -17,14 +18,14 @@ typedef struct {
     u8 value_15;                /* 0x015 */
 } Settings;
 
-extern Settings gEngineApp_m_Settings_multiplayer; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
+#define SETTINGS_VIEW (*(Settings *) &gEngineApp_m_Settings_multiplayer) /* the file's view of gEngineApp_m_Settings_multiplayer, which globals/game.h declares: this type is what keeps the ROM's code */
 
 u8 Hud_GetSpriteValue(s32 unused, s32 id) {
     Settings *settings;
     SubSettings *sub;
 
     if (id == 0x2DA) {
-        settings = &gEngineApp_m_Settings_multiplayer;
+        settings = &SETTINGS_VIEW;
         sub = (SubSettings *)((char *)settings + 0x1BF);
         if (settings->enabled != 0) {
             if (sub->unk_34 == 0) {
@@ -38,3 +39,5 @@ u8 Hud_GetSpriteValue(s32 unused, s32 id) {
     }
     return 1;
 }
+
+#undef SETTINGS_VIEW

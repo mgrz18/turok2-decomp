@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/collision.h"
 #include "structs/game.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
@@ -8,7 +9,7 @@
 /* gCollisionResults is the collision results (CCollisionResults, structs/collision.h);
  * this reads its first word, m_pInstance (what the last test hit), as a
  * pointer variable: gCollisionResults.m_pInstance does not give this code. */
-extern CGameObjectInstance *gCollisionResults; /* local type: the code reads m_pInstance through this pointer view (see above) */
+extern CGameObjectInstance * gCollisionHitInstance __asm__("gCollisionResults"); /* gCollisionResults (declared by globals/collision.h) seen as this file's type: what keeps the ROM's code */
 
 void CPlayer__Respawn(CPlayer *p);
 
@@ -25,12 +26,12 @@ s32 CPlayer__CheckTagHit(CPlayer *p) {
     s32 kind;
     s32 mode;
 
-    if (gCollisionResults != NULL) {
-        slot = &gCollisionResults; /* read through the slot: the ROM copies the pointer */
+    if (gCollisionHitInstance != NULL) {
+        slot = &gCollisionHitInstance; /* read through the slot: the ROM copies the pointer */
         a = *slot;
         kind = a->header.m_Type;
-        if (kind == 1 && gEngineApp_m_Game.m_Settings.multiplayer && gCollisionResults->m_nTypeFlag == 0x64E
-            && gCollisionResults->m_AI.m_ModeBefore != gCollisionResults->m_AI.m_Mode) {
+        if (kind == 1 && gEngineApp_m_Game.m_Settings.multiplayer && gCollisionHitInstance->m_nTypeFlag == 0x64E
+            && gCollisionHitInstance->m_AI.m_ModeBefore != gCollisionHitInstance->m_AI.m_Mode) {
             opts = p->m_pOptions;
             mode = opts->m_TagMode;
             if (mode == kind) {

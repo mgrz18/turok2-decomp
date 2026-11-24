@@ -1,10 +1,11 @@
 #include "common.h"
+#include "globals/game.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
 
 /* The scope model raised to the view (see CPlayer__AnimateScope). */
 
-extern s32 gEngineApp_m_Game_m_DebugLines; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
+#define DEBUG_LINES_ON (*(s32 *) &gEngineApp_m_Game_m_DebugLines) /* the file's view of gEngineApp_m_Game_m_DebugLines, which globals/game.h declares: this type is what keeps the ROM's code */
 
 void CPlayer__AnimateScope(CPlayerOverlay *m, CPlayer *owner);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
@@ -41,7 +42,7 @@ void CPlayer__UpdateZoom(CPlayer *p) {
             if (p->m_SniperMode != 0) {
                 p->m_SniperMode = 0;
                 LowerScope(&p->m_Overlay);
-            } else if (gWeaponInfoTable[p->m_Data.m_CurrentWeapon]->zoomModel != 0 && (gEngineApp_m_Game_m_DebugLines == 0 || !(p->m_ContState.m_dwButtons & 0x20))) {
+            } else if (gWeaponInfoTable[p->m_Data.m_CurrentWeapon]->zoomModel != 0 && (DEBUG_LINES_ON == 0 || !(p->m_ContState.m_dwButtons & 0x20))) {
                 p->m_SniperMode = 1;
                 if (p->m_Data.m_CurrentWeapon == 0x1B) {
                     p->m_TargetZoomBlend = 0.7f;
@@ -84,3 +85,5 @@ void CPlayer__UpdateZoom(CPlayer *p) {
         }
     }
 }
+
+#undef DEBUG_LINES_ON

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/camera.h"
 #include "globals/strings.h"
 #include "structs/vector.h"
 #include "structs/region.h"
@@ -15,7 +16,7 @@ typedef struct {
 /* The camera pool gEngineApp_m_Game_m_CameraPool (CCameraPool) seen to the settings gEngineApp_m_Settings
  * (+0x1228): the ROM reads them through this symbol, and through gEngineApp_m_Settings
  * the code no longer matches. */
-extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
+extern CGameFromCameraPool gCameraPoolGameView __asm__("gEngineApp_m_Game_m_CameraPool"); /* gEngineApp_m_Game_m_CameraPool (declared by globals/camera.h) seen as this file's type: what keeps the ROM's code */
 
 s32 Cinema_IsActive(void);
 s32 CPlayer__IsInMatchEndState(CPlayer *p);
@@ -57,7 +58,7 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
     if (gScene.m_WarpState) {
         return;
     }
-    if ((gEngineApp_m_Game_m_CameraPool.m_Settings.cheatFlags & 1) && type != 0x1D) {
+    if ((gCameraPoolGameView.m_Settings.cheatFlags & 1) && type != 0x1D) {
         return;
     }
     if ((u16)p->m_Mode < 2) {
@@ -66,12 +67,12 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
     if (p->m_pOnEnemy) {
         damage /= 5;
     }
-    if (gEngineApp_m_Game_m_CameraPool.m_Settings.multiplayer) {
+    if (gCameraPoolGameView.m_Settings.multiplayer) {
         if (p->m_pOptions->m_Handicap) {
             damage = damage * (1.0f / 256) / ((p->m_pOptions->m_Handicap + f) * 0.3f) * 256.0f;
         }
     }
-    if (gEngineApp_m_Game_m_CameraPool.m_Settings.cheatFlags & 0x10) {
+    if (gCameraPoolGameView.m_Settings.cheatFlags & 0x10) {
         check = 1;
     } else {
         check = p->m_Data.m_SpecialPickupCount[384] & 0xF;
@@ -104,8 +105,8 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
         alpha = ((damage >> 8) * 0xFF) / 20;
         alpha = (MIN(alpha, 0xFF) < 0x80) ? 0x80 : MIN(alpha, 0xFF);
         time = 0x1E;
-        if (old > 0xF00 && p->m_Data.m_Health <= 0xF00 && !gEngineApp_m_Game_m_CameraPool.m_Settings.multiplayer) {
-            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, ((void *)p->m_pCamera), sPlayerHurtText_LowHealth);
+        if (old > 0xF00 && p->m_Data.m_Health <= 0xF00 && !gCameraPoolGameView.m_Settings.multiplayer) {
+            CCameraPool__AddText(&gCameraPoolGameView, ((void *)p->m_pCamera), sPlayerHurtText_LowHealth);
             Sound__PlaySpeech(0x156);
         }
         amount = damage >> 8;
@@ -121,7 +122,7 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
         CCamera__SetHitFlash(((void *)p->m_pCamera), alpha & 0xFF, time);
     }
     if ((old >> 8) != (p->m_Data.m_Health >> 8)) {
-        if (gEngineApp_m_Game_m_CameraPool.m_Settings.multiplayer) {
+        if (gCameraPoolGameView.m_Settings.multiplayer) {
             if (p->m_pOptions->m_TagMode == 1) {
                 Sound__Play2D(0x27DA);
             }

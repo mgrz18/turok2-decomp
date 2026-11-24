@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu.h"
 #include "globals/engine.h"
 
 typedef struct {
@@ -23,7 +24,7 @@ typedef struct {
 
 typedef struct PlayerList_25492C PlayerList_25492C;
 
-extern Globals_25492C gEngineApp_m_Game_m_MenuPool; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
+extern Globals_25492C gMenuPoolGlobalsView_25492C __asm__("gEngineApp_m_Game_m_MenuPool"); /* gEngineApp_m_Game_m_MenuPool (declared by globals/menu.h) seen as this file's type: what keeps the ROM's code */
 
 s32 MenuPool_CountOpen(void *);
 extern s32 CPlayerPool__CountIdleMenus(PlayerList_25492C *list);
@@ -46,7 +47,7 @@ void CPlayerPool__UpdateMatchClock(void *list_) {
     if (match->over || !gEngineApp_m_Settings.multiplayer) {
         return;
     }
-    if (!MenuPool_CountOpen(&gEngineApp_m_Game_m_MenuPool) && match->timeLeft > 0.0f && !gEngineApp_m_Settings.paused) {
+    if (!MenuPool_CountOpen(&gMenuPoolGlobalsView_25492C) && match->timeLeft > 0.0f && !gEngineApp_m_Settings.paused) {
         if (CPlayerPool__CountIdleMenus(list)) {
             match->timeLeft -= gFrameIncrement;
         }
@@ -55,7 +56,7 @@ void CPlayerPool__UpdateMatchClock(void *list_) {
             CPlayerPool__EndMatch(list);
         }
     }
-    if (!MenuPool_CountOpen(&gEngineApp_m_Game_m_MenuPool) && CPlayerPool__IsFragLimitReached(list)) {
+    if (!MenuPool_CountOpen(&gMenuPoolGlobalsView_25492C) && CPlayerPool__IsFragLimitReached(list)) {
         if (!match->over && !gEngineApp_m_Settings.paused && match->scoreLimit > 0 && !match->tag) {
             CPlayerPool__EndMatch(list);
         }
@@ -64,13 +65,13 @@ void CPlayerPool__UpdateMatchClock(void *list_) {
 #else
 void CPlayerPool__UpdateMatchClock(void *list_) {
     PlayerList_25492C *list = list_;
-    MatchState_25492C *match = &gEngineApp_m_Game_m_MenuPool.match;
+    MatchState_25492C *match = &gMenuPoolGlobalsView_25492C.match;
     Globals_25492C *g;
 
-    if (match->over || !gEngineApp_m_Game_m_MenuPool.timed) {
+    if (match->over || !gMenuPoolGlobalsView_25492C.timed) {
         return;
     }
-    if (!MenuPool_CountOpen(&gEngineApp_m_Game_m_MenuPool) && match->timeLeft > 0.0f && !gEngineApp_m_Game_m_MenuPool.paused) {
+    if (!MenuPool_CountOpen(&gMenuPoolGlobalsView_25492C) && match->timeLeft > 0.0f && !gMenuPoolGlobalsView_25492C.paused) {
         if (CPlayerPool__CountIdleMenus(list)) {
             match->timeLeft -= gFrameIncrement;
         }
@@ -79,7 +80,7 @@ void CPlayerPool__UpdateMatchClock(void *list_) {
             CPlayerPool__EndMatch(list);
         }
     }
-    g = &gEngineApp_m_Game_m_MenuPool;
+    g = &gMenuPoolGlobalsView_25492C;
     if (!MenuPool_CountOpen(g) && CPlayerPool__IsFragLimitReached(list)) {
         MatchState_25492C *m = &g->match;
 

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu.h"
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/controller.h"
@@ -68,7 +69,7 @@ typedef struct {
     /* 0x01 */ u8 pad1[0x40 - 1];
 } PortSetup;
 
-extern Globals gEngineApp_m_Game_m_MenuPool; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
+extern Globals gMenuPoolGlobalsView __asm__("gEngineApp_m_Game_m_MenuPool"); /* gEngineApp_m_Game_m_MenuPool (declared by globals/menu.h) seen as this file's type: what keeps the ROM's code */
 
 void CPlayer__Update(CPlayer *p);
 void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *other);
@@ -140,26 +141,26 @@ void CPlayerPool__Update(PlayerList *list) {
         if (Controller_StartPressedNoCinema(p->m_ContState.m_pContState)) {
             if (Cinema_IsActive()) {
                 Cinema_TrySkip();
-            } else if (!MenuPool_CountOpen(&gEngineApp_m_Game_m_MenuPool) && p->m_Data.m_Health != 0 && p->m_pCamera != NULL
-                       && p->m_pCamera->m_Menus.count == 0 && (gEngineApp_m_Game_m_MenuPool.match.over == 0 || gEngineApp_m_Game_m_MenuPool.timed == 0)) {
-                gEngineApp_m_Game_m_MenuPool.paused = 1;
+            } else if (!MenuPool_CountOpen(&gMenuPoolGlobalsView) && p->m_Data.m_Health != 0 && p->m_pCamera != NULL
+                       && p->m_pCamera->m_Menus.count == 0 && (gMenuPoolGlobalsView.match.over == 0 || gMenuPoolGlobalsView.timed == 0)) {
+                gMenuPoolGlobalsView.paused = 1;
                 Music_DuckVolume();
                 Sound__StopAllExcept(300);
                 Sound__DisableAmbientTrack();
                 reset_strokes(&p->m_Barrel);
                 p->m_LivesOverlay.m_Value = -1;
                 p->m_TokensOverlay.m_Value = -1;
-                MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPauseMenuDesc, p, (p->m_ContState.m_pContState), 0);
+                MenuPool_OpenMenu(&gMenuPoolGlobalsView, &gPauseMenuDesc, p, (p->m_ContState.m_pContState), 0);
             }
         }
         if (p->m_bLevelNotCompleteExit) {
             hub = Level_GetHub(gScene_m_LevelID) - 1;
             if (hub < 6 && (p->m_Data.m_dwLevelFirstTimeFlags & (1 << hub))) {
-                MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gMissionFailedMenuDesc, p, (p->m_ContState.m_pContState), 0);
+                MenuPool_OpenMenu(&gMenuPoolGlobalsView, &gMissionFailedMenuDesc, p, (p->m_ContState.m_pContState), 0);
             }
             p->m_bLevelNotCompleteExit = 0;
         }
-        if (!MenuPool_CountOpen(&gEngineApp_m_Game_m_MenuPool) && Cinema_PathPlaying() && Cinema_GetScriptId() == 400 && !list->cinema) {
+        if (!MenuPool_CountOpen(&gMenuPoolGlobalsView) && Cinema_PathPlaying() && Cinema_GetScriptId() == 400 && !list->cinema) {
             if (p->m_pCamera != NULL && p->m_pCamera->m_Menus.count == 0) {
                 list->cinema = 1;
                 list->cinemaStarted = 0;
@@ -177,8 +178,8 @@ void CPlayerPool__Update(PlayerList *list) {
 
         CPlayer__ReadInput(&p->m_ContState, p);
         next = p->m_pNext;
-        match = &gEngineApp_m_Game_m_MenuPool.match;
-        if (p != NULL && !match->over && (match->timeLeft >= 900.0f || match->timeLeft < 0.0f || !gEngineApp_m_Game_m_MenuPool.timed)
+        match = &gMenuPoolGlobalsView.match;
+        if (p != NULL && !match->over && (match->timeLeft >= 900.0f || match->timeLeft < 0.0f || !gMenuPoolGlobalsView.timed)
             && ((p->m_ContState.m_pContState->buttonsSingle & 0x1000) || p->m_bActive)) {
             p->m_bActive = 1;
             character = gEngineApp_m_Settings.slots[p->m_nController].m_nCharacter;

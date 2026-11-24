@@ -1,11 +1,12 @@
 #include "common.h"
+#include "globals/camera.h"
 #include "globals/strings.h"
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/collision.h"
 #include "globals/game.h"
 
-extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
+#define CAMERA_POOL_GAME (*(CGameFromCameraPool *) &gEngineApp_m_Game_m_CameraPool) /* the file's view of gEngineApp_m_Game_m_CameraPool, which globals/camera.h declares: this type is what keeps the ROM's code */
 
 /* The game the settings belong to, recovered from the settings pointer. Its address is
    gEngineApp_m_Settings - 0x1228 for the compiler, not gEngineApp_m_Game_m_CameraPool: that is what keeps the tagged and
@@ -33,7 +34,7 @@ void CPlayer__ShowKillMessages(CPlayer *victim, CPlayer *killer, DamageEvent *hi
     if (settings->multiplayer != 0) {
         if (victim == killer) {
             Util_StrCpy(killer->m_DeathMatchString[killer->m_nDeathmatchString], sKillMessageText_YouKilledYourself);
-            SHOW_MESSAGE(&gEngineApp_m_Game_m_CameraPool, killer, 1.5f);
+            SHOW_MESSAGE(&CAMERA_POOL_GAME, killer, 1.5f);
         } else if (victim->m_pOptions->m_TagMode != 0) {
             f32 time = 1.5f;
             CGameFromCameraPool *game;
@@ -60,8 +61,10 @@ void CPlayer__ShowKillMessages(CPlayer *victim, CPlayer *killer, DamageEvent *hi
             } else {
                 Util_StrCpy(killer->m_DeathMatchString[killer->m_nDeathmatchString], sKillMessageText_YouKilled);
                 Util_StrCpy(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->m_Name);
-                SHOW_MESSAGE(&gEngineApp_m_Game_m_CameraPool, killer, 1.5f);
+                SHOW_MESSAGE(&CAMERA_POOL_GAME, killer, 1.5f);
             }
         }
     }
 }
+
+#undef CAMERA_POOL_GAME
