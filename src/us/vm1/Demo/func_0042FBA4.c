@@ -9,8 +9,8 @@ void CCamera__Construct(void *);
 void Sound__SetListener(void *);
 void CCache__Flush(s32);
 void CCache__Deallocate(sptr, void *);
-struct CMemEntry *CCache__Allocate(s32, s32, s32, char *);
-void *memset(void *destination, s32 value, uptr size);
+struct CMemEntry *CCache__Allocate(s32, s32, u32, char *);
+void *memset(void *, s32, uptr);
 
 static __inline__ void clearAxis(CShakeAxis *axis) {
     axis->m_Shake = 0;

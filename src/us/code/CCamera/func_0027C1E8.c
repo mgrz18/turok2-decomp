@@ -7,7 +7,7 @@
 #include "globals/camera.h"
 #include "globals/player.h"
 
-void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
+void CEngineApp__DrawFilledRect(void *, u8 *, s32, s32, s32, s32);
 void CCamera__UpdateFlash(CCamera *cam);
 s32 Cinema_PathPlaying(void);
 void CPlayerPool__DrawHuds(CPlayerPool *list, CCamera *cam);

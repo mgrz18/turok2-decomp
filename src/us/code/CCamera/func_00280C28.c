@@ -23,9 +23,11 @@ void CCameraViewParams__Construct(CCameraViewParams *o) {
 }
 #else
 #include "rw/junk_types.h"
+#include "globals/camera.h"
 
-extern s32 gDefaultVisBits[]; /* local type: the u32 of globals/camera.h loads it first (GCC 2 alias order) */
-void CCameraViewParams__Construct(ObjInit *o) {
+#define DEFAULT_VIS_BITS (((CVisBits *) &gDefaultVisBits)->m_Bits)
+void CCameraViewParams__Construct(CCameraViewParams *params) {
+    ObjInit *o = (ObjInit *) params;
     CVector3 *p;
     f32 z;
     o->unk20.i = 0;
@@ -44,6 +46,6 @@ void CCameraViewParams__Construct(ObjInit *o) {
     o->unk34 = 0;
     o->unk38 = z;
     o->unk3C = 0.17453295f;
-    o->unk40 = gDefaultVisBits[0];
+    o->unk40 = DEFAULT_VIS_BITS;
 }
 #endif

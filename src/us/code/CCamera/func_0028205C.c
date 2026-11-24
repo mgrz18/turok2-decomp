@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/camera.h"
 
-s32 CCache__Deallocate(sptr, sptr);                /* extern */
-s32 CCache__Flush(s32);                     /* extern */
-s32 Sound__SetListener(sptr);                         /* extern */
+void Sound__SetListener(void *);
+void CCache__Flush(s32);
+void CCache__Deallocate(sptr, void *);
 
 /* Frees the pool's cameras, the main one first. */
 void CCameraPool__FreeCameras(CCameraPool *pool) {

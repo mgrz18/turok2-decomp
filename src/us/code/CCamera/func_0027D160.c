@@ -72,10 +72,10 @@ void CMtxF__RotateY(CMtxF m, f32 angle);
 void CMtxF__TransformPoints(CMtxF m, CVector3 *in, CVector3 *out, u32 count);
 void Frustum_FromCorners(CPlane *planes, CVector3 *eye, CVector3 *c0, CVector3 *c1, CVector3 *c2, CVector3 *c3);
 void BoundingBox_FromPoints(CVector3 *box, s32 count, CVector3 *points);
-void CMtxF__Identity(CMtxF m);
+void CMtxF__Identity(void *);
 void CEmitterPool__Advance(void *sky, CCamera *cam);
 void MenuPool_Update(void *menus);
-f32 CGameRegion__GetHeight(CFloor *floor, f32 x, f32 z);
+f32 CGameRegion__GetHeight(struct CGameRegion *, f32, f32);
 
 #define MIN1(x) (((x) > 1.0f) ? 1.0f : (x))
 
@@ -395,7 +395,7 @@ found:
     height = cam->m_ViewParams.m_YPosOffset;
     cam->m_ViewParams.m_VisBits = gDefaultVisBits;
     if (floor != NULL && Cinema_PathPlaying() == 0) {
-        above = ((y + height) - CGameRegion__GetHeight(floor, x, z)) * 0.09765625f;
+        above = ((y + height) - CGameRegion__GetHeight((struct CGameRegion *) floor, x, z)) * 0.09765625f;
         if (above < 11.0f && above > 5.0f) {
             cam->m_ViewParams.m_VisBits = floor->m_VisBits;
         }

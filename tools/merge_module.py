@@ -17,6 +17,17 @@ and rewrites versions/turok2.us.yaml: the first file's `c` and `.rodata` subsegm
 merged file, the others are gone. Then `make setup`, a clean build and `make verify` decide.
 
     python3 tools/merge_module.py src/us/code/CSun [--name CSun] [--dry-run]
+
+One object over the engine and the VM (docs/MODULES.md, round 27): `--vm src/us/vm1/Demo` names the
+directory of the functions that object linked into the paged VM module. They join the merged file,
+each definition written `VM_TEXT` (common.h: `__attribute__((section(".text.vm")))` on the N64 build),
+so cc1 outputs them in a section of their own while their literals stay in the object's one .rodata.
+The source order is the two parts' .text orders interleaved by the order of their .rodata slices
+(a file without .rodata goes with the next one that has, of its own part; the rest at the end). The
+yaml keeps the VM part's first `c` subsegment, in dict form with `linker_section: .text.vm` (splat
+writes `<merged>.c.o(.text.vm)` there), and the VM part's .rodata slices go with the merge.
+
+    python3 tools/merge_module.py src/us/code/CCamera --vm src/us/vm1/Demo
 """
 
 import argparse
@@ -98,7 +109,7 @@ def signature(item):
     """`T name(params);` from a definition (its text up to the body's brace), comments dropped."""
     c = strip_comments(item)
     head = c[:c.index("{")].strip()
-    head = re.sub(r"^\s*(INLINE\s+|inline\s+|DEFERRED\s+)?", "", head)
+    head = re.sub(r"^\s*(INLINE\s+|inline\s+|DEFERRED\s+|VM_TEXT\s+)*", "", head)
     return re.sub(r"\s+", " ", head) + ";\n"
 
 
@@ -284,6 +295,7 @@ def main():
                     "(`inline`: output after the others, string literals at the definition)")
     ap.add_argument("--rodata-free", action="store_true", help="no .rodata order check: the slices and the unnamed "
                     "data between them become the merged file's one .rodata (make verify decides)")
+    ap.add_argument("--vm", help="the directory of the same object's functions linked into the VM module (section .text.vm)")
     ap.add_argument("--dry-run", action="store_true", help="print the merged file, change nothing")
     ap.add_argument("--no-fix", action="store_true", help="round 23's merge: no static renames, no include hoisting, "
                     "no typedef dedupe against the headers, no deferred prototypes")
@@ -297,6 +309,12 @@ def main():
     if clash:
         sys.exit(f"{a.dir}: {name}.c exists already ({clash[0].relative_to(ROOT)}): pass --name")
     files = {p.stem: p for p in d.glob("*.c")}
+    vm = {}
+    if a.vm:
+        vm = {p.stem: p for p in (ROOT / a.vm).resolve().glob("*.c")}
+        if set(vm) & set(files):
+            sys.exit(f"{a.vm}: a file name is in both parts")
+        files.update(vm)
     lines, ents = yaml_entries(set(files))
     text_order = [e[2].rsplit("/", 1)[-1] for e in ents if e[1] == "c"]
     if sorted(text_order) != sorted(files) or len(files) < 2:
@@ -304,6 +322,24 @@ def main():
     # the module's c entries must be adjacent; so must its .rodata entries, in the same order
     cs = [e for e in ents if e[1] == "c"]
     ro = [e for e in ents if e[1] == ".rodata"]
+    cs_vm = []
+    if vm:
+        cs_vm = [e for e in cs if e[2].rsplit("/", 1)[-1] in vm]
+        cs = [e for e in cs if e[2].rsplit("/", 1)[-1] not in vm]
+        if not cs or not cs_vm:
+            sys.exit(f"{a.dir}: --vm needs files in both parts")
+        # one source order: each part's .text order, interleaved by the .rodata run (a file goes with the next of
+        # its own part that has .rodata; the files after the last such one at the end, engine part first)
+        parts = [[e[2].rsplit("/", 1)[-1] for e in cs], [e[2].rsplit("/", 1)[-1] for e in cs_vm]]
+        text_order = []
+        for e in ro:
+            s = e[2].rsplit("/", 1)[-1]
+            p = parts[1] if s in vm else parts[0]
+            if s in p:
+                k = p.index(s)
+                text_order += p[:k + 1]
+                del p[:k + 1]
+        text_order += parts[0] + parts[1]
     # every subsegment line, also the ones without a file (`- [0xAB194, rodata]`: splat's own asm/data)
     entry_lines = [n for n, l in enumerate(lines) if ANY_ENTRY.match(l)]
     pos = {n: i for i, n in enumerate(entry_lines)}
@@ -326,7 +362,7 @@ def main():
             pads.update(entry_lines[k] for k in between)
             return True
         return not between
-    if not adjacent(cs):
+    if not adjacent(cs) or (cs_vm and not adjacent(cs_vm)):
         sys.exit(f"{a.dir}: its .text subsegments are not adjacent")
     ro_order = [e[2].rsplit("/", 1)[-1] for e in ro]
     if a.rodata_free and ro:
@@ -389,6 +425,8 @@ def main():
                  for m in [SIMPLE_TYPEDEF.fullmatch(re.sub(r"\s+", " ", strip_comments(it)).strip())] if m]
         if not any(hdr.get(m.group(2)) == canon_type(m.group(1)) for m in local):
             hoisted, hdr = [], {}   # nothing to drop: the files keep their own include order
+    # the VM part's functions go to their own section (common.h VM_TEXT), written before the definition
+    vm_lead = re.compile(r"((?:\s|/\*.*?\*/|//[^\n]*\n)*)", re.S)
     defined = {}
     for its in parsed:
         for it, kind, n in its:
@@ -452,7 +490,7 @@ def main():
                     earlier_first(p)
                     out.append(defined[p])
                     last = "proto"
-    for its in parsed:
+    for fi, its in enumerate(parsed):
         for it, kind, n in its:
             if kind == "proto" and n in defined:
                 if n in done or n in seen:
@@ -475,6 +513,8 @@ def main():
                 if pending:
                     flush(force=any(re.search(r"\b%s\b" % p, strip_comments(it)) for p in pending))
                 done.add(n)
+                if text_order[fi] in vm:
+                    it = vm_lead.sub(lambda m: m.group(1) + "VM_TEXT ", it, count=1)
                 out.append("\n" + it if out and not out[-1].endswith("\n\n") else it)
                 last = "func"
                 continue
@@ -506,10 +546,15 @@ def main():
         print(merged)
         return 0
     target.write_text(merged)
-    first = {"c": cs[0], ".rodata": ro[0] if ro else None}
+    first = {"c": cs[0], ".rodata": ro[0] if ro else None, "vm": cs_vm[0] if cs_vm else None}
     drop = {e[0] for e in ents if e not in first.values()} | pads
     for k, e in first.items():
-        if e:
+        if e and k == "vm":
+            m = ENTRY.match(lines[e[0]])
+            indent = lines[e[0]][:len(lines[e[0]]) - len(lines[e[0]].lstrip())]
+            lines[e[0]] = (f"{indent}- {{start: {m.group(1)}, type: c, name: {rel_dir}/{name}, linker_section: .text.vm}}"
+                           f"   # {a.vm.rstrip('/').split('src/us/')[-1]}: the object's VM part\n")
+        elif e:
             lines[e[0]] = lines[e[0]].replace(e[2], f"{rel_dir}/{name}")
     YAML.write_text("".join(l for n, l in enumerate(lines) if n not in drop))
     if len(shared) == 1:

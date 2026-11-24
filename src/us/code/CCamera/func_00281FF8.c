@@ -1,9 +1,9 @@
 #include "common.h"
 #include "globals/strings.h"
 #include "structs/camera.h"
-#include "protos/cache.h"
 
-void memset(sptr, s32, sptr);           /* extern */
+struct CMemEntry *CCache__Allocate(s32, s32, u32, char *);
+void *memset(void *, s32, uptr);
 
 /* Allocates the pool's on-screen texts (0x40 bytes each) and clears them. */
 void CCameraPool__AllocTexts(CCameraPool *pool, s32 count) {

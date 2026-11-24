@@ -12,7 +12,7 @@ extern s32 Cinema_PathPlaying(void);
 #include "structs/camera.h"
 #include "structs/region.h"
 
-extern f32 CGameRegion__GetHeight(CGameRegion *tri, f32 x, f32 z);
+f32 CGameRegion__GetHeight(struct CGameRegion *, f32, f32);
 
 /* Host body on CCamera.m_ViewParams: the Rage Wars GameplayCamera view sits at N64 offsets (its
  * next pointer and the region slot are 4 bytes there), and its Shared_Quad (an s32/f32 union)
@@ -56,7 +56,7 @@ void CCamera__SetViewParams(CCamera *cam, s32 type, f32 rotY, f32 rx, f32 ry, f3
     }
 }
 #else
-extern f32 CGameRegion__GetHeight(s32 arg0, f32 arg1, f32 arg2);
+f32 CGameRegion__GetHeight(struct CGameRegion *, f32, f32);
 void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6,
                    f32 arg7, f32 arg8, f32 arg9, Shared_Quad arg10, sptr arg11, f32 arg12,
                    f32 arg13) {
@@ -89,7 +89,7 @@ void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, 
     w = arg0->unk44;
     arg0->unk64 = gDefaultVisBits;
     if (object != 0 && Cinema_PathPlaying() == 0) {
-        value = ((y + w) - CGameRegion__GetHeight(object, x, z)) * 0.09765625f;
+        value = ((y + w) - CGameRegion__GetHeight((struct CGameRegion *) object, x, z)) * 0.09765625f;
         if (value < 11.0f && 5.0f < value) {
             arg0->unk64 = ((MenuRules *)(object))->locked;
         }

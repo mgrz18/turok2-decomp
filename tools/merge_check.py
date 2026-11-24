@@ -62,7 +62,7 @@ def norm(asm):
             funcs[cur] = body
             cur = None
             continue
-        if cur and sect == ".text":
+        if cur and sect in (".text", ".text.vm"):
             body.append(t)
         elif sect in (".rdata", ".rodata") and not re.match(r"\S+:$", t):
             ro.append(LAB.sub("L", t))
@@ -95,8 +95,13 @@ def one(d):
         return res
     mf, mro = norm(asm)
     rf, rro = {}, []
-    for f in files:
-        a, e = compile_(open(os.path.join(src_dir, f)).read(), os.path.join(od, "ref", f[:-2]), src_dir)
+    refs = [(src_dir, f) for f in files]
+    if "--vm" in EXTRA:   # one object over the engine and the VM: the VM part's files are references too
+        vd = os.path.join(REPO, EXTRA[EXTRA.index("--vm") + 1])
+        refs += [(vd, f) for f in sorted(os.listdir(vd)) if f.endswith(".c")]
+        res["files"] = len(refs)
+    for sd, f in refs:
+        a, e = compile_(open(os.path.join(sd, f)).read(), os.path.join(od, "ref", f[:-2]), sd)
         if a is None:
             res["status"] = "REFCOMPILE"
             res["msg"] = f + ": " + e.strip()[:300]

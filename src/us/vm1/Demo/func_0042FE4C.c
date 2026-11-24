@@ -8,7 +8,7 @@
 #include "structs/camera.h"
 #include "protos/list.h"
 
-extern void * memset(void *arg0, int arg1, uptr arg2);
+void *memset(void *, s32, uptr);
 extern void CCamera__Construct(void *);
 extern void CCamera__Advance(void *);
 void CCameraPool__Construct(CCameraPool *pool) {

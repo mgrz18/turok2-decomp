@@ -4,8 +4,8 @@
  * offset (structs/camera.h). */
 #include "structs/camera.h"
 
-void CEmitterPool__Construct(void *pool);
+void CEmitterPool__Construct(struct CEmitterPool *);
 
 void CCamera__ConstructSkySystem(CCamera *cam) {
-    CEmitterPool__Construct(cam->m_SkySystem);
+    CEmitterPool__Construct((struct CEmitterPool *) cam->m_SkySystem);
 }

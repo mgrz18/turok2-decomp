@@ -3,7 +3,7 @@
 #include "structs/game.h"
 
 void CCamera__UpdateFlash();                            /* extern */
-void CEngineApp__DrawFilledRect(void *, void *, s32, s32, s32, s32); /* extern */
+void CEngineApp__DrawFilledRect(void *, u8 *, s32, s32, s32, s32);
 
 /* Draws the camera's flash: a rectangle of m_FlashColor over its viewport. */
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CCamera__UpdateFlash receives CCamera__DrawFlash's own argument

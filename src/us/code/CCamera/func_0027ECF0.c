@@ -5,22 +5,10 @@
 #include "globals/game.h"
 #include "globals/render.h"
 #include "protos/list.h"
+#include "globals/camera.h"
 
-/* local types: this file cannot include globals/camera.h (gDefaultVisBits below) */
-extern f32 gSplitScreenMarginBottom; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */          /* split screen margins: bottom, */
-extern f32 gSplitScreenMarginTop; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */          /* top, */
-extern f32 gSplitScreenMarginLeft; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */          /* left (not yet a symbol of its own: gSplitScreenMarginTop + 4 in the asm) */
-extern f32 gSplitScreenMarginRight; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */          /* right */
-extern CCameraPool gEngineApp_m_Game_m_CameraPool; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* the camera pool */
-extern CBox gCameraViewBox; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* the view boxes of all the active cameras together */
-extern CBox gCameraVisibleBox; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* and their widened (animation) boxes */
-extern u32 gCameraVisBits; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* and their visibility bits */
-extern s32 gDefaultVisBits[];        /* local type: the u32 of globals/camera.h loads it before the box copies (GCC 2 alias order) */
-
-/* gCameraVisBits seen as a structure: the loop ORs into it through one. */
-typedef struct {
-    /* 0x0 */ u32 m_Bits;
-} CVisBits;
+/* gDefaultVisBits read through the same view: as a plain u32 GCC 2 loads it before the box copies (alias order). */
+#define DEFAULT_VIS_BITS (((CVisBits *) &gDefaultVisBits)->m_Bits)
 
 u32 CShakeAxis__Advance(CShakeAxis *axis);
 void CCamera__MoveViewport(CCamera *cam, f32 width, f32 height, f32 x, f32 y);
@@ -132,7 +120,7 @@ void CCameraPool__Advance(CCameraPool *pool) {
     *clip = *(CBox *) &pool->m_MainCamera.m_ViewMin;
     bounds = &gCameraVisibleBox;
     *bounds = *(CBox *) &pool->m_MainCamera.m_AnimMin;
-    gCameraVisBits = gDefaultVisBits[0];
+    gCameraVisBits = DEFAULT_VIS_BITS;
     CCamera__Advance(&pool->m_MainCamera);
     view = (CCamera *) pool->m_ActiveList.m_pHead;
     if (view != NULL) {

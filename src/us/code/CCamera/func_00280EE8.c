@@ -8,7 +8,7 @@ typedef struct {
 } Color32;
 
 
-void CEngineApp__DrawFilledRect(void *, Color32 *, s32, s32, s32, s32);
+void CEngineApp__DrawFilledRect(void *, u8 *, s32, s32, s32, s32);
 
 /* Fades out a red flash over the screen area and draws it while it lasts. */
 void CCamera__DrawHitFlash(CCamera *scr) {
@@ -24,7 +24,7 @@ void CCamera__DrawHitFlash(CCamera *scr) {
         color.g = 0;
         color.b = 0;
         color.a = scr->m_Flash;
-        CEngineApp__DrawFilledRect(&gEngineApp, &color, scr->m_Viewport.m_ScreenPosX, scr->m_Viewport.m_ScreenPosY,
+        CEngineApp__DrawFilledRect(&gEngineApp, (u8 *) &color, scr->m_Viewport.m_ScreenPosX, scr->m_Viewport.m_ScreenPosY,
                       scr->m_Viewport.m_ScreenPosX + scr->m_Viewport.m_Width, scr->m_Viewport.m_ScreenPosY + scr->m_Viewport.m_Height);
     }
 }

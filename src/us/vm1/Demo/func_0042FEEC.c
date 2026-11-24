@@ -5,7 +5,7 @@
 #ifdef TARGET_PORT
 #include "structs/camera.h"
 
-void CEmitterPool__Construct(char *);
+void CEmitterPool__Construct(struct CEmitterPool *);
 
 /* Host body: the pool and its cameras through CCameraPool/CCamera (the view below has the camera
  * table and count at their N64 offsets 4/8 and the 0xEC0 camera stride). */
@@ -13,9 +13,9 @@ void CCameraPool__ResetEmitterPools(CCameraPool *owner) {
     s32 i;
 
     for (i = 0; i < owner->m_nCameras; i++) {
-        CEmitterPool__Construct((char *)owner->m_Cameras[i].m_SkySystem);
+        CEmitterPool__Construct((struct CEmitterPool *)owner->m_Cameras[i].m_SkySystem);
     }
-    CEmitterPool__Construct((char *)owner->m_MainCamera.m_SkySystem);
+    CEmitterPool__Construct((struct CEmitterPool *)owner->m_MainCamera.m_SkySystem);
 }
 #else
 typedef struct Cameras {
@@ -24,15 +24,15 @@ typedef struct Cameras {
     /* 0x8 */ s32 count;
 } Cameras;
 
-void CEmitterPool__Construct(char *);
+void CEmitterPool__Construct(struct CEmitterPool *);
 
 /* Updates each camera's message block (at 0x558), then the owner's own at 0x598. */
 void CCameraPool__ResetEmitterPools(Cameras *owner) {
     sptr i;
 
     for (i = 0; i < owner->count; i++) {
-        CEmitterPool__Construct((char *)(i * 0xEC0 + owner->cameras + 0x558));
+        CEmitterPool__Construct((struct CEmitterPool *)(i * 0xEC0 + owner->cameras + 0x558));
     }
-    CEmitterPool__Construct((char *)owner + 0x598);
+    CEmitterPool__Construct((struct CEmitterPool *)((char *)owner + 0x598));
 }
 #endif

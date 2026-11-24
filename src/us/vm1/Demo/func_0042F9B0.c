@@ -4,24 +4,25 @@
 #include "globals/render.h"
 #include "protos/list.h"
 #include "structs/twin_demo.h"
+#include "globals/camera.h"
 
 #ifdef TARGET_PORT
 int T2Port_LegacyShake(void); /* port/game/t2debug.c: T2_LEGACY_SHAKE */
 #endif
 
-typedef struct IntPair {
-    s32 field_0;
-    s32 field_4;
-} IntPair;
+/* gCameraVisBits and gScreenClearTime after it, seen as one structure: the store below is addressed off
+ * gCameraVisBits (one %hi for both), as a word. */
+typedef struct {
+    /* 0x0 */ u32 m_VisBits;
+    /* 0x4 */ s32 m_ScreenClearTime;
+} CCameraVisPair;
 
-extern IntPair gCameraVisBits; /* local type: one load pair over gCameraVisBits and gScreenClearTime */
-
-void CCameraViewParams__Construct(void *);
+void CCameraViewParams__Construct(CCameraViewParams *);
 void CMtxF__Identity(void *);
 void CCamera__ResetWarp(CCamera *);
 void CCamera__SetMode(CCamera *, s32);
 void MenuPool_Construct(void *);
-void CEmitterPool__Construct(void *);
+void CEmitterPool__Construct(struct CEmitterPool *);
 void CCamera__ConstructSkySystem(CCamera *);
 
 void CCamera__Construct(CCamera *view) {
@@ -125,11 +126,11 @@ void CCamera__Construct(CCamera *view) {
         view->m_vp[i].vtrans[3] = 0;
     }
     MenuPool_Construct(view->m_MenuPool);
-    CEmitterPool__Construct(view->m_SkySystem);
+    CEmitterPool__Construct((struct CEmitterPool *) view->m_SkySystem);
     CMtxF__Identity(view->m_mfFaceScreen);
     CMtxF__Identity(view->m_mfFaceScreenYAxisUp);
     view->m_FlashMode = 0;
-    gCameraVisBits.field_4 = 0;
+    ((CCameraVisPair *) &gCameraVisBits)->m_ScreenClearTime = 0;
     CList__Construct(&view->m_ActiveTextList, T2_OFFSETOF(CCameraText, m_pLast), T2_OFFSETOF(CCameraText, m_pNext));
     CCamera__ConstructSkySystem(view);
 }
