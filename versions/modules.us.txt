@@ -209,9 +209,9 @@ module Render: 0x00207A70..0x0020C0CC, 30 functions; pad
   0x0020BFE8 Render_SortTreeFind
   0x0020C030 Render_SortTreeInsert
 
-module CMtxF: 0x0020C0D0..0x002150B8, 124 functions; pad
+module CMtxF: 0x0020C0D0..0x002141F0, 114 functions; pad
   // dir src/us/code/CMtxF
-  // name runs (possible objects the padding cannot show): CMtxF 8, CQuaternion 2, CVector3 4, CQuaternion 1, CVector3 1, Angle 1, CVector3 17, CMtxF 35, Angle 3, CQuaternion 6, Random 4, Math 6, Angle 2, Random 1, Timer 1, Edge 5, Color 1, LightVolume 1, Actors 3, Lighting 4, Model 1, Lighting 2, LightVolume 1, Math 1, Lighting 3, CStaticObject 7, Instance 1, CStaticObject 1, Model 1
+  // name runs (possible objects the padding cannot show): CMtxF 8, CQuaternion 2, CVector3 4, CQuaternion 1, CVector3 1, Angle 1, CVector3 17, CMtxF 35, Angle 3, CQuaternion 6, Random 4, Math 6, Angle 2, Random 1, Timer 1, Edge 5, Color 1, LightVolume 1, Actors 3, Lighting 4, Model 1, Lighting 2, LightVolume 1, Math 1, Lighting 3
   0x0020C0D0 CMtxF__TransformBox
   0x0020C208 CMtxF__InvertAffine
   0x0020C618 CMtxF__MultiplyAffine
@@ -326,6 +326,10 @@ module CMtxF: 0x0020C0D0..0x002150B8, 124 functions; pad
   0x00213FA0 Lighting_CollectVolumesForModel
   0x00214108 func_00214108
   0x00214188 func_00214188
+
+module CStaticObject: 0x002141F0..0x002150B8, 10 functions; rodata pad + rodata pad: at 0xA63C9 (stale words after Lit Vertices; where Lighting_ gives way to CStaticObject__)
+  // dir src/us/code/CStaticObject
+  // name runs (possible objects the padding cannot show): CStaticObject 7, Instance 1, CStaticObject 1, Model 1
   0x002141F0 CStaticObject__ConstructCompact
   0x00214564 CStaticObject__Construct
   0x00214844 CStaticObject__Draw

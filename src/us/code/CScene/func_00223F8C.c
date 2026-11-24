@@ -6,10 +6,18 @@
 #include "structs/intelligence.h"
 #include "structs/world.h"
 #include "structs/game_object.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__DrawRegisteredInstances(struct CScene *, sptr);
 void Render_ResetBatches();
 void Render_FlushBatches(void);
-void CGameObjectInstance__Draw(CGameObjectInstance *e, sptr a);
+void CGameObjectInstance__Draw(void *actor, void *camera);
 void CScene__DrawRegisteredInstances(CScene *lv, sptr arg) {
     Gfx *g;
     s32 i;

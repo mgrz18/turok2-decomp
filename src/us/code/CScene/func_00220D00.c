@@ -7,7 +7,16 @@
 #include "structs/level_actor.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__ComputeLights(void *, s32, f32 *, u8 *);
+void CScene__DecompressGridSection(struct CScene *, s32 ***);
 
 /* Instantiates a level's actor data: from the level file's four tables
  * (two kinds of placed objects, the level actors, and a fourth kind of
@@ -36,12 +45,12 @@ typedef struct { u8 pad0[0x48]; } SrcD;                                /* 0x48 *
 typedef struct { u8 pad0[GRID_STATIC_SIZE]; } ItemA;                    /* 0x90 */
 typedef struct { u8 pad0[0xC0]; } ItemD;                               /* 0xC0 */
 
-s32 ProPackDecompress(s32 ***, s32);
+s32 ProPackDecompress(void *handle, s32 arg1);
 void CStaticObject__ConstructCompact(ItemA *, SrcA *, s32, void *, f32);
 void CStaticObject__Construct(ItemA *, SrcB *, s32, void *);
 void CLevelActor__Construct(CLevelActor *, SrcC *, s32, void *);
 void LightVolume_Construct(ItemD *, SrcD *);
-f32 GameObject_GetCollisionHeight(CLevelActor *);
+f32 GameObject_GetCollisionHeight(void *actor);
 
 void CScene__DecompressGridSection(CScene *world, s32 ***file) {
     StrideTable *tE;

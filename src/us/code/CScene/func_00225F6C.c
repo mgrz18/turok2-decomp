@@ -16,7 +16,7 @@ struct Sub18 {
 };
 struct RecordRecAtE4;
 struct Sub18;
-/* Turok 2 LevelActor: def 0x14, type id 0xB8, size 0x288
+/* Turok 2 LevelActor_00225F6C: def 0x14, type id 0xB8, size 0x288
  * (Rage Wars 0x18 / 0xE4 / 0x2E8). */
 struct RecordRecAtE4 {
     char pad0[0x14];

@@ -13,7 +13,7 @@
 
 #define T2_AI(e) ((u8 *) &(e)->m_AI) /* the AI by member (N64 0x140) */
 f32 GameObject_GetCollisionYOffset(CGameObjectInstance *e);
-f32 GameObject_GetCollisionHeight(CGameObjectInstance *e);
+f32 GameObject_GetCollisionHeight(void *actor);
 s32 Action_CheckRequiredItem(CGameObjectInstance *e, u8 *p, CGameObjectInstance *me);
 void CScene__CheckAutoActivation(CScene *lv, CGameObjectInstance *me, CVector3 *p0, CVector3 *p1) {
     s32 isB;

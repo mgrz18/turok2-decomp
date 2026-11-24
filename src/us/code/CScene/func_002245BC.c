@@ -6,7 +6,15 @@
 #include "structs/player.h"
 #include "structs/world.h"
 #include "protos/iset.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__SetInstanceSavedBitInLevel(void *, s32, s32, s32);
 
 /* Turok 2 level actor: 0x288 bytes (0x2E8 in Rage Wars). */
 

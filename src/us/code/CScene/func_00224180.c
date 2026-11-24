@@ -3,7 +3,15 @@
 
 #include "common.h"
 #include "structs/world.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+s32 CScene__FindObjectType(struct CScene *, s32);
 
 s32 CScene__FindObjectType(CScene *lv, s32 id) {
     IdTable *t = lv->m_pObjectTypes;

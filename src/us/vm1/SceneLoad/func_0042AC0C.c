@@ -3,6 +3,14 @@
  * CPlayerPool__GetFirstActive result and the actor array keeps the last loop's load in $v0, `actor += 0x288` gives the player
  * loop its register order, and the sound switch with one shared call keeps w in $s3. */
 #include "common.h"
+#include "protos/cache.h"
+/* The request CCache__LoadPersistantSubBlock leaves in v0 (protos/cache.h declares the N64 definition
+ * void): the N64 symbol by another C name, returning it; the port's definition returns it. */
+#ifdef TARGET_PORT
+#define CCache__LoadPersistantSubBlock_v(...) ((void **) CCache__LoadPersistantSubBlock(__VA_ARGS__))
+#else
+void **CCache__LoadPersistantSubBlock_v() __asm__("CCache__LoadPersistantSubBlock");
+#endif
 #include "globals/swoosh.h"
 #include "structs/world.h"
 #include "structs/game.h"
@@ -13,7 +21,24 @@
 #include "globals/sysrc.h"
 #include "globals/audio.h"
 #include "protos/iset.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__ClearListCounts(void *);
+void CScene__DecompressAnimatedInstances(struct CScene *, void *);
+void CScene__DecompressCollision(void *, void *);
+void CScene__DecompressLinks(void *, void ***);
+void CScene__DecompressPaths(void *, s32 ***);
+void CScene__GetLevelName(struct CScene *, s32, void *, s32);
+void CScene__LoadLevel(struct CScene *, s32, s32);
+void CScene__LoadLightSettings(void *);
+void CScene__ReleaseSectors(void *);
+void CScene__StreamAllSections(struct CScene *);
 #include "protos/player.h"
 #include "protos/game.h"
 #ifdef TARGET_PORT
@@ -25,18 +50,12 @@
  * level's data blocks and spawns its actors. */
 
 
-extern s32 ProPack__Decompress(s32, sptr);
+s32 ProPack__Decompress(s32 unused, void **res);
 extern void CCollisionInfo__Reset(void);
 extern void CDecompressor__Flush(CDecompressor *thisx);
-extern void **CCache__Allocate(s32 unused, s32 size, s32 mode, char *name);
-extern void CCache__Deallocate(sptr unused, void **block);
-extern void CCache__Flush(s32);
-extern void **CCache__LoadPersistantIndex(s32 unused, void **out, sptr key, char *name);
-extern void **CCache__LoadPersistantSubBlock(s32 unused, void *file, s32 index, s32 key, CScene *owner, void *callback, char *name);
-extern void CCache__SetFrameDelay(s32);
-extern void CGameObjectInstance__UpdateAnimation(u8 *actor);
+void CGameObjectInstance__UpdateAnimation(void *actor);
 extern void CGameObjectInstance__InitAIType(u8 *actor);
-extern void CGameObjectInstance__UpdateAI(u8 *actor);
+void CGameObjectInstance__UpdateAI(void *actor);
 extern void Sound__StopFlags(s32);
 extern void Sound__DetachAll(void);
 extern void LoopSounds_Construct(void *, void *, s32);
@@ -55,7 +74,7 @@ extern void CDLightSet__Construct(void *);
 /* the particle data is a pointer: m_pParticleEffects is the cache handle (read pointer-wide) */
 extern void CParticleSystem__Construct(CParticleSystem *, sptr);
 extern void SwooshSystem_Construct(void *);
-extern void CPlayerPool__LevelStart(void *);
+void CPlayerPool__LevelStart(void *pool);
 extern void CPlayer__StopLoopingSounds(void *);
 extern void COnScreen__ResetBossBars(void *);
 extern void CCameraPool__ResetEmitterPools(void *);
@@ -107,7 +126,7 @@ loaded:
     CScene__ReleaseSectors(w);
     w->m_Mode = 0;
     CDecompressor__Flush(&gDecompressor);
-    CCache__Flush(0);
+    ((void (*)(s32)) CCache__Flush)(0); /* the definition takes none */
     if (w->m_nLevel != -1) {
         ptr = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
         if (ptr != NULL) {
@@ -127,7 +146,7 @@ loaded:
         CCache__Deallocate(0, w->m_hSections);
         CCache__Deallocate(0, w->m_hHeap);
     }
-    CCache__Flush(0);
+    ((void (*)(s32)) CCache__Flush)(0); /* the definition takes none */
     gFrameCountGameplay = 0;
     CCache__SetFrameDelay(8);
     CScene__ClearListCounts(w);
@@ -194,22 +213,22 @@ loaded:
     MatrixHeap_Construct(w->m_Heap, *block, size);
     key = CISet__GetROMAddress(w->m_pLevels, w->m_LevelsKey, level);
     w->m_hLevelIndex = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelFile, key, "level index");
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 1, key, w, CScene__DecompressCollision, "collision");
+    block = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 1, key, w, CScene__DecompressCollision, "collision");
     w->m_hRegionData = block;
     w->m_pRegionData = *block;
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 4, key, w, ProPack__Decompress, "grid bounds");
+    block = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 4, key, w, ProPack__Decompress, "grid bounds");
     w->m_hCollision = block;
     w->m_pCollision = *block;
     w->m_LevelInfoKey = CISet__GetROMAddress(w->m_pLevelFile, key, 5);
     w->m_hLevelInfo = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelInfo, w->m_LevelInfoKey, "grid sections index");
-    w->m_hLinks = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 7, key, w, CScene__DecompressLinks, "links");
-    w->m_hPaths = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 2, key, w, CScene__DecompressPaths, "level paths");
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 0, key, w, NULL, "level info");
+    w->m_hLinks = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 7, key, w, CScene__DecompressLinks, "links");
+    w->m_hPaths = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 2, key, w, CScene__DecompressPaths, "level paths");
+    block = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 0, key, w, NULL, "level info");
     w->m_hLevelHeader = block;
     w->m_pLevelHeader = *block;
     CScene__LoadLightSettings(w);
     gFogEnabled = (w->m_pLevelHeader->m_Flags >> 2) & 1;
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 6, key, w, ProPack__Decompress, "sky layers");
+    block = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 6, key, w, ProPack__Decompress, "sky layers");
     w->m_hSections = block;
     data = *block;
     w->m_pSections = data + 8;
@@ -217,7 +236,7 @@ loaded:
     w->m_Mode = 1;
     w->m_pActors = NULL;
     w->m_nActors = 0;
-    w->m_hActors = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 3, key, w, CScene__DecompressAnimatedInstances, "animated instances");
+    w->m_hActors = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 3, key, w, CScene__DecompressAnimatedInstances, "animated instances");
     w->m_Mode = 2;
     CScene__RestoreFiredEvents(w);
     count = w->m_nActors;
@@ -294,7 +313,7 @@ loaded:
     CScene__ReleaseSectors(w);
     w->m_Mode = 0;
     CDecompressor__Flush(&gDecompressor);
-    CCache__Flush(0);
+    ((void (*)(s32)) CCache__Flush)(0); /* the definition takes none */
     if (w->m_nLevel != -1) {
         ptr = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
         if (ptr != NULL) {
@@ -314,7 +333,7 @@ loaded:
         CCache__Deallocate(0, w->m_hSections);
         CCache__Deallocate(0, w->m_hHeap);
     }
-    CCache__Flush(0);
+    ((void (*)(s32)) CCache__Flush)(0); /* the definition takes none */
     gFrameCountGameplay = 0;
     CCache__SetFrameDelay(8);
     CScene__ClearListCounts(w);
@@ -379,22 +398,22 @@ loaded:
     MatrixHeap_Construct(w->m_Heap, *block, size);
     key = CISet__GetROMAddress(w->m_pLevels, w->m_LevelsKey, level);
     w->m_hLevelIndex = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelFile, key, "level index");
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 1, key, w, CScene__DecompressCollision, "collision");
+    block = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 1, key, w, CScene__DecompressCollision, "collision");
     w->m_hRegionData = block;
     w->m_pRegionData = *block;
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 4, key, w, ProPack__Decompress, "grid bounds");
+    block = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 4, key, w, ProPack__Decompress, "grid bounds");
     w->m_hCollision = block;
     w->m_pCollision = *block;
     w->m_LevelInfoKey = CISet__GetROMAddress(w->m_pLevelFile, key, 5);
     w->m_hLevelInfo = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelInfo, w->m_LevelInfoKey, "grid sections index");
-    w->m_hLinks = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 7, key, w, CScene__DecompressLinks, "links");
-    w->m_hPaths = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 2, key, w, CScene__DecompressPaths, "level paths");
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 0, key, w, NULL, "level info");
+    w->m_hLinks = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 7, key, w, CScene__DecompressLinks, "links");
+    w->m_hPaths = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 2, key, w, CScene__DecompressPaths, "level paths");
+    block = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 0, key, w, NULL, "level info");
     w->m_hLevelHeader = block;
     w->m_pLevelHeader = *block;
     CScene__LoadLightSettings(w);
     gFogEnabled = (w->m_pLevelHeader->m_Flags >> 2) & 1;
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 6, key, w, ProPack__Decompress, "sky layers");
+    block = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 6, key, w, ProPack__Decompress, "sky layers");
     w->m_hSections = block;
     data = *block;
     w->m_pSections = data + 8;
@@ -402,7 +421,7 @@ loaded:
     w->m_Mode = 1;
     w->m_pActors = NULL;
     w->m_nActors = 0;
-    w->m_hActors = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 3, key, w, CScene__DecompressAnimatedInstances, "animated instances");
+    w->m_hActors = CCache__LoadPersistantSubBlock_v(0, w->m_pLevelFile, 3, key, w, CScene__DecompressAnimatedInstances, "animated instances");
     w->m_Mode = 2;
     CScene__RestoreFiredEvents(w);
     count = w->m_nActors;

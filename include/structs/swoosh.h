@@ -117,6 +117,18 @@ typedef struct Swoosh {
     /* 0x50 */ s32 unk50;
 } Swoosh; /* size 0x54 */
 
+/* A swoosh point's frame (Trail_ComputeNodeFrame, Trail_ComputeFrames): its three axes and its
+ * position, the rows of a CMtxF. */
+typedef struct SwooshFrameRow {
+    f32 x, y, z, w;
+} SwooshFrameRow;
+typedef struct SwooshFrame {
+    SwooshFrameRow a;
+    SwooshFrameRow b;
+    SwooshFrameRow c;
+    SwooshFrameRow d;
+} SwooshFrame; /* size 0x40 */
+
 /* A repeating timer (SwooshSystem_AddTimer, SwooshSystem_UpdateTimers). */
 typedef struct SwooshTimer {
     /* 0x00 */ struct SwooshTimer *prev;

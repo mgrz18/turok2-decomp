@@ -7,12 +7,12 @@
 #include "protos/iset.h"
 #include "structs/world.h"
 
-struct IntPair;
-struct IntPair {
+struct IntPair_0042B3E4;
+struct IntPair_0042B3E4 {
     int field_0;
     int field_4;
 };
-struct IntPair;
+struct IntPair_0042B3E4;
 struct Bucket;
 typedef struct Bucket Bucket;
 struct Bucket;
@@ -77,7 +77,7 @@ struct WorldRecAt1B40C {
 #endif
 struct WorldRecAt1B40C;
 typedef struct WorldRecAt1B40C WorldRecAt1B40C;
-extern s32 ProPackDecompress(void ***handle, s32 arg1);
+s32 ProPackDecompress(void *handle, s32 arg1);
 static __inline__ s32 groupHas(WorldRecAt1B40C *world, s32 n) {
     s32 index;
     void *g;
@@ -93,10 +93,10 @@ static __inline__ s32 groupHas(WorldRecAt1B40C *world, s32 n) {
 }
 void CScene__DecompressLinks(WorldRecAt1B40C *world, void ***handle) {
     void *node;
-    struct IntPair *l0;
-    struct IntPair *l1;
-    struct IntPair *l2;
-    struct IntPair *l3;
+    struct IntPair_0042B3E4 *l0;
+    struct IntPair_0042B3E4 *l1;
+    struct IntPair_0042B3E4 *l2;
+    struct IntPair_0042B3E4 *l3;
     s32 k;
     s32 i;
     s32 n;

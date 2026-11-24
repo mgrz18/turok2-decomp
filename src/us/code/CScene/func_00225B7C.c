@@ -6,8 +6,16 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
-#include "protos/scene.h"
-struct LevelActor;
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__DamageAllEnemies(struct CScene *, s32, s32);
+struct LevelActor_00225B7C;
 struct Box;
 typedef struct Box Box;
 struct Box;
@@ -24,7 +32,7 @@ struct CQuatern_t {
     float z;
     float w;
 };
-struct LevelActor;
+struct LevelActor_00225B7C;
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
 struct Shared_ParticleLighting {
     u8 ambient[3], reserved3;
@@ -41,8 +49,8 @@ struct Shield {
 };
 struct Shield;
 typedef struct Shield Shield;
-typedef struct LevelActor LevelActor;
-struct LevelActor {
+typedef struct LevelActor_00225B7C LevelActor_00225B7C;
+struct LevelActor_00225B7C {
     u8 kind;
     s8 team;
     char pad2;
@@ -128,14 +136,14 @@ struct LevelActor {
     s32 renderFlags;
     s32 flags2E4;
 };
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
+struct LevelActor_00225B7C;
+struct LevelActor_00225B7C;
+struct LevelActor_00225B7C;
+struct LevelActor_00225B7C;
+struct LevelActor_00225B7C;
+struct LevelActor_00225B7C;
+struct LevelActor_00225B7C;
+struct LevelActor_00225B7C;
 typedef struct Shared_ReactionActor Shared_ReactionActor;
 typedef struct Shared_ReactionPlayer Shared_ReactionPlayer;
 typedef struct Shared_ReactionObjectKind Shared_ReactionObjectKind;
@@ -260,16 +268,16 @@ struct Shared_ReactionPlayerRecord {
     s32 unk324;
     Shared_ReactionPlayer *unk328;
 };
-extern void DamageEvent_Set(Shared_DamageEvent *event, sptr arg1, s32 damage, f32 radius, s32 flags, sptr arg5);
-extern void CAI__CallHurt(LevelActor *actor, s32 *behavior, Shared_DamageEvent *event);
+void DamageEvent_Set(void *event, sptr source, s32 damage, f32 radius, s32 flags, sptr frame);
+void CAI__CallHurt(void *obj, void *ai, void *event);
 void CScene__DamageAllEnemies(CScene *world, s32 damage, s32 flags) {
     Shared_DamageEvent event;
-    LevelActor **actors;
+    LevelActor_00225B7C **actors;
     s32 count;
     s32 i;
     DamageEvent_Set(&event, 0, damage, 102.399994f, flags, 0);
     count = world->m_nKind1;
-    actors = (LevelActor **)world->m_pKind1;
+    actors = (LevelActor_00225B7C **)world->m_pKind1;
     for (i = 0; i < count; i++) {
         CAI__CallHurt(actors[i], &actors[i]->behaviorFlags, &event);
     }

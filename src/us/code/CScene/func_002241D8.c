@@ -4,7 +4,16 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game_object.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+s32 CScene__FindObjectType(struct CScene *, s32);
+void CScene__SetInstanceObjectType(struct CScene *, struct CGameObjectInstance *, s32, sptr);
 
 extern void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, sptr);
 

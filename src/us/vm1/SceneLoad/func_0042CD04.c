@@ -11,8 +11,8 @@ typedef struct Entry {
 } Entry;
 
 
-extern s32 ProPackDecompress(s32 ***handle, s32);
-extern void Angle_Wrap(void *);
+s32 ProPackDecompress(void *handle, s32 arg1);
+void Angle_Wrap(f32 *value);
 
 /* Resolves the references of every item of every group of the loaded resource and keeps it in the
  * level (CScene.unk_68; the references point into block 2 of m_pRegionData). Typed on CScene: the

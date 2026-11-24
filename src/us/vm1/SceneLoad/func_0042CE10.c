@@ -5,7 +5,7 @@
 #include "protos/cache.h"
 #include "structs/world.h"
 
-extern void Model_DecompressCallback(void);
+void Model_DecompressCallback(sptr arg0, sptr arg1);
 
 extern s32 CScene__FindObjectType(void *level, s32 key);
 extern s32 CScene__GetObject(void *level, s32 id);

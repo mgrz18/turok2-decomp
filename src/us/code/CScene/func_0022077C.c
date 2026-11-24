@@ -58,9 +58,9 @@ s32 SortRecord_Compare();
 s32 SortRecord_Swap();
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
-void CStaticObject__Draw(Drawable *item, void *cam);
-void CGameObjectInstance__Draw(Drawable *item, void *cam);
-void CLevelActor__Draw(Drawable *item);
+void CStaticObject__Draw(void *object, void *camera);
+void CGameObjectInstance__Draw(void *actor, void *camera);
+void CLevelActor__Draw(void *actor);
 
 /* Sorts the list by distance from the camera, then draws it. */
 void CScene__DrawSortedList(DrawList *list, void *cam) {

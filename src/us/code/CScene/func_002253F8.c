@@ -7,7 +7,7 @@
 #include "structs/world.h"
 #include "structs/event.h"
 
-s32 LevelEvent_Fire(sptr);
+void LevelEvent_Fire(void *event);
 void CScene__UpdateDelayedEvents(CScene *scene) {
     CDelayedEvent *d = scene->m_DelayedEvents.m_pHead;
     CDelayedEvent *next;
@@ -32,7 +32,7 @@ void CScene__UpdateDelayedEvents(CScene *scene) {
     }
 }
 #else
-s32 LevelEvent_Fire(s32);
+void LevelEvent_Fire(void *event);
 
 
 /* A timed list entry: counts down and is freed at zero. */

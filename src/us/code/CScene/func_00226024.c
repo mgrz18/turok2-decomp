@@ -9,7 +9,15 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__DrawWarpFade(struct CScene *);
 void CEngineApp__DrawFilledRect(u8 *a, u8 *col, s32 c, s32 d, s32 e, s32 f);
 void CScene__DrawWarpFade(CScene *lv) {
     u8 col[4];

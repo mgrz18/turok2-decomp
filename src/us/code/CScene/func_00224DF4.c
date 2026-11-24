@@ -12,8 +12,8 @@ typedef CScene Owner;
 #define unk48 m_pGraphicSets
 #define table_of(o) ((StrideTable *)(o)->m_pGraphicSetTypes)
 
-extern s32 BinarySearch(void *entries, s32 count, sptr id);
-extern u8 ProPack__Decompress[];
+s32 BinarySearch(void *array, u32 count, u32 key);
+s32 ProPack__Decompress(s32 unused, void **res);
 
 sptr CScene__LoadGraphicSet(Owner *owner, s32 id, s32 flags, s32 arg3) {
     s32 index;

@@ -29,10 +29,10 @@ CPlayer *CCamera__GetPlayer(CCamera *);
 s32 CPlayer__GetPickupCountLow(CPlayer *, s32);
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
-s32 Frustum_TestBox(void *, CBox *);
-void CStaticObject__RequestLitVertices(CStaticObject *, CCamera *);
-void CStaticObject__Draw(CStaticObject *, CCamera *);
-void CLevelActor__Draw(CLevelActor *);
+s32 Frustum_TestBox(void *frustum, void *box);
+void CStaticObject__RequestLitVertices(void *object, void *camera);
+void CStaticObject__Draw(void *object, void *camera);
+void CLevelActor__Draw(void *actor);
 
 void CScene__DrawGeometry(CScene *w, CCamera *v_) {
     register CCamera *v asm("$18") = v_;
