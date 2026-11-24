@@ -174,7 +174,7 @@ its functions are replaced, they are under `#ifndef TARGET_PORT` in the merged f
 reports a missed one (a duplicate definition), because the merged object is pulled in for
 its other functions.
 
-**Left: 75 directories** (`python3 tools/merge_check.py`, `COMPILE 30 REFUSED 45`):
+**Left: 75 directories** (`python3 tools/merge_check.py`, `COMPILE 30 REFUSED 45`) (round 25: part n2 merged 5 of them and found the real cause of the `.rodata`, flags and name-clash rows: next section):
 
 | Blocker | Directories | What it takes |
 |---|---:|---|
@@ -263,9 +263,9 @@ These are the families part n1 works on in vm1 (`CList`/`CISet`/`CCache`, the fi
 | `code/libultra/audio/save` | 2 | **merged** (round 24, first batch) |
 | `code/libultra/audio/seq` | 12 | **merged** (round 24, first batch) |
 | `code/libultra/audio/sndplayer` | 5 | **merged** (round 24, first batch) |
-| `code/libultra/audio/synthesizer` | 9 | .rodata not in .text order (1 inverted pairs of 3 subsegments) |
-| `code/libultra/gu/lookat` | 2 | the files do not share their cc1 flags |
-| `code/libultra/gu/perspective` | 2 | the files do not share their cc1 flags |
+| `code/libultra/audio/synthesizer` | 9 | **merged** (round 25, n2: flags proven, three functions `DEFERRED`; was: .rodata not in .text order) |
+| `code/libultra/gu/lookat` | 2 | **merged** (round 25, n2: `-fforce-addr` proven; was: cc1 flags differ) |
+| `code/libultra/gu/perspective` | 2 | **merged** (round 25, n2: `-fforce-addr` proven; was: cc1 flags differ) |
 | `code/libultra/io/controller` | 3 | declarations differ (2: `__osContBuffer`, `__osContNumControllers`) |
 | `code/libultra/io/piacs` | 3 | **merged** (round 24, first batch) |
 | `code/libultra/io/siacs` | 3 | **merged** (round 24, first batch) |
@@ -273,30 +273,30 @@ These are the families part n1 works on in vm1 (`CList`/`CISet`/`CCache`, the fi
 | `code/libultra/io/vimgr` | 2 | **merged** (round 24, first batch) |
 | `code/libultra/libc/xprintf` | 2 | **merged** (round 24, first batch) |
 | `code/libultra/os/timerintr` | 4 | **merged** (round 24, first batch) |
-| `code/AI` | 48 | .rodata interrupted by data no C file owns (1: `unnamed@0xA7478`) |
+| `code/AI` | 48 | .rodata interrupted by data no C file owns (1: `unnamed@0xA7478`); round 25 (n2): linker padding before `func_00241E30` or `func_002427E0`: two objects; also declarations differ |
 | `code/Action` | 17 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `Action_Draw`)) |
-| `code/Anim` | 49 | .rodata interrupted by data no C file owns (1: `unnamed@0xA64F4`) |
+| `code/Anim` | 49 | .rodata interrupted by data no C file owns (1: `unnamed@0xA64F4`); round 25 (n2): `D_800A58F4` (a float the C reads as an extern); also declarations differ |
 | `code/BinaryRange` | 13 | **merged** (round 24, first batch) |
 | `code/Boot` | 4 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `gSavedPlayers`)) |
-| `code/CAudioWorld` | 101 | .rodata interrupted by data no C file owns (3: `unnamed@0xA8C94`) |
+| `code/CAudioWorld` | 101 | .rodata interrupted by data no C file owns (3: `unnamed@0xA8C94`); round 25 (n2): linker padding three times: four objects; also declarations differ |
 | `code/CCache` | 56 | calls typed differently (2: `CCache__AllocateInternal`, `CCache__WaitForDisplayLists`); declarations differ (18: `CCache__DeallocateInternal`, `CCache__DetachCacheEntry`, `CCache__FreeCacheEntry`, `CCache__FreeMemEntry`, ...); local types differ (3: `B12Bucket`, `B12Mgr`, `B12Node`); other (1: `request for member `m_pHead' in something not a structure or`) |
-| `code/CCamera` | 66 | .rodata interleaved with another directory's (2 subsegments between, e.g. `func_0042F9B0`) |
+| `code/CCamera` | 66 | .rodata interleaved with another directory's (2 subsegments between, e.g. `func_0042F9B0`); round 25 (n2): interleaved with `vm1/Demo`: one object over the engine and the VM; also declarations differ |
 | `code/CCollisionSetup` | 3 | **merged** (round 24, first batch) |
 | `code/CEmitter` | 10 | declarations differ (4: `CList__AddHead`, `CList__Remove`, `Emitter_CompareHeightAsc`, `Sortable`) |
-| `code/CEngineApp` | 90 | .rodata interrupted by data no C file owns (1: `unnamed@0xAA9FC`) |
-| `code/CGameObjectInstance` | 64 | .rodata interrupted by data no C file owns (2: `unnamed@0xA66C4`) |
+| `code/CEngineApp` | 90 | .rodata interrupted by data no C file owns (1: `unnamed@0xAA9FC`); round 25 (n2): `60.0f` no file owns (not padding); also `--name` |
+| `code/CGameObjectInstance` | 64 | .rodata interrupted by data no C file owns (2: `unnamed@0xA66C4`); round 25 (n2): `sCGameObjectInstanceCacheDesc_AnimObjectInfo` and a `1.0f` read as externs; also declarations differ |
 | `code/CGameRegion` | 53 | calls typed differently (1: `incompatible types in initialization`); declarations differ (24: `CGameRegion__FloodClearFlag4`, `CGameRegion__FloodSetFlag4`, `CGameRegion__FloodSetHeight`, `CGameRegion__GetCeilingHeight`, ...); local types differ (2: `CollisionBuildVertex`, `Node75`); parse errors (6: `&`, `.`, `if`, `return`, ...); other (4: `initializer element is not constant`, `request for member `x' in something not a structure or union`, `request for member `y' in something not a structure or union`, `request for member `z' in something not a structure or union`) |
 | `code/CISet` | 14 | declarations differ (3: `CUSet__GetTotalSize`, `CUSet__Transpose`, `osCreateMesgQueue`); local types differ (2: `CMutex`, `OffsetTable`) |
-| `code/CInstancePool` | 18 | .rodata interrupted by data no C file owns (1: `unnamed@0xA6C6C`) |
-| `code/CLevelActor` | 9 | .rodata not in .text order (2 inverted pairs of 5 subsegments) |
-| `code/CMtxF` | 124 | .rodata interrupted by data no C file owns (3: `unnamed@0xA6004`) |
-| `code/CParticle` | 212 | .rodata interrupted by data no C file owns (8: `unnamed@0xA7004`) |
-| `code/CPlayer` | 245 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042DA60`) |
-| `code/CScene` | 96 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042AA80`) |
+| `code/CInstancePool` | 18 | .rodata interrupted by data no C file owns (1: `unnamed@0xA6C6C`); round 25 (n2): `sCInstancePoolCacheDesc_*` strings read as externs; also declarations differ |
+| `code/CLevelActor` | 9 | .rodata not in .text order (2 inverted pairs of 5 subsegments); round 25 (n2): deferred `func_00215944` (`--inline`); also declarations differ |
+| `code/CMtxF` | 124 | .rodata interrupted by data no C file owns (3: `unnamed@0xA6004`); round 25 (n2): `sCStaticObjectCacheDesc_*` strings and `0, 1.0, 0` read as externs; also declarations differ |
+| `code/CParticle` | 212 | .rodata interrupted by data no C file owns (8: `unnamed@0xA7004`); round 25 (n2): linker padding six times; `D_800A652C` and a float table read as externs; also declarations differ |
+| `code/CPlayer` | 245 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042DA60`); round 25 (n2): interleaved with `vm1/CPlayer`: one object over the engine and the VM; also declarations differ |
+| `code/CScene` | 96 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042AA80`); round 25 (n2): interleaved with `vm1/SceneLoad`: one object over the engine and the VM; also declarations differ |
 | `code/Cinema` | 34 | declarations differ (5: `Sound__StopAllExcept`, `gScene`, `gScene_m_LevelID`, `gScene_m_WarpSpawn`, ...) |
 | `code/Color` | 3 | **merged** (round 24, first batch) |
 | `code/Controller` | 37 | declarations differ (3: `Controller_IsPakWatched`, `RumblePool_Init`, `osMotorStop`) |
-| `code/Crash` | 16 | .rodata interrupted by data no C file owns (1: `unnamed@0xAACEC`) |
+| `code/Crash` | 16 | .rodata interrupted by data no C file owns (1: `unnamed@0xAACEC`); round 25 (n2): its object's `.rodata` starts with the strings of its `.data` register tables: those tables in C first; also declarations differ |
 | `code/DLights` | 6 | **merged** (round 24, after unifying its declarations; was: local types differ (1: `ListNode`)) |
 | `code/Demo` | 3 | **merged** (round 24, first batch) |
 | `code/Destructible` | 15 | declarations differ (3: `AI_DropPickupsOnce`, `Actor_SpawnParticle`, `Sound__Play`) |
@@ -308,10 +308,10 @@ These are the families part n1 works on in vm1 (`CList`/`CISet`/`CCache`, the fi
 | `code/GameObject` | 62 | own basic typedefs (3: `s32`, `u32`, `u8`); calls typed differently (2: `GameObject_GetGroundHeight`, `GameObject_TraceMove`); declarations differ (5: `CGameRegion__GetHeight`, `CScene__GetObjectTypeID`, `CVector3__Normalize`, `GameObject_GetFrameDelta`, ...); local types differ (2: `CGameRegion`, `Triple`); parse errors (1: `}`); other (1: `structure has no member named `m_pVertices'`) |
 | `code/GameObjectMove` | 6 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `Collision_MoveInstance`)) |
 | `code/Generator` | 16 | declarations differ (5: `Actor_SpawnParticle`, `CInstancePool__Spawn`, `CLevelActorPool__Spawn`, `CScene__GetIntelligence`, ...); local types differ (1: `B01Info`) |
-| `code/HostIo` | 34 | the files do not share their cc1 flags |
+| `code/HostIo` | 34 | **merged** (round 25, n2: `-msplit-addresses` proven for all 34; was: cc1 flags differ) |
 | `code/Hud` | 48 | declarations differ (5: `Draw`, `ModeState`, `gEngineApp_m_OnScreen_m_FontXScale`, `gEngineApp_m_OnScreen_m_ShadowXOff`, ...); local types differ (2: `Chunk`, `FontStyle`); parse errors (12: `(Each undeclared identifier is reported `, `*`, `FrameEntry`, `byte`, ...); other (1: `for each function it appears in.)`) |
 | `code/InteractiveAnim` | 15 | **merged** (round 24, after unifying its declarations; was: declarations differ (3: `AI_PlayAnim`, `CGameObjectInstance__AdvanceAnimation`, `CGameObjectInstance__SetAnimByAction`)) |
-| `code/LevelEvent` | 31 | .rodata interrupted by data no C file owns (1: `unnamed@0xA8C3C`) |
+| `code/LevelEvent` | 31 | .rodata interrupted by data no C file owns (1: `unnamed@0xA8C3C`); round 25 (n2): linker padding before `func_0026DFB0`: two objects; also declarations differ |
 | `code/LoopSounds` | 10 | **merged** (round 24, after unifying its declarations; was: declarations differ (3: `CList__AddTail`, `CList__Remove`, `Sound__Stop`)) |
 | `code/Platform` | 27 | **merged** (round 24, after unifying its declarations; was: declarations differ (2: `Platform_Step`, `StateInfo`)) |
 | `code/Render` | 28 | calls typed differently (1: `Model_BlendMorphFrames`); declarations differ (2: `CCache__LockForDisplayList`, `CCache__Unlock`); local types differ (2: `Material`, `Vtx`) |
@@ -327,32 +327,32 @@ These are the families part n1 works on in vm1 (`CList`/`CISet`/`CCache`, the fi
 | `code/Texture` | 8 | declarations differ (3: `CISet__GetBlock`, `CISet__GetBlockAndSize`, `Pair`) |
 | `code/Throwable` | 13 | declarations differ (3: `CAI__CallHurt`, `OwnedState`, `gThrowableCollisionInfo_m_InstanceBehavior`) |
 | `code/Turret` | 15 | **merged** (round 24, after unifying its declarations; was: calls typed differently (1: `Turret_EventShow`); declarations differ (1: `Turret_Effects`)) |
-| `code/VM` | 20 | .rodata not in .text order (1 inverted pairs of 2 subsegments) |
+| `code/VM` | 20 | .rodata not in .text order (1 inverted pairs of 2 subsegments); round 25 (n2): deferred from `func_0028E068` on (`--inline`); also declarations differ |
 | `code/WeaponMode` | 49 | declarations differ (13: `Anim`, `Bone`, `CAI__SetMode`, `CCameraPool__AddText`, ...) |
 | `code/__scHandleRSP` | 17 | declarations differ (2: `Sched`, `__scHandleRetrace`); local types differ (1: `Stream`); parse errors (7: `(Each undeclared identifier is reported `, `*`, `Qn`, `Stream`, ...); other (1: `for each function it appears in.)`) |
-| `code/adecHuffDecode` | 18 | the files do not share their cc1 flags |
+| `code/adecHuffDecode` | 18 | the files do not share their cc1 flags; round 25 (n2): `func_002A0044` compiles differently under `-fforce-addr`: re-match it |
 | `code/alAdpcmPull` | 5 | **merged** (round 24, first batch) |
 | `vm1/BlindOne` | 70 | declarations differ (26: `AI_UpdateTargets`, `Animator_Update`, `CCache__Allocate`, `CCache__AllocateMemoryForDecompression`, ...); parse errors (1: `DrawInfo`) |
 | `vm1/CEngineApp` | 4 | **merged** (round 24, first batch) |
 | `vm1/COnScreen` | 3 | **merged** (round 24, first batch) |
-| `vm1/CPlayer` | 13 | .rodata interleaved with another directory's (39 subsegments between, e.g. `func_00248340`) |
+| `vm1/CPlayer` | 13 | .rodata interleaved with another directory's (39 subsegments between, e.g. `func_00248340`); round 25 (n2): interleaved with `code/CPlayer` (compiles merged otherwise) |
 | `vm1/CheatMenu` | 48 | **merged** (round 24, after unifying its declarations; was: declarations differ (2: `Controller_MenuLeft`, `Controller_MenuRight`)) |
 | `vm1/Cont` | 2 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `RumblePool_Init`)) |
 | `vm1/ContinueMenu` | 2 | **merged** (round 24, first batch) |
-| `vm1/Demo` | 28 | .rodata interleaved with another directory's (6 subsegments between, e.g. `func_0027C074`) |
+| `vm1/Demo` | 28 | .rodata interleaved with another directory's (6 subsegments between, e.g. `func_0027C074`); round 25 (n2): interleaved with `code/CCamera`; also `--name` |
 | `vm1/GameOverMenu` | 3 | **merged** (round 24, first batch) |
-| `vm1/MissionMenu` | 14 | .rodata interrupted by data no C file owns (1: `unnamed@0xC2368`) |
+| `vm1/MissionMenu` | 14 | .rodata interrupted by data no C file owns (1: `unnamed@0xC2368`); round 25 (n2): linker padding before `func_00424B90`; also declarations differ |
 | `vm1/MotherBoss` | 65 | declarations differ (6: `AI_UpdateTargets`, `Actor_SpawnParticle`, `CAI__CallHurt`, `CLevelActorPool__Spawn`, ...) |
-| `vm1/MpMenu` | 110 | .rodata interrupted by data no C file owns (3: `unnamed@0xC1A78`) |
-| `vm1/NameEntryMenu` | 8 | .rodata interrupted by data no C file owns (1: `unnamed@0xC1F4C`) |
-| `vm1/OptionsMenu` | 31 | .rodata not in .text order (2 inverted pairs of 4 subsegments) |
-| `vm1/Pak` | 42 | .rodata not in .text order (1 inverted pairs of 3 subsegments) |
-| `vm1/PakMenu` | 140 | .rodata interrupted by data no C file owns (2: `unnamed@0xC2008`) |
-| `vm1/Primagen` | 115 | .rodata interrupted by data no C file owns (2: `unnamed@0xC0F14`) |
+| `vm1/MpMenu` | 110 | .rodata interrupted by data no C file owns (3: `unnamed@0xC1A78`); round 25 (n2): linker padding before one of ten starts; `sMpMenuFmt_3d` read as an extern; also declarations differ |
+| `vm1/NameEntryMenu` | 8 | .rodata interrupted by data no C file owns (1: `unnamed@0xC1F4C`); round 25 (n2): the strings of its key table in `.data` (asm): the table in C first (compiles merged otherwise) |
+| `vm1/OptionsMenu` | 31 | **merged** (round 25, n2: every function `DEFERRED`; was: .rodata not in .text order) |
+| `vm1/Pak` | 42 | .rodata not in .text order (1 inverted pairs of 3 subsegments); round 25 (n2): deferred from index 2..6 on, index 7 defined before 6; also declarations differ |
+| `vm1/PakMenu` | 140 | .rodata interrupted by data no C file owns (2: `unnamed@0xC2008`); round 25 (n2): linker padding (two places); `sPakMenuText_Spaces3` read as an extern; also declarations differ |
+| `vm1/Primagen` | 115 | .rodata interrupted by data no C file owns (2: `unnamed@0xC0F14`); round 25 (n2): linker padding twice; also declarations differ |
 | `vm1/SceneActorPool` | 2 | **merged** (round 24, first batch) |
-| `vm1/SceneLoad` | 24 | .rodata interleaved with another directory's (15 subsegments between, e.g. `func_00220530`) |
+| `vm1/SceneLoad` | 24 | .rodata interleaved with another directory's (15 subsegments between, e.g. `func_00220530`); round 25 (n2): interleaved with `code/CScene`; also declarations differ |
 | `vm1/StatsMenu` | 15 | declarations differ (1: `gEngineApp_m_Settings_match_tag`) |
-| `vm1/TotemDefense` | 18 | .rodata not in .text order (8 inverted pairs of 9 subsegments) |
+| `vm1/TotemDefense` | 18 | .rodata not in .text order (8 inverted pairs of 9 subsegments); round 25 (n2): every function deferred (`--inline all`); also declarations differ |
 | `vm2/BlindOne` | 60 | its .text subsegments are not adjacent; round 25: no asm left (70 files), declarations differ (n3 table above) |
 | `vm2/CEngineApp` | 4 | **merged** (round 24, first batch) |
 | `vm2/COnScreen` | 2 | **merged** (round 24, first batch) |
@@ -374,6 +374,108 @@ These are the families part n1 works on in vm1 (`CList`/`CISet`/`CCache`, the fi
 | `vm2/SceneLoad` | 19 | its .text subsegments are not adjacent; round 25: no asm left (23 files), declarations differ (n3 table above) |
 | `vm2/StatsMenu` | 15 | declarations differ (2: `CPlayerPool__GetIndex`, `gEngineApp_m_Settings_match_tag`); local types differ (1: `FieldRecAt14`) |
 | `vm2/TotemDefense` | 7 | **merged** (round 25, n3: its asm in C, 4 parts) |
+
+## Round 25, part n2: `.rodata` order, unowned data, cc1 flags
+
+**How SN's toolchain fills an object's `.rodata`** (small test files through `tools/sn64/cc1`, the
+original `cc1n64.exe` and `asn64.exe` under wine; same results from both compilers):
+
+- cc1 writes a string literal into `.rodata` when it expands the function that first uses it in the
+  file (once per file: a second use shares it), i.e. at the function's definition, before its code. A
+  file-scope initializer's strings go out where the variable is output.
+- asn64 puts each `li.s`/`li.d` constant into `.rodata` at the instruction, in code order, never
+  pooled (two `0.5f` in two functions are two words); cc1 writes a jump table at its `switch`.
+  `tools/sn_li.py` flushes its pool at cc1's next section directive, which gives the same order.
+- A function is output (code, literals, jump tables) at its definition, **except an `inline` one**:
+  GCC 2.8.1 at `-O2` keeps every `inline` function, public ones too, until the end of the file and
+  outputs them after all the others, in the order of their first declaration; their strings are
+  already out, at the definition. At `-O3` (`-finline-functions`) the same happens to `static`
+  functions defined after their callers. The original sources are C++ (`MATCHING.md`): a member
+  function defined in its class body is `inline`.
+
+So a module whose `.rodata` has a later function's strings before an earlier function's float
+literals is one object with deferred functions, not a wrong boundary. ultralib's `synthesizer.c`
+proves it: in its own order (`_timeToSamplesNoRound` static, `_timeToSamples`, `__nextSampleTime`
+static) at `-O3` cc1 gives exactly the ROM's `.text` order (`_timeToSamples`, `__nextSampleTime`,
+`_timeToSamplesNoRound`) and `.rodata` order (`"EX"`, `"audio/synthesizer.c"`, then the two
+functions' literals).
+
+**`merge_module.py` does it:** `--inline all|stem,..` writes those files' functions `DEFERRED`
+(`include/common.h`: `inline` on the N64 build, nothing on the port's, where C99 `inline` would emit
+no definition) and declares the deferred functions before them in `.text` order wherever one is
+declared early (output order is first-declaration order); `--rodata-free` takes the slices and the
+unnamed data between them as the merged object's one `.rodata` (another file's slice in between still
+refuses); `make verify` decides. `--cc1-flags auto` (or a given set) picks one flag set under which
+every file of the module compiles to the same assembly as under its own, else refuses.
+
+**Merged here (5 directories, 74 files -> 5), `make verify` OK:**
+
+| Directory | What it took |
+|---|---|
+| `vm1/OptionsMenu` (31) | every function `DEFERRED` (`--inline all`): the ROM has the strings of `OptionsMenu_ControlSideText`/`OptionsMenu_StickHorzText` before `GameSettings_SetDefaults`' `1.0f` |
+| `code/libultra/audio/synthesizer` (9) | `--cc1-flags auto` (the game's flags compile all nine the same, also the one with `-msplit-addresses`); `_timeToSamples`, `__nextSampleTime`, `_timeToSamplesNoRound` `DEFERRED`; one `RateSource`; the port's five functions under `#ifndef TARGET_PORT` |
+| `code/HostIo` (34) | `-msplit-addresses` compiles all 34 the same; one `HostIo_GetSR`/`SetSR`; `HostIo_ReadByte`'s `u32` read as a cast (`srlv`); `HostIo_Call` under `#ifndef TARGET_PORT` (was `T2_GAME_EXCLUDE`) |
+| `code/libultra/gu/lookat`, `gu/perspective` (2 + 2) | `-fforce-addr` compiles both files the same; ultralib's float matrix renamed `GuMatrix` (not `rw/abu_types.h`'s `struct Matrix`) |
+
+```
+python3 tools/merge_module.py src/us/vm1/OptionsMenu --rodata-free --inline all
+python3 tools/merge_module.py src/us/code/libultra/audio/synthesizer --cc1-flags auto --rodata-free \
+    --inline func_00294C30,func_00294C70,func_00294D18
+python3 tools/merge_module.py src/us/code/HostIo --cc1-flags auto        # also gu/lookat, gu/perspective
+```
+
+**The rest of the 31 directories, by real cause.** `merge_check.py --rodata-free` shows that 21 of
+them also have the "declarations differ" problems of part n1 behind the `.rodata` refusal (only
+`vm1/CPlayer` and `vm1/NameEntryMenu` compile merged), so every row below needs that header work too.
+
+*Out of order: deferred functions* (model above; each needs its header work, then `--inline`):
+
+| Directory | `DEFERRED` set the ROM implies |
+|---|---|
+| `code/CLevelActor` | `func_00215944` (`CLevelActor__LoadGeometry`/`TouchGeometry`): its strings lie between `func_002154DC`'s and `func_002156FC`'s literals. Compile: `CScene__GetObjectTypeID` `u16`/`s32`, `GameObject_GetGroundRotation` by value/out pointer, `CMtxF__*` `f32 *`/`CMtxF *` |
+| `code/VM` | `func_0028E068` (index 4) and everything after it: `func_0028E60C`'s `"Virtual Region"` precedes `func_0028E068`'s literals. Compile: the `gPager_*` views, `B09SlotA`, `func_0028EE40` |
+| `vm1/TotemDefense` | all (strings of indices 4 and 7 before the literals of 0..3) |
+| `vm1/Pak` | the functions from index 2..6 on; `func_00426164`'s strings come after `func_004263DC`'s, so index 7 is defined before index 6 (declared in `.text` order): needs a source-order option in `merge_module.py` |
+
+*Unowned data between the slices* (`unnamed@...` in the yaml; `python3 tools/rodata_gaps.py <dir>` classifies them) is of two kinds:
+
+- **Linker padding** (stale buffer words, often instructions, before a slice on a 16-byte boundary):
+  the next slice is the first of *another object*; `.text` cannot show it because the object before
+  ended on 16. The module directory is two objects there, and `versions/modules.us.txt` needs the
+  boundary (a new evidence kind for `tools/modules.py`, then the files moved): `code/LevelEvent`
+  before `func_0026DFB0` (`LevelEvent_Fire`; the only 16-aligned start in range), `code/CParticle`
+  before `func_002333C0`, `func_00239F00`, `func_0023D050` (unique), and ranges in `code/AI`
+  (`func_00241E30` or `func_002427E0`), `code/CAudioWorld` (three), `code/CParticle` (three more),
+  `vm1/MissionMenu` (`func_00424B90`), `vm1/MpMenu`, `vm1/PakMenu`, `vm1/Primagen` (two). A VM split
+  must be made in `vm2` too (`modules.py` pairs the two copies; part n3's directories).
+- **The module's own data that its C reads as externs**: named strings (`sCrashText_Spaces3`,
+  `sCGameObjectInstanceCacheDesc_AnimObjectInfo`, `sCInstancePoolCacheDesc_*`,
+  `sCStaticObjectCacheDesc_*` in `code/CMtxF`, `sMpMenuFmt_3d`, `sPakMenuText_Spaces3`), float words
+  (`D_800A58F4` in `code/Anim`, `D_800A652C` in `code/CParticle`, `42700000` in `code/CEngineApp`,
+  `0, 1.0, 0` in `code/CMtxF`: no 16-aligned start in range, so not padding) and the strings of
+  tables in `.data` (`vm1/NameEntryMenu`: 37 one-character strings, the key table of its menu in
+  `virtual_rodata_0.data.s`). A merged file must write them as literals (one copy per object: a
+  string two files share can only be given back in the merged file), or define the `.data` table in
+  C at its place in the source. `code/Crash` shows the size of it: its object starts at
+  `0x800AA070` with the flag-name strings of its register tables (`"IP7"`, `"BD"`, `": "`), so its
+  `.data` tables must become C first.
+
+*Interleaved with another directory's* (`code/CPlayer` + `vm1/CPlayer`, `code/CScene` +
+`vm1/SceneLoad`, `code/CCamera` + `vm1/Demo`): the VM functions' literals sit between the engine
+functions' in one `.rodata` run, in `.text` order of each part. One original object per pair, its
+functions linked partly into the engine and partly into the paged VM module: one merged file would
+need its VM functions in their own text section (`__attribute__((section(...)))`, linked into the VM
+segment) while their `.rodata` stays in the object's. Build work in the linker-script generation,
+not attempted.
+
+*cc1 flags:* `code/adecHuffDecode` is the one left: under `-fforce-addr` (the flags of 3 of its 18
+files) every file compiles the same except `func_002A0044` (`adecHuffDecode`, a register
+allocation difference); its C must be re-matched under `-fforce-addr` first.
+
+*Name clash:* `code/CEngineApp` and `vm1/Demo` merge with `--name`, but `code/CEngineApp` has
+unattributed data (`60.0f`) inside its `.rodata` and `vm1/Demo` is interleaved with `code/CCamera`.
+
+None of this needs a ROM change.
 
 ## Evidence
 
