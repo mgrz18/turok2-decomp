@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
-extern s32 EnemyAnim_Idle_AF6F0(void *, sptr, void *);
 
 s32 EnemyAnim_WaitForTrigger(CGameObjectInstance *arg0, sptr arg1) {
     u16 kind;
@@ -18,7 +18,7 @@ s32 EnemyAnim_WaitForTrigger(CGameObjectInstance *arg0, sptr arg1) {
             case 0x2B3E:
                 break;
             default:
-                return EnemyAnim_Idle_AF6F0(arg0, arg1, sub);
+                return EnemyAnim_Idle_AF6F0(arg0, (CAI *) arg1);
         }
     }
     return sub->m_StartAnim;

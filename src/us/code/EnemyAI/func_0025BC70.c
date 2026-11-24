@@ -4,21 +4,19 @@
 #include "globals/scene.h"
 #include "globals/ai.h"
 #include "protos/scene.h"
+#include "protos/enemy_ai.h"
 
 /* AI init for a family of actors: installs the AI callbacks and seeds the
  * timers/flags from the actor definition. Types 0x44E..0x456 (except 0x44F and
  * 0x452) are left alone. */
 
-extern struct { u8 value; } gEngineApp_m_Settings_multiplayer;
+#include "globals/game.h"
 
 extern void EnemyAI_Update();
-extern void EnemyAI_CalcOrientationMatrix();
-extern void EnemyAI_DrawFaded();
 extern void EnemyAI_OnHit();
 extern void EnemyAI_CheckGrab();
 extern void EnemyAI_OnDamage();
 extern void EnemyAI_HeadNodeCallback();
-extern f32 Random_Blend(f32 lo, f32 hi);
 
 void EnemyAI_Init(CGameObjectInstance *actor, CAI *ai) {
     CEnemyIntelligence *info;
@@ -29,7 +27,8 @@ void EnemyAI_Init(CGameObjectInstance *actor, CAI *ai) {
     actor->m_dwFlags |= 0x02000000;
     actor->m_dwFlags |= 0x04000000;
     info = &actor->header.m_pIntelligence->m_Enemy;
-    if (gEngineApp_m_Settings_multiplayer.value == 0) {
+    /* read through a one-byte struct: the plain u8 load is scheduled earlier than the ROM's */
+    if (((struct { u8 value; } *) &gEngineApp_m_Settings_multiplayer)->value == 0) {
         actor->m_dwFlags |= 0x10000000;
     }
     switch (actor->m_nTypeFlag) {

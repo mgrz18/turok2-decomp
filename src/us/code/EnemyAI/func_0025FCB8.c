@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 /* AI reaction (like EnemyAI_OnHit case 11, but setting the delay): raises the
  * intensity by 20 (at most 255) and sets the reaction delay to 75..60 frames. */

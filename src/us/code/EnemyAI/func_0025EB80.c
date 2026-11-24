@@ -3,9 +3,8 @@
 #include "structs/game_object.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
-void Throwable_SetModeAnim(CPlayer *player, CAI *ai, CGameObjectInstance *obj);
 
 void EnemyAI_Mount(CGameObjectInstance *obj, CAI *ai, CPlayer *player) {
     ai->m_Enemy.m_pGrabbed = (CGameObjectInstance *) player; /* pointer-wide (m_VarBuffer[2] is a u32) */

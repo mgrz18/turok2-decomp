@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
-void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 
 /* AI callback: turns toward the target, 60 degrees at a time in modes 1-2,
  * else 15. */

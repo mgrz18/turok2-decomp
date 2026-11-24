@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 s32 EnemyAI_HasComboEndAnim(CGameObjectInstance *arg0, CAI *arg1) {
     CEnemyIntelligence *temp_a0;

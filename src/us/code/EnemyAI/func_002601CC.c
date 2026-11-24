@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
-f32 Random_Blend(f32, f32);                        /* extern */
 
 /* m_VarBuffer[6] holds a float timer here. */
 s32 EnemyAI_TryTeleportOut(CGameObjectInstance *arg0, CAI *arg1) {

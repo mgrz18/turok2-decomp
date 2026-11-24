@@ -1,6 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 
 void EnemyMode_UnderwaterToGround_Update(sptr arg0, CAI *arg1) {

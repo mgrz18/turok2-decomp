@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 /* AI callback: raises the 0xC8 level by 10 (at most 255) and sets the timer
  * from it, 0..255 -> 240..120. The float temporaries (240 passed through two

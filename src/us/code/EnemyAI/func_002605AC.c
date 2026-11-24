@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/light.h"
+#include "protos/enemy_ai.h"
 
 #include "structs/game_object.h"
 
-s32 CGameObjectInstance__DrawModelImmediate(sptr, sptr, sptr);
 
 /* Host body (C23): the draw callback of a melting corpse (EnemyMode 60). The N64 view reads
  * CAI::m_ModeTime at its N64 0x40 (the host CAI has two pointers before it), and the actor and

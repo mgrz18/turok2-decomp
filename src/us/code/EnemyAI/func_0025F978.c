@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 
 

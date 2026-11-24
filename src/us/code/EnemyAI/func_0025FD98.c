@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "protos/enemy_ai.h"
 
 /* De-faked in round 21 (j4): the N64 draft tested the CAI pointer in two identical arms (which
  * kept the beq's delay slot empty) and had a separate host body; the test on mode 0x35 first gives

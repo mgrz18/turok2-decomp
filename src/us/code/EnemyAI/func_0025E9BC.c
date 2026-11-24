@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
-void AI_StopSound(CGameObjectInstance *obj, CAI *ai);
-void CListedInstance__Free(CGameObjectInstance *obj);
 
 void EnemyMode_DeathMelt_Update(CGameObjectInstance *obj, CAI *ai) {
     f32 t;

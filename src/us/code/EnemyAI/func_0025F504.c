@@ -1,12 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
-s32 GameObject_IsLeashed();
-f32 GameObject_GetLeashRadius(CGameObjectInstance *);
-f32 Random_Blend(f32, f32);
-f32 func_002974C0(f32);
-f32 func_002982F0(f32);
-void Collision_MoveInstance(CGameObjectInstance *, CVector3, sptr);
 
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS GameObject_IsLeashed receives EnemyMode_TeleportIn_Enter's own argument
  * registers (pass-through); the host passes them. */

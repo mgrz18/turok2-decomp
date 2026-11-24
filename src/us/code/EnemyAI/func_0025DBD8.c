@@ -1,18 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 /* AI combat update: turns toward the target, then picks a reaction (taunt,
  * the 0x11F4-range anims, a dodge or a special melee for type 0x259). */
 
-extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void EnemyMode_Move_Update(CGameObjectInstance *actor, CAI *ai);
-#ifdef TARGET_PORT
-extern s16 EnemyAI_PickAttack(CGameObjectInstance *actor, CAI *ai, CAITargets *t); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
-#else
-extern s32 EnemyAI_PickAttack(CGameObjectInstance *actor, CAI *ai, CAITargets *t);
-#endif
 extern void EnemyAI_TryDodge(CGameObjectInstance *actor, CAI *ai);
 
 static __inline__ s8 canTaunt(CAI *ai, CEnemyIntelligence *info) {
@@ -54,7 +47,7 @@ void EnemyMode_Attack_Update(CGameObjectInstance *actor, CAI *ai) {
     } else if (ai->m_AnimRepeatedCount != 0) {
         EnemyMode_Move_Update(actor, ai);
     }
-    if (actor->m_nTypeFlag == 0x259 && EnemyAI_PickAttack(actor, ai, &t) == 0xE) {
+    if (actor->m_nTypeFlag == 0x259 && EnemyAI_PickAttack_w(actor, ai, &t) == 0xE) {
         CAI__SetMode(actor, ai, 0xE);
     }
     EnemyAI_TryDodge(actor, ai);

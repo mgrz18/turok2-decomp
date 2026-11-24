@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 /* AI callback: in modes 0x11-0x12 sets 0x120 from the intensity (0..255 ->
  * 60..15); clears AI flag 0x4000000. */

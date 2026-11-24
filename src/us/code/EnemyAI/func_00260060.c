@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 s32 EnemyAI_DrawWithBlend(s32, s32);
 

@@ -1,6 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 
 void EnemyAI_JoypadTestPlayAnimUpdate(CGameObjectInstance *obj, CAI *ai) {

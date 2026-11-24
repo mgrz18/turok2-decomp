@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "protos/enemy_ai.h"
 
 /* Picks an actor's death animation from what killed it (weapon, projectile, hit direction). */
 
@@ -21,7 +22,6 @@ typedef struct {
 
 
 extern s32 Random_Next(void); /* rand */
-extern sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, sptr model, sptr arg2);
 
 s32 EnemyAI_PickDeathMode(CGameObjectInstance *actor, sptr unused, HitInfo *hit) {
     CEnemyIntelligence *anims;

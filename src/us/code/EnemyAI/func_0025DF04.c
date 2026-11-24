@@ -1,6 +1,7 @@
 #include "common.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
+#include "protos/enemy_ai.h"
 #ifdef TARGET_PORT
 #include "structs/game_object.h"
 #endif
@@ -21,7 +22,6 @@ typedef struct {
     /* 0x52 */ u16 flags2;
 } TargetInfo;
 
-sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 s32 EnemyAnim_NormalDeath_B0120(void *, void *);
 s32 EnemyAnim_NormalDeath_B0150(void *, void *);
 s32 EnemyAnim_NormalDeath_B0180(void *, void *);

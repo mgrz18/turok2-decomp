@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/enemy_ai.h"
 
 s32 Cinema_RequestForObject(sptr, sptr);                /* extern */
 

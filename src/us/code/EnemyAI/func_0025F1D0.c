@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
-s32 AI_IsAimedAt(CGameObjectInstance *obj, CAI *ai, struct CGameObjectInstance *target, f32 angle);
 
 void EnemyMode_Evade_Update(CGameObjectInstance *obj, CAI *ai) {
     u16 anim;

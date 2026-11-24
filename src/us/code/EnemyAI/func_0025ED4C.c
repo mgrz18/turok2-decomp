@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/light.h"
+#include "protos/enemy_ai.h"
 
 typedef struct {
     /* 0x0 */ f32 alpha;
@@ -8,7 +9,6 @@ typedef struct {
 } FillAlpha;
 
 
-void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *obj, CAI *ai, sptr arg2);
 
 void EnemyAI_DrawWithBlend(CGameObjectInstance *obj, CAI *ai, s32 arg2) {
     f32 fade = 1.0f;

@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
-#include "protos/game.h"
+#include "protos/enemy_ai.h"
 
 
 

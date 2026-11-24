@@ -32,7 +32,7 @@ void AI_TurnTowardTarget(CGameObjectInstance *o, CAI *ai, CGameObjectInstance *t
 void AI_DropPickupsOnce(CInstanceHeader *o, u32 *flags, u32 bit, u32 m1, u32 m2);
 struct CDropPickup;
 void AI_DropPickupsByMask(CInstanceHeader *o, s32 a1, u32 mask, struct CDropPickup *e);
-void Actor_SpawnParticle(CInstanceHeader *obj, s32 kind, CVector3 at);
+void Actor_SpawnParticle(CInstanceHeader *obj, s32 kind, CVector3 at, s32 unused);
 void AI_StartSound(CInstanceHeader *src, CAI *owner, s32 id);
 void AI_PushAway(CGameObjectInstance *a, s32 unused, CGameObjectInstance *b, CGameObjectInstance *c,
                  CVector3 *outPos, CGameRegion **outRegion);
@@ -44,7 +44,7 @@ sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, sptr action
 CQuaternion CGameObjectInstance__GetRotation(CGameObjectInstance *actor);
 s32 CGameObjectInstance__GetGeometryKind(void *obj);
 CQuaternion Actor_GetGroundRotation(void *obj);
-void CQuaternion__ToMatrix(CQuaternion *q, CMtxF mf);
+void CQuaternion__ToMatrix(CQuaternion *q, void *mf); /* a CMtxF */
 s32 CParticleSystem__Spawn(void *, void *, void *, s32 *, sptr, s32, CVector3, CQuaternion, CVector3, void *, s32, s32);
 struct LoopSounds *LoopSounds_Get(void);
 void *LoopSounds_Start(void *sounds, s32 id, CVector3 *pos, void *follow, sptr owner);

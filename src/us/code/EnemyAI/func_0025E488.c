@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
-s32 Throwable_SetModeAnim(sptr, sptr, sptr);               /* extern */
 
 void EnemyAI_SetGrabbed(sptr arg0, CAI *arg1, sptr arg2) {
     /* arg2 is the grabbed actor: pointer-wide m_pGrabbed, its CAI at the host offset */

@@ -5,18 +5,13 @@
 #include "structs/camera.h"
 #include "globals/math.h"
 #include "globals/ai.h"
+#include "protos/enemy_ai.h"
 
 /* Places a projectile at its owner's muzzle: inherits the shooter's rotation,
  * yaws it by its own angle and pushes it 10.24 units along the result. */
 
 
-void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
-void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
-void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
-void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *mtx);
 void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
-f32 func_002982F0(f32 x); /* sinf */
-f32 func_002974C0(f32 x); /* cosf */
 
 void Projectile_PlaceAtMuzzle(CGameObjectInstance *self, CAI *ai) {
     CMtxF m;

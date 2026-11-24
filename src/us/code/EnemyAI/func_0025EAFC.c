@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 
 f32 EnemyAI_GetTypeTurnRate(CGameObjectInstance *obj) {

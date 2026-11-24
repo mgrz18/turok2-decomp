@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
-s32 EnemyMode_Move_Update(sptr, sptr);
 
 void EnemyMode_WoundedArm_Update(sptr arg0, CAI *arg1) {
     if (arg1->m_AnimRepeatedCount != 0) {

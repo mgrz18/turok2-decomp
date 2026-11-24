@@ -1,18 +1,13 @@
 #include "common.h"
-#include "protos/ai.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "protos/enemy_ai.h"
 
 /* Index-2 attack follow-up: in the 7020-7041 animation band it chains to the
  * next move; otherwise it finishes the current one. */
 
-sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 s32 EnemyAnim_NormalDeath_B0390(void *, void *);
 s32 EnemyAnim_NormalDeath_B03C0(void *, void *);
-s32 GameObject_IsOnGround(void *);
-void AI_DropPickupsOnce(void *, void *, s32, s32, s32);
-void AI_StopSound(void *, void *);
-void CListedInstance__Free(void *);
 
 void EnemyMode_Death_Update(CGameObjectInstance *actor, CAI *state) {
     CEnemyIntelligence *info = &actor->header.m_pIntelligence->m_Enemy;

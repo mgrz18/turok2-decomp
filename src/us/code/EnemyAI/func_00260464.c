@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/ai.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
-f32 AI_AngleToPoint(sptr, CVector3);               /* angle from the actor heading to a point */
 
 
 void EnemyAI_TurnToPoint(sptr arg0, CAI *arg1) {

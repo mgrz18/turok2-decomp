@@ -1,6 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 
 void EnemyMode_AirToGround_Update(CGameObjectInstance *obj, CAI *ai) {

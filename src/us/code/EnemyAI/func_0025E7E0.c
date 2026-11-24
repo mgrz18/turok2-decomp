@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
-void AI_UpdateTargets(CGameObjectInstance *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 
 /* Like EnemyAI_GetModeTurnRate: the turn rate, pi/3 in modes 1-2, else pi/12. */
 static __inline__ f32 TurnRate(CGameObjectInstance *self, CAI *ai) {

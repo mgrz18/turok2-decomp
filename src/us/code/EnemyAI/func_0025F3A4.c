@@ -1,12 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 /* AI state: turn towards the target with the 10000 animation, the turn rate
  * depending on the stance; release the grabbed actor near the end of it. */
 
-sptr CGameObjectInstance__PickRandomAnim(void *self, sptr anim, sptr arg2);
-void AI_UpdateTargets(void *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 
 void EnemyMode_PickupThrowObject_Update(CGameObjectInstance *self, CAI *ai) {
     CAITargets t;

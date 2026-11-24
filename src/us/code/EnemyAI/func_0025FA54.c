@@ -1,6 +1,6 @@
 #include "common.h"
 #include "globals/engine.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 typedef struct {
     /* 0x00 */ char pad[0x64];

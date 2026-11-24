@@ -1,12 +1,11 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/engine.h"
+#include "protos/enemy_ai.h"
 
 #include "structs/game_object.h"
 #include "structs/model.h"
 
-s32 Render_DrawModelShared(sptr, sptr, s32, sptr, sptr, s32, s32);
-s32 CGameObjectInstance__DrawModelImmediate(sptr, sptr, sptr);
 
 /* Host body (C23): the N64 code reads the draw args' model handle (0x0C), the actor's draw
  * matrices (0x98) and lights (0x110 + gEvenOdd * 0x18) and the low byte of m_nModel (0x1B, big

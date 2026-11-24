@@ -1,6 +1,6 @@
 #include "common.h"
+#include "protos/enemy_ai.h"
 
-s32 EnemyMode_Move_Update();                            /* extern */
 
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS EnemyMode_Move_Update receives EnemyMode_TakeCover_Update's own argument
  * registers (pass-through); the host passes them. */

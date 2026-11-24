@@ -1,11 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "rw/abu_protos.h"
-
-f32 Random_Blend(f32 arg0, f32 arg1);
+#include "protos/enemy_ai.h"
 
 
-void EnemyMode_CloakActivate_Enter(sptr arg0, CAI *arg1) {
+
+void EnemyMode_CloakActivate_Enter(CGameObjectInstance *arg0, CAI *arg1) {
     f32 temp_f20;
     f32 temp_f21;
 

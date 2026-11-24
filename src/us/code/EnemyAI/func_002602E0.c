@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 /* Lowers the aggression by arg2, down to 0. */
 void EnemyAI_LowerAggression(s32 arg0, CAI *arg1, s32 arg2) {

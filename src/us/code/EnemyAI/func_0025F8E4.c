@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 /* Raises the aggression by 25, up to 255. */
 void EnemyMode_ReactionExplosion_Enter(sptr arg0, CAI *arg1) {

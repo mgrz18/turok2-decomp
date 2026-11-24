@@ -6,7 +6,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/ai.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 typedef struct Object Object;
 
@@ -50,22 +50,15 @@ struct Object {
 };
 #endif
 
-void EnemyAI_NukedFrozenRemove(Object *obj, CAI *ai);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define AI_SetTargetOverride AI_SetTargetOverride_f
 #endif
 void AI_SetTargetOverride(Object *obj, CAI *ai, Object *owner, f32 time);
-void AI_HearNoise(Object *obj, CAI *ai, CVector3 *from, s32);
 void Sound__PlayPitched(s16 sound, CVector3 pos, s32, sptr, f32 volume);
 s32 Random_Next(void);
-void AI_StopSound(Object *obj, CAI *ai);
 s32 EnemyAI_PickDeathMode(Object *obj, CAI *ai, DamageEvent *dmg);
 void TotemDefense_AddKill(void);
 s32 EnemyAnim_PickDeath(Object *obj, CAI *ai);
-sptr CGameObjectInstance__PickRandomAnim(Object *obj, sptr node, sptr);
-void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
-f32 func_00298470(f32 x);
-f32 CVector3__GetYaw(CVector3 *v);
 
 /* An object's owner (0x1A8) lies inside its AI block. */
 #define OWNER(o) ((*(Object **)&((CGameObjectInstance *)(o))->m_AI.m_pParent))

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 
 void EnemyMode_PlayerRide_Update(CGameObjectInstance *self, CAI *ai) {

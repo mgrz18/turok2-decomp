@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "protos/enemy_ai.h"
 
 
 /* the port (round 9 x1): the CAI by member: N64 0x130/0x131 are m_Enemy.m_Behavior[0]/[1] (the
@@ -9,7 +10,6 @@ typedef CAI State;
 #define unk130 m_Enemy.m_Behavior[0]
 #define unk131 m_Enemy.m_Behavior[1]
 
-s32 EnemyAnim_Idle_AF6F0(CGameObjectInstance *actor, State *state);
 s32 EnemyAnim_Idle_AF720(CGameObjectInstance *actor, State *state);
 s32 EnemyAnim_Idle_AF750(CGameObjectInstance *actor, State *state);
 

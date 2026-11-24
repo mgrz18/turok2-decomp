@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 /* AI callback: raises the intensity by 20 (at most 255) and sets the timer
  * from it, 0..255 -> 75..60 (same shape as EnemyMode_ReactionBoreClunk_Enter). */

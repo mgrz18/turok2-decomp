@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 /* AI callback: clears AI flag 0x4000000 and actor flag 0x20000; sets the
  * timer from the intensity (0..255 -> 15..45). */

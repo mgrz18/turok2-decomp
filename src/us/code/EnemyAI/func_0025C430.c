@@ -5,7 +5,7 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "globals/ai.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 /* AI attack-wait callback: state 0 counts the delay down; once it has run out
  * (more than 30 frames left means an attack is due) it plays the attack

@@ -1754,7 +1754,7 @@ f32 AI_FlatDistSqToPoint(CGameObjectInstance *arg0, CVector3 point)
  * (type 3) its velocity and ground rotation. One body for the N64 and the port since round 29
  * (the N64 view, SpawnObj, had the velocity at 0x18 and the target at 0x1C0, which missed the
  * host members, so the port had its own copy). */
-void Actor_SpawnParticle(CInstanceHeader *obj, s32 kind, CVector3 at) {
+void Actor_SpawnParticle(CInstanceHeader *obj, s32 kind, CVector3 at, s32 unused) {
     CVector3 pos;
     CVector3 vel;
     CQuaternion rot;

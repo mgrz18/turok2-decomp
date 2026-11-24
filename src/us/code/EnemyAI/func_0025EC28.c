@@ -3,10 +3,8 @@
 #include "structs/game_object.h"
 #include "globals/scene.h"
 #include "protos/scene.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
-void EnemyAI_DrawFaded();
-void EnemyAI_CalcOrientationMatrix();
 
 void EnemyAI_Dismount(CGameObjectInstance *obj, CAI *ai, CPlayer *player) {
     obj->m_AI.m_VarBuffer[2] = 0;

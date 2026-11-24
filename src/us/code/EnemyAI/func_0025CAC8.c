@@ -5,8 +5,8 @@
 #include "structs/collision.h"
 #include "globals/collision.h"
 #include "globals/ai.h"
-#include "protos/ai.h"
 #include "structs/particle.h"
+#include "protos/enemy_ai.h"
 
 /* AI hit callback: a projectile (or its owner) close enough lengthens the
  * wait and becomes the last-heard position; then the projectile type picks a
@@ -15,8 +15,6 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-extern f32 CVector3__Distance(CVector3 *a, CVector3 *b);
-extern void Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
 
 /* A noise at pos within 3072 units lengthens the wait and is remembered. */
 static __inline__ void hearNoise(CGameObjectInstance *actor, CAI *ai, CVector3 *pos) {

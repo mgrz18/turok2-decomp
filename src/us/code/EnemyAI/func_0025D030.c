@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "protos/enemy_ai.h"
 
 /* Picks an attack for the current mode: every attack the definition enables
  * for this mode and whose range test passes goes into a weighted random

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "protos/enemy_ai.h"
 
 /* Raises the aggression by 10, up to 255, and clears the condition timer. */
 void EnemyMode_ReactionShocked_Enter(sptr arg0, CAI *arg1) {

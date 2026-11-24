@@ -1,6 +1,6 @@
 #include "common.h"
-#include "protos/ai.h"
 #include "globals/controller.h"
+#include "protos/enemy_ai.h"
 
 
 /* Three override slots, 6 bytes apart (see EnemyAnim_JoypadTestPlayAnim). */

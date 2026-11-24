@@ -7,7 +7,7 @@
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "globals/ai.h"
-#include "protos/ai.h"
+#include "protos/enemy_ai.h"
 
 /* Typed on CGameObjectInstance / CAI (m2c's Object/AI views had the N64 offsets:
  * the behaviour index at 0x133 was m_Enemy.m_BehaviorIndex, the current mode row at 0x30). */
@@ -19,12 +19,8 @@ typedef struct {
 } Sound;
 
 void *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
-f32 Random_Blend(f32 lo, f32 hi);
 s32 EnemyAI_TickTimers(CGameObjectInstance *obj, CAI *ai);
 void AI_TurnHeadToTarget(CGameObjectInstance *obj, CAI *ai, f32);
-s32 Sound__Play(s16 sound, CVector3 pos, sptr, sptr);
-void AI_StartSound(CGameObjectInstance *obj, CAI *ai, s32 sound);
-void AI_StopSound(CGameObjectInstance *obj, CAI *ai);
 
 /* AI update: age, scale the frame time, run the current mode handler (its
  * enter callback when the animation changes), count down the timers, start
