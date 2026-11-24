@@ -90,7 +90,7 @@ MotherBoss_2:MotherBoss_Hurt_2 0x800C05C0  # X batch
 MotherBoss_2:MotherBoss_StartPhase2Cinema_2 0x800C0878  # X batch, twin of func_0040ABB4
 CheatMenu_2:CheatsMenu_WarpSelect_2 0x800C11E0  # X batch: the warp menu of func_0041A5DC
 OptionsMenu_2:GameSettings_SetDefaults_2 0x800C1328  # X batch: copy of func_0041BA50
-func_00462EC0 0x800A5D70  # copy of func_00429FA0: its strings and 1.0f, in the engine .rodata
+SceneLoad_2:CScene__Construct_2 0x800A5D70  # copy of func_00429FA0: its strings and 1.0f, in the engine .rodata
 MotherBoss_2:MotherBoss_DropPickupsAtSpawnPoints_2 0x800C05D4  # copy of func_00409500 (X), which now owns the pool
 MotherBoss_2:MotherBoss_UpdateSpotsAndPickups_2 0x800C05EC  # copy of func_00409784 (X), which now owns the pool
 MotherBoss_2:MotherBoss_TeleportTarget_2 0x800C05F8  # twin of func_00409A64 (X), which now owns the pool
@@ -99,8 +99,8 @@ Primagen_2:Primagen_UpdateMode27_2 0x800C0478  # twin of func_00405AC8 (X), whic
 Primagen_2:Primagen_UpdateSpawner_2 0x800C03B8  # twin of func_0040457C (FAKEMATCH, as there)
 Primagen_2:Primagen_SetStage_2 0x800C0388  # twin of func_00403C14
 MotherBoss_2:MotherBoss_Phase1ChooseAttack_2 0x800C0850  # twin of func_0040A6F0 (N)
-func_00464960 0x800A5F54  # twin of func_0042BA40 (B)
-func_00465B04 0x800A6010  # -1.0f of func_002261A8, then 1.0f and jtbl of func_0042CBE4 (one source file)
+SceneLoad_2:CScene__DecompressAnimatedInstances_2 0x800A5F54  # twin of func_0042BA40 (B)
+SceneLoad_2:CScene__FindNearestPathPoint 0x800A6010  # -1.0f of func_002261A8, then 1.0f and jtbl of func_0042CBE4 (one source file)
 Primagen_2:Primagen_EnterMode24_2 0x800C0540  # copy of func_004077AC, which now owns the pool
 Primagen_2:Primagen_UpdateMode21_2 0x800C0544  # copy of func_00407800, which now owns the pool
 Primagen_2:Primagen_UpdateMode22_2 0x800C0548  # copy of func_00407858, which now owns the pool
@@ -121,7 +121,7 @@ CPlayer_2:CPlayer__StartGame_2 0x800A6AC4  # copy of func_0042E14C, which now ow
 CPlayer_2:CPlayer__LoseLife_2 0x800A6AC8  # copy of func_0042E29C, which now owns the pool
 CPlayer_2:CPlayer__ResetHealth_2 0x800A70D8  # copy of func_0042EA00, which now owns the pool
 CPlayer_2:CPlayer__LevelStart_2 0x800A6AA0  # copy of func_0042DE74, which now owns the pool
-func_00463B2C 0x800A5EB4  # copy of func_0042AC0C, which now owns the pool
+SceneLoad_2:CScene__LoadLevel_2 0x800A5EB4  # copy of func_0042AC0C, which now owns the pool
 PakMenu_2:DamagedPakMenu_UpdateLine3_2 0x800C1430  # copy of func_004235F4, which now owns the pool
 Pak_2:Pak_SaveNoteVerified_2 0x800C18B0  # copy of func_00426164, which now owns the pool
 Pak_2:Pak_AllocDirectory_2 0x800C18A0  # copy of func_004263DC, which now owns the pool
@@ -162,9 +162,9 @@ Primagen_2:Primagen_UpdateMode23_2 0x800C0538  # copy of func_004076B0 (round 25
 Primagen_2:Primagen_UpdateMode9_2 0x800C0550  # copy of func_004078B8 (round 25: was asm), which owns the pool
 Primagen_2:Primagen_UpdateMode10_2 0x800C0558  # copy of func_004079C4 (round 25: was asm), which owns the pool
 Primagen_2:Primagen_UpdateMode11_2 0x800C055C  # copy of func_00407AC8 (round 25: was asm), which owns the pool
-func_00464E68 0x800A5F6C  # copy of func_0042BF48 (round 25: was asm), which owns the pool
-func_004650B4 0x800A5FC4  # copy of func_0042C194 (round 25: was asm), which owns the pool
-func_00465480 0x800A600C  # copy of func_0042C560 (round 25: was asm), which owns the pool
+SceneLoad_2:CScene__StreamAllSections_2 0x800A5F6C  # copy of func_0042BF48 (round 25: was asm), which owns the pool
+SceneLoad_2:CScene__FindWarpDests_2 0x800A5FC4  # copy of func_0042C194 (round 25: was asm), which owns the pool
+SceneLoad_2:CScene__FindNearestWarpDest_2 0x800A600C  # copy of func_0042C560 (round 25: was asm), which owns the pool
 TotemDefense_2:TotemDefense_DrawTotem_2 0x800C0570  # copy of func_004089E0 (round 25: was asm), which owns the pool
 TotemDefense_2:TotemDefense_TryHitEnemy_2 0x800C05A8  # copy of func_00408CF4 (round 25: was asm), which owns the pool
 TotemDefense_2:TotemDefense_StopEnemies_2 0x800C05B0  # copy of func_00408DCC (round 25: was asm), which owns the pool
