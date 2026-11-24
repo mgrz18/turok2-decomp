@@ -15,7 +15,7 @@ extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s
 extern void ImpactEvent_Send(CGameObjectInstance *src, CGameObjectInstance *dst, s32 effect, s32 id,
                           CVector3 pos, EffectParams params);
 
-extern s32 gLevelScript_values[]; /* local type: values[0] as one row; the real s32 [2][8] (or the member path) changes the ROM code here. [0]: parts left (mode 1), [2]: parts left (mode 2, was D_8012F990) */
+extern s32 gLevelScript_values[]; /* local type: values[0] as one row; the real s32 [2][8] (or the member path) changes the ROM code here. [0]: parts left (mode 1), [2]: parts left (mode 2, the old symbol at 0x8012F990) */
 
 void Primagen_HandleAnimEvent_2(s32 arg0, CGameObjectInstance *obj, s32 arg2, CVector3 pos, s32 event) {
     CAITargets t;
