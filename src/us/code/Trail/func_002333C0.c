@@ -6,10 +6,10 @@
 #include "structs/swoosh.h"
 
 extern SwooshNode *Swoosh_TakeNode(CSwooshSystem *arg0, Swoosh *arg1);
-extern void CMtxF__GetTranslation(void *object, f32 *output);
-extern void CMtxF__GetScale(void *arg0, f32 *arg1);
-extern void CMtxF__ToMtxAffine(void *arg0, void *arg1);
-extern void CVector3__Subtract(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2);
+void CMtxF__GetTranslation(void *mf, void *out);
+void CMtxF__GetScale(void *mf, void *out);
+void CMtxF__ToMtxAffine(void *mf, void *mtx);
+void CVector3__Subtract(void *out, void *a, void *b);
 extern f32 func_00298470(f32);
 
 /* Adds a point to swoosh arg1 at matrix arg2 and spreads the points along its length. */

@@ -33,7 +33,7 @@ extern void Render_SetCombineMode(s32 mode);
 extern void Render_SetRenderMode(s32 mode);
 extern s32 Trail_GetAnimFrame(Swoosh *trail, SwooshInfo *track, AnimInfo *info);
 extern void Texture_Load(void *slot, void *model, s32 frame, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
-extern Gfx *RibbonVtxPool_Alloc(void *pool, s32 count);
+sptr RibbonVtxPool_Alloc(void *pool, s32 count);
 extern void Morph_BlendVerticesTex(Swoosh *trail, SwooshNode *node, Gfx *vertices, f32 texS, Morph *morph);
 
 void Trail_DrawTextured(void *pool, Swoosh *trail, s32 unused) {
@@ -101,12 +101,12 @@ void Trail_DrawTextured(void *pool, Swoosh *trail, s32 unused) {
     edges = count - 1;
     GFX_CMD(0xDA380003, GBI_ADDR(&clock->mtx[gEvenOdd]))
     while (clock != 0 && next != 0 && 0.0f < clock->life && 0.0f < next->life) {
-        vertices = RibbonVtxPool_Alloc(pool, count);
+        vertices = (Gfx *) RibbonVtxPool_Alloc(pool, count);
         if (vertices == 0) break;
         Morph_BlendVerticesTex(trail, clock, vertices, clock->fraction, &storage);
         GFX_CMD(0x01000000 | (count << 12) | ((count & 0x7F) << 1), GBI_ADDR(vertices))
         GFX_CMD(0xDA380003, GBI_ADDR(&next->mtx[gEvenOdd]))
-        vertices = RibbonVtxPool_Alloc(pool, count);
+        vertices = (Gfx *) RibbonVtxPool_Alloc(pool, count);
         if (vertices == 0) break;
         scale = next->fraction;
         while (clock->fraction < scale) scale -= period;

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/swoosh.h"
 
-s32 DList_AddTail(void *, void *);              /* extern */
-s32 DList_Remove(void *, void *);               /* extern */
+s32 DList_AddTail(void *list, void *node);
+void DList_Remove(void *list, void *node);
 
 /* Moves a free swoosh point to the end of swoosh arg1's points. */
 SwooshNode *Swoosh_TakeNode(CSwooshSystem *arg0, Swoosh *arg1) {

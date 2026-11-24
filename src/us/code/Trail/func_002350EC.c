@@ -16,10 +16,10 @@ typedef Swoosh Trail;
 typedef SwooshNode TrailNode;
 typedef CSwooshSystem TrailMgr;
 
-void CMtxF__Identity(void *m);
+void CMtxF__Identity(void *mf);
 void DList_Init(void *p);
-Trail *NodePool_Alloc(SwooshPool *list);
-void CParticle__AddDrawModeBits(void *a, void *b);
+void *NodePool_Alloc(void *pool);
+void CParticle__AddDrawModeBits(void *particle, void *texture);
 SwooshInfo *CScene__GetSwoosh(void *tbl, s32 arg);
 #ifdef TARGET_PORT
 /* Round 20 i3: gendata types a data symbol by the declarations of the C that uses it. The trail
@@ -28,7 +28,7 @@ SwooshInfo *CScene__GetSwoosh(void *tbl, s32 arg);
  * and every textured trail was drawn with no width. This reference makes them host f32s. */
 f32 *const gTrailPoints_port[4] = { sTrailTexture0Points, sTrailTexture1Points, sTrailTexture2Points, sTrailTexture3Points };
 #endif
-void Material_GetTextureSet(s32 *p, s32 v);
+void Material_GetTextureSet(void *texture, s32 id);
 TrailNode *Swoosh_NewNode(void *o, Trail *s, void *m);
 
 /* Adds a node to the actor's trail, starting the trail first when the actor has none. */

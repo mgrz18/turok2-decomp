@@ -3,11 +3,11 @@
 #include "structs/particle.h"
 #include "structs/swoosh.h"
 
-s32 CMtxF__FromMtxAffine(sptr, sptr);
-s32 CMtxF__ClampEntries(sptr);
+void CMtxF__FromMtxAffine(void *mf, void *mtx);
+void CMtxF__ClampEntries(void *mf);
 sptr Swoosh_NewNode(sptr, sptr, sptr);
 
-s32 CMtxF__ScaleAxes(s32 *, f32, f32, f32);    /* extern */
+void CMtxF__ScaleAxes(void *mf, f32 x, f32 y, f32 z);
 
 void Swoosh_AddParticleNode(CSwooshSystem *arg0, CParticle *arg1, sptr arg2) {
     u8 sp10[0x40];
@@ -22,13 +22,13 @@ void Swoosh_AddParticleNode(CSwooshSystem *arg0, CParticle *arg1, sptr arg2) {
                 temp_f0 = var_s0->time;
                 if (temp_f0 > 0.0f) {
                     if (temp_f0 > 0.0f) {
-                        CMtxF__FromMtxAffine((sptr) sp10, arg2);
+                        CMtxF__FromMtxAffine(sp10, arg2);
                         var_f0 = 0.01f;
                         if (arg1->m_pEffect->m_pModel != 0) {
                             var_f0 = 0.29257143f;
                         }
                         CMtxF__ScaleAxes(sp10, var_f0, var_f0, var_f0);
-                        CMtxF__ClampEntries((sptr) sp10);
+                        CMtxF__ClampEntries(sp10);
                         Swoosh_NewNode((sptr) arg0, (sptr) var_s0, (sptr) sp10);
                     }
                 }

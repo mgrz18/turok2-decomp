@@ -1,20 +1,22 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802A25D0_de_17.c, func_802A5020_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/vector.h"
 #include "globals/math.h"
 
 extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-extern Vector4f *Quat_AlignYTo(Vector4f *out, u32 bx, u32 by, u32 bz);
-extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
+extern CQuaternion *Quat_AlignYTo(CQuaternion *out, u32 bx, u32 by, u32 bz);
+void CVector3__Cross(void *out, void *a, void *b);
 extern f32 func_00298470(f32);
-extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
-Vector4f *Quat_AlignYTo(Vector4f *out, u32 bx, u32 by, u32 bz) {
+void CVector3__Scale(void *out, void *in, f32 scale);
+/* The rotation that turns +y onto the unit vector (bx, by, bz), passed as three words (the floats' bits). */
+CQuaternion *Quat_AlignYTo(CQuaternion *out, u32 bx, u32 by, u32 bz) {
     CVector3 axis;
     CVector3 cross;
-    Vector4f result;
+    CQuaternion result;
     f32 one;
     f32 magnitude;
     f32 angle;

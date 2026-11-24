@@ -5,10 +5,10 @@
 #include "common.h"
 #include "structs/swoosh.h"
 
-void Trail_PlaceNodes(Swoosh *);
-void Trail_ComputeFrames(Swoosh *, sptr);
-void Trail_DrawTextured(CSwooshSystem *, Swoosh *, s32);
-void Trail_DrawUntextured(CSwooshSystem *, Swoosh *, s32);
+void Trail_PlaceNodes(Swoosh *e);
+void Trail_ComputeFrames(void *arg0, sptr arg1);
+void Trail_DrawTextured(void *pool, Swoosh *trail, s32 unused);
+void Trail_DrawUntextured(CSwooshSystem *pool, Swoosh *actor, s32 unused);
 /* Static inline in the Rage Wars source file (dropped by the importer). */
 static inline void upd(CSwooshSystem *m, Swoosh *e, s32 c) {
     if (e->flags & 8) {

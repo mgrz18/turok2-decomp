@@ -5,13 +5,13 @@
 #include "globals/engine.h"
 #include "structs/swoosh.h"
 
-void CMtxF__ToMtxAffine(void *, void *);
-void CMtxF__FromMtxAffine(void *, void *);
-void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
-void CMtxF__ClampEntries(void *);
-void CMtxF__GetTranslation(void *, void *);
-void CMtxF__GetScale(void *, void *);
-void CMtxF__ScaleAxes(void *, f32, f32, f32);
+void CMtxF__ToMtxAffine(void *mf, void *mtx);
+void CMtxF__FromMtxAffine(void *mf, void *mtx);
+void CVector3__Subtract(void *out, void *a, void *b);
+void CMtxF__ClampEntries(void *mf);
+void CMtxF__GetTranslation(void *mf, void *out);
+void CMtxF__GetScale(void *mf, void *out);
+void CMtxF__ScaleAxes(void *mf, f32 x, f32 y, f32 z);
 f32 func_00298470(f32);                 /* sqrtf */
 
 /* Rage Wars' func_802A6174: places one node on its owner, or freezes it when the owner went away (-1). */

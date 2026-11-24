@@ -5,10 +5,10 @@
 /* A swoosh (structs/swoosh.h); layer < 0: drawn untextured (Trail_DrawUntextured). */
 typedef Swoosh Trail;
 
-s32 Trail_ComputeFrames(Trail *, sptr);             /* extern */
-s32 Trail_PlaceNodes(Trail *);                  /* extern */
-s32 Trail_DrawTextured(sptr, Trail *, s32);        /* extern */
-s32 Trail_DrawUntextured(sptr, Trail *, s32);        /* extern */
+void Trail_ComputeFrames(void *arg0, sptr arg1);
+void Trail_PlaceNodes(Swoosh *e);
+void Trail_DrawTextured(void *pool, Swoosh *trail, s32 unused);
+void Trail_DrawUntextured(CSwooshSystem *pool, Swoosh *actor, s32 unused);
 
 void Trail_Draw(sptr arg0, Trail *arg1, s32 arg2) {
     if (arg1->flags & 8) {
@@ -19,9 +19,9 @@ void Trail_Draw(sptr arg0, Trail *arg1, s32 arg2) {
     }
     if (arg1->nodes.count >= 2) {
         if (arg1->layer >= 0) {
-            Trail_DrawTextured(arg0, arg1, arg2);
+            Trail_DrawTextured((void *) arg0, arg1, arg2);
             return;
         }
-        Trail_DrawUntextured(arg0, arg1, arg2);
+        Trail_DrawUntextured((CSwooshSystem *) arg0, arg1, arg2);
     }
 }

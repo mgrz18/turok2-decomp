@@ -48,12 +48,12 @@ struct R8Emit {
 /* The particle a swoosh follows: m_mtxDraw at 0x48, m_pEffect at 0xF8 (Rage Wars 0x60 / 0x118). */
 typedef CParticle R8Actor;
 typedef CSwooshSystem R8Mgr;
-void CMtxF__ToMtxAffine(void *, void *);
-void CMtxF__FromMtxAffine(void *, void *);
-void CMtxF__ClampEntries(void *);
-void CMtxF__GetTranslation(void *, void *);
-void CMtxF__GetScale(void *, void *);
-void CMtxF__ScaleAxes(void *, f32, f32, f32);
+void CMtxF__ToMtxAffine(void *mf, void *mtx);
+void CMtxF__FromMtxAffine(void *mf, void *mtx);
+void CMtxF__ClampEntries(void *mf);
+void CMtxF__GetTranslation(void *mf, void *out);
+void CMtxF__GetScale(void *mf, void *out);
+void CMtxF__ScaleAxes(void *mf, f32 x, f32 y, f32 z);
 void Swoosh_NewNode(void *, void *, void *);
 void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
     u8 sp10[0x40];

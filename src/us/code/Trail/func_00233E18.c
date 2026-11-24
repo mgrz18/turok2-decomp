@@ -5,23 +5,14 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py.
  * The points are structs/swoosh.h's SwooshNode. */
 
-typedef struct V16 {
-    f32 x, y, z, w;
-} V16;
-typedef struct Out41D8 {
-    V16 a;
-    V16 b;
-    V16 c;
-    V16 d;
-} Out41D8;
 void CVector3__Subtract(void *out, void *a, void *b);
-void CVector3__Scale(void *out, void *a, f32 s);
+void CVector3__Scale(void *out, void *in, f32 scale);
 void CVector3__Cross(void *out, void *a, void *b);
 void CVector3__Normalize(void *v);
-void CMtxF__Identity(void *m);
+void CMtxF__Identity(void *mf);
 void CMtxF__RotateVector(u8 *p, void *a, void *b);
-void Trail_ComputeNodeFrame(SwooshNode *e0, SwooshNode *e1, u8 *arg2, Out41D8 *out) {
-    V16 v10, v20, v30, v40, v50;
+void Trail_ComputeNodeFrame(SwooshNode *e0, SwooshNode *e1, u8 *arg2, SwooshFrame *out) {
+    SwooshFrameRow v10, v20, v30, v40, v50;
     f32 ty, tz;
     CVector3__Subtract(&v20, &e0->pos, &e1->pos);
     CVector3__Normalize(&v20);

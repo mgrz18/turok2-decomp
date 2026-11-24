@@ -5,7 +5,7 @@
 #include "structs/swoosh.h"
 
 extern f32 func_002974C0(f32 x);        /* cosf */
-extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+void CVector3__Scale(void *out, void *in, f32 scale);
 
 #define LERP_COLOR(a, b) ((f32)(a) + t * (f32)((b) - (a)))
 

@@ -1,11 +1,14 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802A25D0_de_15.c, func_802A4A60_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/boss.h"
 #include "globals/engine.h"
 
 extern f32 Random_Blend(f32 arg0, f32 arg1);
-void Animator_Update(Animator *a) {
+/* Steps the animator: the current op (wait, fade the value, fade the colour), then the next ops
+ * of its script until one takes time. */
+void Animator_Update(ScriptAnimator *a) {
     s32 next;
     f32 op0;
     f32 op1;

@@ -6,12 +6,12 @@
 #include "structs/particle.h"
 #include "structs/swoosh.h"
 
-void CMtxF__ToMtxAffine(void *, void *);
-void CMtxF__FromMtxAffine(void *, void *);
-void CMtxF__ClampEntries(void *);
-void CMtxF__GetTranslation(void *, void *);
-void CMtxF__GetScale(void *, void *);
-void CMtxF__ScaleAxes(void *, f32, f32, f32);
+void CMtxF__ToMtxAffine(void *mf, void *mtx);
+void CMtxF__FromMtxAffine(void *mf, void *mtx);
+void CMtxF__ClampEntries(void *mf);
+void CMtxF__GetTranslation(void *mf, void *out);
+void CMtxF__GetScale(void *mf, void *out);
+void CMtxF__ScaleAxes(void *mf, f32 x, f32 y, f32 z);
 
 /* Moves point n to its owner particle's draw matrix (-1: the owner is gone, the point keeps the
  * other frame buffer's matrix), scaled to world units (0.2926 for a model particle). */

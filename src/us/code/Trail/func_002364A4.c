@@ -9,12 +9,12 @@
 void CQuaternion__FromDirection(void *a, CVector3 *b);
 void CQuaternion__ToMatrix(void *a, void *b);
 void CMtxF__PreRotateX(void *a, f32 f);
-void CVector3__Normalize(CVector3 *v);
-void CVector3__Scale(CVector3 *a, CVector3 *b, f32 s);
+void CVector3__Normalize(void *v);
+void CVector3__Scale(void *out, void *in, f32 scale);
 void CVector3__Add(CVector3 *a, CVector3 *b, CVector3 *c);
 void CMtxF__Translate(void *m, f32 x, f32 y, f32 z);
-void CMtxF__ScaleAxes(void *m, f32 a, f32 b, f32 c);
-void CMtxF__ToMtxAffine(void *a, void *b);
+void CMtxF__ScaleAxes(void *mf, f32 x, f32 y, f32 z);
+void CMtxF__ToMtxAffine(void *mf, void *mtx);
 /* Places a ground decal of kind idx at pos facing dir (a free one, else the oldest of its kind). */
 SwooshDecal *SwooshSystem_PlaceDecal(CSwooshSystem *o, CVector3 pos, CVector3 dir, s32 idx, sptr val) {
     u8 m10[0x40];
