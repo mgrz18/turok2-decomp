@@ -5,23 +5,15 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
-struct RootActor;
-struct RootTriple;
-struct RootBox;
-typedef struct RootBox RootBox;
-struct RootBox;
-struct RootBox {
+typedef struct RootBox {
     CVector3 min;
     CVector3 max;
-};
-struct RootTriple;
-struct RootTriple {
+} RootBox;
+typedef struct RootTriple {
     s32 x;
     s32 y;
     s32 z;
-};
-struct RootTriple;
-typedef struct RootTriple RootTriple;
+} RootTriple;
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
 struct Shared_ParticleLighting {
     u8 ambient[3], reserved3;
@@ -126,16 +118,6 @@ typedef struct RootChannel {
     u8 active,blending;
     char padc[4]; void *resource;
 } RootChannel;
-struct RootActor;
-struct RootActor;
-struct RootTriple;
-struct RootTriple;
-struct RootTriple;
-struct RootActor;
-struct RootActor;
-struct RootActor;
-struct RootTriple;
-struct RootActor;
 void CMtxF__SetRotateY(void *m, f32 angle);
 void CMtxF__TransformPoint(void *m, void *in, void *out);
 void CAnimationState__GetBonePosition(void *channel, s32 bone, f32 t, f32 *out);
