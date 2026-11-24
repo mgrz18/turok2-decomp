@@ -1,21 +1,27 @@
+#include "structs/vector.h"
 #include "common.h"
 #include "structs/game.h"
-#include "structs/controller.h"
 #include "globals/game.h"
 #include "globals/menu.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MULTI/8043E9A8_4.CPP, func_8043EA98_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct ObjRecAt20V2 {
-    char pad0[0x20];
-    char *unk20;
-};
-
+#include "common.h"
+#include "ultra_types.h"
+#include "gfx.h"
+#include "structs/controller.h"
+#include "structs/list.h"
+#include "structs/table.h"
+#include "structs/menu.h"
+/* Turok 2 layouts (Rage Wars: 8 records of 0x96 bytes at 0xD0, local/mode at 0x1D/0x1E). */
+extern void TitleMenu_Single_2(void *arg0, Menu *menu);
+void Music_RestoreVolume(void);
 extern s32 Controller_ConfirmPressed(char *);
-extern void Music_RestoreVolume(void);
-extern void CEngineApp__StartGame_2(void *, s32);
-
-void TitleMenu_Single_2(void *arg0, struct ObjRecAt20V2 *menu) {
+void Music_RestoreVolume(void);
+extern void CEngineApp__StartGame_2(char *, s32);
+/* The window's controller by member (an m2c view wrote it at N64 offset 0x20: Menu.desc on the host). */
+void TitleMenu_Single_2(void *arg0, Menu *menu) {
     GameSettings *globals;
     CPlayerOptions *settings;
     ControllerProfile *profile;
@@ -34,7 +40,7 @@ void TitleMenu_Single_2(void *arg0, struct ObjRecAt20V2 *menu) {
         if (Controller_ConfirmPressed(profile) != 0) {
             settings->m_bActive = on;
             gEngineApp_m_Settings.defaultSlot.m_nController = i;
-            menu->unk20 = profile;
+            menu->controller = profile;
             break;
         }
         profile++;

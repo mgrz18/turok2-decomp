@@ -1,18 +1,18 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/menu.h"
 
-s32 Music_SetTrack(s32);
-s32 Menu_StepValue_2(sptr, s32, s32, s32, s32, s32);
+void Music_SetTrack(s32 track);
 
 s32 Music_GetTrack();                                /* extern */
 #include "globals/game.h"
 
-s32 SoundMenu_StepMusicVolume_2(s32 arg0, unsigned long arg1)
+s32 SoundMenu_StepMusicVolume_2(sptr arg0, sptr arg1)
 {
   s32 new_var;
   s32 var_a1;
-  var_a1 = (s32) gEngineApp_m_Settings_unk14[0];
-  new_var = Menu_StepValue_2(arg1, var_a1, 8, 0, 0xFF, 0);
+  var_a1 = gEngineApp_m_Settings_unk14[0];
+  new_var = Menu_StepValue_2(arg1, (s32) var_a1, 8, 0, 0xFF, 0);
   var_a1 = new_var;
   if (var_a1 == 0xF7)
   {

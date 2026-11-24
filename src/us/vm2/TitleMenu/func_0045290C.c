@@ -1,11 +1,12 @@
-#include "common.h"
-#include "m2c_macros.h"
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80444CF8_de_3.c, func_804446D8_de.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
-
+#include "rw/abu_types.h"
 #include "globals/game.h"
+#include "protos/menu.h"
 
-s32 Menu_StepDebugMode_2(s32 arg0, s32 arg1) {
-    gEngineApp_m_Settings_unk18[0] = Menu_StepValue_2(arg1, (s32) gEngineApp_m_Settings_unk18[0], 1, 0, 2, 1);
+s32 Menu_StepDebugMode_2(void *first, void *second) {
+    u8 *option = &gEngineApp_m_Settings.unk18;
+    *option = Menu_StepValue_2(second, *option, 1, 0, 2, 1);
     return 0;
 }

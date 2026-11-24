@@ -1,19 +1,16 @@
-#include "common.h"
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8043E830_de.c, func_8043EA4C_de.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+#include "rw/abu_types.h"
 #include "globals/menu.h"
 #include "structs/game.h"
 
-void Controller_UnwatchPak(sptr);
-s32 CEngineApp__SetupFadeTo(sptr, s32);
-
-
-s32 SingleMenu_GoBack_2(s32 arg0, void *arg1)
-{
-  s8 *new_var2;
-  int new_var;
-  CEngineApp__SetupFadeTo((sptr) (&gEngineApp), 8);
-  new_var2 = (s8 *) (*((void **) (((s8 *) arg1) + 0x20)));
-  gInSinglePlayerMenu = 0;
-  new_var = 1;
-  Controller_UnwatchPak((s32) (*((s8 *) (new_var2 + 4))));
-  return new_var;
+extern void CEngineApp__SetupFadeTo(struct GameSession *object, int value);
+extern s32 SingleMenu_GoBack_2(void *arg0, Outer8043E56C *arg1);
+extern void Controller_UnwatchPak(sptr arg0);
+s32 SingleMenu_GoBack_2(void *arg0, Outer8043E56C *arg1) {
+    CEngineApp__SetupFadeTo(&gEngineApp, 8);
+    gInSinglePlayerMenu = 0;
+    Controller_UnwatchPak(arg1->unk20->unk4);
+    return 1;
 }

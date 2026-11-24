@@ -1,22 +1,22 @@
 #include "common.h"
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
+#include "protos/menu.h"
 
-s32 Music_SetTrack(s32);
-s32 MenuPool_OpenChildMenu_2(sptr, sptr, sptr);
+void Music_SetTrack(s32 track);
 
-s32 Sound__StopAllExcept(s32);                     /* extern */
-s32 Sound__SetForce2D(s32);                     /* extern */
+void Sound__StopAllExcept(s32 volume);
+void Sound__SetForce2D(s32 on);
 s32 Music_GetTrack();                                /* extern */
-s32 Controller_DisableMenuSounds();                            /* extern */
+void Controller_DisableMenuSounds(void);
 
-s32 TitleMenu_SoundOptions_2(s32 arg0, s32 arg1, s32 arg2) {
+s32 TitleMenu_SoundOptions_2(sptr arg0, sptr arg1, sptr arg2) {
     Sound__StopAllExcept(-1);
     sSoundMenuSavedTrack = Music_GetTrack();
     Music_SetTrack(sSoundMenuTrack);
     Sound__SetForce2D(1);
     sSoundMenuActive = 0;
     Controller_DisableMenuSounds();
-    MenuPool_OpenChildMenu_2(arg2, arg1, (sptr) &gSoundOptionsMenuDesc_2);
+    MenuPool_OpenChildMenu_2(arg2, arg1, &gSoundOptionsMenuDesc_2);
     return 1;
 }

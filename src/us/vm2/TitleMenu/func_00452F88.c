@@ -1,21 +1,10 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80444EC0_14.CPP, func_804453F0_de.
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8044524C_us_rev1_14.c, func_804453F0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+#include "rw/abu_types.h"
 #include "globals/menu.h"
 
-extern void Music_SetTrack(s32 a);
-struct ObjRecAtB0;
-struct ObjRecAtB0 {
-    char pad0[0xB0];
-    s32 unkB0;
-};
-struct ObjRecAtB0;
-typedef struct ObjRecAtB0 ObjRecAtB0;
-struct RecordRecAt20V1;
-struct ObjRecAtB0;
-struct RecordRecAt20V1 {
-    char pad[0x20];
-    struct ObjRecAtB0 *inner;
-};
+void Music_SetTrack(s32 track);
 s32 SoundMenu_StepMusicTrack_2(s32 arg0, struct RecordRecAt20V1 *arg1) {
     s32 var_a0;
     var_a0 = sSoundMenuTrack;

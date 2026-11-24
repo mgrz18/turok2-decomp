@@ -2,7 +2,7 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-s32 Controller_WatchPak(s8);                          /* extern */
+void Controller_WatchPak(s32 on);
 
 void SingleMenu_InitAfterPak_2(Menu *arg0) {
     Controller_WatchPak(arg0->controller->port);
