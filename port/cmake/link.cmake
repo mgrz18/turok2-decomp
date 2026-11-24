@@ -122,10 +122,10 @@ set(T2_LINK_REPLACED
     # (SndSeq_Load: under #ifndef TARGET_PORT in the merged SndSeq.c)
     # (Sound__IsPlaying: under #ifndef TARGET_PORT in the merged Sound.c)
     # (LoopSounds_Construct .. LoopSounds_StopAll: under #ifndef TARGET_PORT in the merged LoopSounds.c)
-    func_00275FA0.c   # SndQueue_Add
-    func_00276180.c   # SndQueue_Update
-    func_002763AC.c   # SndQueue_InitNode
-    func_002764C4.c   # SndQueue_RequeueVoice
+    # (SndQueue_Add: under #ifndef TARGET_PORT in the merged SndQueue.c)
+    # (SndQueue_Update: under #ifndef TARGET_PORT in the merged SndQueue.c)
+    # (SndQueue_InitNode: under #ifndef TARGET_PORT in the merged SndQueue.c)
+    # (SndQueue_RequeueVoice: under #ifndef TARGET_PORT in the merged SndQueue.c)
     # (SpeechPlayer_Update .. SpeechPlayer_StopUnlocked, all but SpeechPlayer_ReadHeader: under #ifndef TARGET_PORT in the merged SpeechPlayer.c)
     # libaudio's synthesizer driver, voice calls and event helpers (views at N64 offsets):
     # port/audio/t2audio_lib.c
