@@ -704,10 +704,7 @@ void MenuItem_DrawModel_2(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unus
 extern void *func_00416B28_4143DC() __asm__("MenuPool_GetCamera_2");
 extern void func_00416C00_4143DC() __asm__("Menu_ResetFlash_2");
 extern void func_00416C0C_4143DC(void *p) __asm__("Menu_StartFlash_2");
-/* The colour records a window starts with (Menu colors): 8 records of
- * 0x18 bytes, read as halfwords at 0, 4, 8 and bytes at 0xD, 0x11, 0x15 (the
- * low parts of six words: the symbol sits 2 bytes into the table). */
-typedef struct { u16 a; u8 pad2[2]; u16 b; u8 pad6[2]; u16 c; u8 padA[3]; u8 d; u8 pad0E[3]; u8 e; u8 pad12[3]; u8 f; u8 pad16[2]; } MenuColorInit;
+#include "structs/twin_menuitem.h"
 extern MenuColorInit D_800C1CD2[];
 /* Builds a window in its block: the items from the desc's table, the
  * extras after them, the colours, then the desc's init and the items' select
