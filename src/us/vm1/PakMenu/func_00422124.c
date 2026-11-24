@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "globals/menu.h"
+#include "structs/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
@@ -10,7 +11,6 @@
 #ifdef TARGET_PORT
 /* The port: RecordRecAt24 reads the player, the controller and the context at N64 offsets 0x1C/0x20/0x24;
  * the host Menu (structs/menu.h) has them pointer-wide further on. */
-#include "structs/menu.h"
 s32 GameNoteMenu_SelectNo(void *unused, Menu *record) {
     if (sGameNoteLoad != 0) {
         MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakLoadGameMenuDesc, (sptr) record->player,
@@ -22,8 +22,9 @@ s32 GameNoteMenu_SelectNo(void *unused, Menu *record) {
     return 1;
 }
 #else
-extern s32 GameNoteMenu_SelectNo(void *unused, struct RecordRecAt24 *record);
-s32 GameNoteMenu_SelectNo(void *unused, struct RecordRecAt24 *record) {
+/* The port body's signature; the N64 body reads the record through the Rage Wars view (a macro). */
+#define record ((struct RecordRecAt24 *) recordArg)
+s32 GameNoteMenu_SelectNo(void *unused, Menu *recordArg) {
     do {
         if (sGameNoteLoad != 0) {
             MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakLoadGameMenuDesc, record->first, record->second, 0);
@@ -33,4 +34,5 @@ s32 GameNoteMenu_SelectNo(void *unused, struct RecordRecAt24 *record) {
     } while (0);
     return 1;
 }
+#undef record
 #endif

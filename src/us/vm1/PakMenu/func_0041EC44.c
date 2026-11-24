@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "globals/menu.h"
+#include "structs/menu.h"
 #include "globals/pak.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
@@ -14,7 +15,6 @@
  * controller at N64 offsets (0xC, 0x1C, 0x20; items 0x28 apart): on the host it read the channel from
  * the menu's param and cleared the disabled bit of the wrong item (the load button stayed disabled,
  * the cursor bounced between it and CANCEL). The same code on the typed Menu (structs/menu.h). */
-#include "structs/menu.h"
 void PakMenu_InitLoadGame(Menu *menu) {
     s32 ch;
 
@@ -51,7 +51,10 @@ void PakMenu_InitLoadGame(Menu *menu) {
     }
 }
 #else
-void PakMenu_InitLoadGame(Shared_PakMenu *menu)
+/* The port body's signature; the N64 body reads the menu through the Rage Wars view (a macro: a local copy
+ * would move a register). */
+#define menu ((Shared_PakMenu *) menuArg)
+void PakMenu_InitLoadGame(Menu *menuArg)
 {
   Shared_PakMenu *new_var3;
   int new_var;
@@ -99,4 +102,5 @@ void PakMenu_InitLoadGame(Shared_PakMenu *menu)
     }
   }
 }
+#undef menu
 #endif
