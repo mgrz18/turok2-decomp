@@ -999,6 +999,96 @@ the compiler, 3 refused: `code/CScene` and `vm1/SceneLoad`, whose `.rodata` inte
 
 None needs a ROM change.
 
+## Round 28, part q4: data in place, `code/CEngineApp`, the CScene question
+
+**Merged: `code/Anim` (49 files -> `Anim.c`), `vm1/MpMenu` (72 -> `MpMenu.c`), `code/CEngineApp` (90 ->
+`CEngineApp_engine.c`, `--name`: `vm1/CEngineApp/CEngineApp.c` keeps its name).** Each:
+`merge_check.py --rodata-free` OK on the one-function files first (every step `asm_diff --base b9bb8125`
+0), then `merge_module.py --rodata-free`, a clean `make setup` + build + `make verify` byte-exact, the
+merged file through clang `-Wimplicit-function-declaration` (no implicit declaration), port md5s.
+
+Header work (one declaration per name):
+
+- **Struct-by-value callees through their words.** The port's `#define X X_i` lines at file scope would
+  rename the definition too once the module is one file (`Bits_ReadFloat` is defined in `Anim`). The
+  callers that pass a struct (or an `f32`) as the words it travels in call an asm-label name instead:
+  `Bits_ReadFloat_3` (`__asm__("Bits_ReadFloat")` on the N64, the real `port/game/t2abi.c` shim on the
+  port), `CQuaternion__Slerp_i`, `CVector3__Lerp_i`. Same code.
+- `Anim`: two files that redeclared Rage Wars basic types and `Func802608ECResult` include
+  `rw/abu_types.h`; `func_00216A9C`'s `Pack` is `AnimPack` (the header's `Pack` has the same layout,
+  but the file does not include it), `func_0021836C`'s `S` is `IdVec`.
+- `MpMenu`: `Controller_ConfirmPressed(ControllerProfile *)`, `Controller_WatchPak(s32)`,
+  `sprintf(char *, const char *, ...)` one prototype each; the blue team score read as a scalar
+  (`globals/game.h` has the array) is `gMatchBlueTeamScore __asm__("gEngineApp_m_Settings_match_teamScore")`.
+- `CEngineApp`: callee prototypes from their definitions (`CPlayerPool__NewGame`, `CCameraPool__NewGame`,
+  `Render_SetRenderMode(u32)`, `Music_SetTrack`, `Controller_SetRumbleOptionAll`, `memset`, `protos/scene.h`'s
+  `CScene__*`). Where a definition takes fewer arguments than a caller passes (`CEngineApp__Boot`,
+  `CEngineApp__BeginDisplayList`, `CEngineApp__UpdateControllers`, `Credits_Draw`, `func_00289108`,
+  `CScene__InitPersistentData`, the N64 one-argument `CCameraPool__NewGame` call), the definition keeps its
+  prototype and the call casts the function (`((void (*)(T)) f)(x)`: the same `jal`, the same argument
+  registers). The array views of scalars (`gCreditsDone`, `gCreditsTimeLeft`,
+  `gMergedController_buttonsSingle`, the `MenuPool` as bytes) are asm-label names.
+  `CEngineApp__SubmitGfxTask`'s N64 body takes the port body's `struct CEngineApp *`/`struct CFrameData *`
+  and reads them through macro views (`#define gfx ((GfxState *) app)`): a local copy moved a register.
+
+**Data defined by the merged file.**
+
+- `Anim`: `D_800A58F4` (0x38000100) is `CAnimationState__GetBoneRotation`'s own literal, 1/32767
+  (`3.051851e-5f`, the value `Anim_GetBoneRotation` already wrote): it was the unnamed piece between two
+  slices. `D_800ACB50` (90.0f) stays an extern: it is in the engine pool (`ABCA8.rodata.s`).
+- `MpMenu`: the ROM's `.rodata` for the object starts with five strings, `"%04d"`, `" "`, `"%02d"`,
+  `"  %02d"`, `"none"`, before `MpMenu_StartFragTag`'s literals, and `"%3d"` sits between
+  `MpMenu_StartFragTag`'s and `MpMenu_StartBloodLust`'s. The functions using them come later in `.text`,
+  and other functions read them by name, so in the original an earlier definition emitted them (an inline
+  label helper or the menu tables: the vm1 `.data` items point at `" "`; cc1 writes a string where it is
+  first expanded and pools later uses). The merged file defines them in place as data under their
+  symbol names, N64 only (the port keeps the generated copies):
+  `const char sFinalScoreMenuFmt_04d_def[] __asm__("sFinalScoreMenuFmt_04d") = "%04d";` and so on
+  (`D_800C0E78` `" "`, `D_800C0E7C` `"%02d"`, `sLimitLabelFmt_02d`, `sLimitLabelText_None`,
+  `sMpMenuFmt_3d`); the label functions read them by name (`MPMENU_FMT_02D` for the one without a
+  header name). `sMpMenuFmt_3d` is also read by `vm2/MpMenu/MpMenu_2.c`: before the merge only the
+  `C1A9C` piece defined it, so it must be defined by the merged file.
+- `CEngineApp`: `mainproc`'s build stamp (`"%s %s"`, `"Nov 10 1998"`, `"13:17:04"`) is in the ROM before
+  `CEngineApp__Main`'s literals although `mainproc` comes later in `.text` (the MpMenu pattern): N64-only
+  `const char sEngineStamp{Fmt,Date,Time}[]` before `CEngineApp__Main`, read by `mainproc` (the port
+  keeps the literals). The unnamed 60.0f at 0xAA9FC is `EngineMode01_Legal_Retrace`'s first literal (the C read
+  it as `D_800A9DFC`); the asm `func_002C232C` reads it too, so `D_800A9DFC` is now an absolute symbol in
+  `versions/symbols_manual.us.txt`.
+
+**`code/CScene` + `vm1/SceneLoad`: not one clean split at 0x224ED0.** Round 27 asked whether the engine
+part is two objects (0x220260..0x224ED0 and on), with `CScene__LoadBinaryBlock` (`func_00224D54`) and
+`CScene__LoadGraphicSet` (`func_00224DF4`) `DEFERRED` at the end of the first. For it: 0x224ED0 starts on
+16; the two functions are the last before it; their strings (`"binary block"`, `"graphicset"`, 0xA6B38)
+come before `func_00220D00`'s 0.5f; and cc1 only puts a function's strings before its code in two ways
+(checked with the game's cc1): the function is `inline` (code at the end of the object, also when an
+`extern inline` body is redefined later in the file: the real definition is still output last), or an
+earlier function expanded the same string. No other function reads 0xA6B38/0xA6B48 (no inlined copy
+elsewhere), so it is the first.
+Against a split there: the `.rodata` of the first object would end at 0xA6BF0 (also on 16, between
+`func_00223A94`'s and `func_00225354`'s slices), yet three strings in it are pooled with functions after
+0x224ED0: `"level index"` (0xA6AC0, `CScene__LoadLevel`'s; read by `CScene__GetLevelName`,
+`func_0022629C`), `"warp dests"` (0xA6BC4, `CScene__FindWarpDests`'; read by `func_0042C560`, whose
+own `.rodata` is at 0xA6C0C, after `func_00226024`'s) and `"level name"` (0xA6BD0: no slice at all; only
+`CScene__GetLevelName` reads it, and it lies before `func_00223A94`'s slice). A literal is pooled only
+inside one compilation unit, so either those three were named global strings in the original (a
+`.rodata` array another object reads by name), or the module is one object and the strings come from
+earlier inline expansions. `CScene__GetLevelName` shows the same pattern as the two loaders (its string
+far before its code; 0x226390, after it, also starts on 16). Next step: try the one-object form first
+(the two loaders and `CScene__GetLevelName` as `static __inline__` helpers defined where their strings
+are, each with a non-inline wrapper where its code is, `merge_check --margs "--vm src/us/vm1/SceneLoad"`
+decides), then the split; the ~140 header conflicts of round 27 come either way.
+
+**State of the part's directories.** Merged: `code/{Anim, CEngineApp}`, `vm1/MpMenu` (211 files -> 3).
+Left:
+
+| Directory | What is left |
+|---|---|
+| `code/Trail` (45) | `rw/abu_types.h`'s `struct Morph` (`blends`/`first`/`second`...) against `structs/morph.h`'s (`items`/`pointsA`/`pointsB`..., same layout): a merged file includes both; the five `rw/abu_types.h` files need rewriting over the real types (the q2 kind of work), then about 15 callee prototypes (`CMtxF__*`, `CVector3__*`, `DList_*`, `NodePool_Alloc`) |
+| `code/CParticle` (62) | about 30 names, the `CParticleSystem__Spawn` family; then the float table as C data |
+| `code/CGameObjectInstance` (64) | about 48 names (`CAnimationState__Reset`, `CGameObjectInstance__PickRandomAnim`...); `sCGameObjectInstanceCacheDesc_AnimObjectInfo` read by 7 files |
+| `code/CMtxF` (124) | about 25 names in the first pass (`Actors_GetLightVolumeFalloff`, `ModelVertex`/`VertexGroup`/`PlacedProp` per-file types, `CISet__GetBlock`, `CStaticObject__*`), more behind them |
+| `code/CScene`, `vm1/SceneLoad`, `vm2/SceneLoad` | the object question above, then the round-27 conflicts |
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
