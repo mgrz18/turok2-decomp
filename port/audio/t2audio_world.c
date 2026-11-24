@@ -1075,15 +1075,22 @@ SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, s32 ta
     v->soundId = m->cueId;
     v->reset = m->unk2BAC;
     v->hasTrack = 0;
+    /* Until round 25 the two id tables reached the host as raw N64 bytes (D_800B2A34/D_800B2A44
+     * had no type), so every id read byte-swapped (0x78 as 0x78000000) and no voice matched.
+     * Round 25 n4 typed them (globals/audio.h): the host then does what the N64 does (the track
+     * voices stop with the music), which changes the random stream of every run (default run
+     * af8bd840 instead of cd2d68ce, first difference at frame 117323). Kept as before, swapped
+     * back, until a port round re-baselines the reference runs (docs/port/STATUS.md, round 25). */
+#define T2_VOICE_ID(x) ((s32) __builtin_bswap32((u32) (x)))
     for (i = 0; i < 4; i++) {
-        if (v->soundId == sVoiceTrackSounds[i]) {
+        if (v->soundId == T2_VOICE_ID(sVoiceTrackSounds[i])) {
             v->hasTrack = 1;
             break;
         }
     }
     v->unkC4 = 1;
     for (i = 0; i < 6; i++) {
-        if (v->soundId == sVoiceNoUnkC4Sounds[i]) {
+        if (v->soundId == T2_VOICE_ID(sVoiceNoUnkC4Sounds[i])) {
             v->unkC4 = 0;
             break;
         }
