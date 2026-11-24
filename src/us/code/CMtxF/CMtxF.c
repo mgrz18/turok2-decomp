@@ -382,6 +382,13 @@ void CMtxF__InvertAffine(f32 *out, f32 *m) {
     out[15] = one;
 }
 
+#ifndef TARGET_PORT
+/* The up vector CMtxF__SetLookDirection copies (as D_800A5404): in the ROM's .rodata between
+ * CMtxF__InvertAffine's literal and CMtxF__MultiplyAffine's, so defined here (the port keeps the
+ * generated copy). */
+const CVector3 sCMtxFUp_def __asm__("D_800A5404") = { 0.0f, 1.0f, 0.0f };
+#endif
+
 void CMtxF__MultiplyAffine(f32 *out, f32 *left, f32 *right)
 {
     out[(0) * 4 + (0)] = (left[(0) * 4] * right[(0)]) + (left[(0) * 4 + 1] * right[4 + (0)]) + (left[(0) * 4 + 2] * right[8 + (0)]);
@@ -3697,3 +3704,9 @@ s32 func_00214188(s32 *arg0) {
     }
     return var_s1;
 }
+
+#ifndef TARGET_PORT
+/* The last bytes of the object's .rodata: a cache name no function in the ROM reads (Rage Wars' lit
+ * vertices are "lit vertices"); stale linker bytes follow up to the next object (versions/ld_fill.us.txt). */
+const char sLitVerticesName_def[] __asm__("D_800A57BC") = "Lit Vertices";
+#endif
