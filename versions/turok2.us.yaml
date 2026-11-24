@@ -2868,9 +2868,7 @@ segments:
     vram: 0x800BFD50     # KSEG0: datos, no useg (0xC0950 + 0x7FFFF400)
     subsegments:
       - [0xC0950, rodata]
-      - [0xC0E10, .rodata, vm1/AutomapDraw/func_00400000]
-      - [0xC0E14, .rodata, vm1/AutomapDraw/func_004001D0]
-      - [0xC0E30, .rodata, vm1/AutomapDraw/func_004004D8]
+      - [0xC0E10, .rodata, vm1/AutomapDraw/AutomapDraw]
       - [0xC0F14, rodata]
       - [0xC0F20, .rodata, vm1/MantidQueen/func_00401FCC]
       - [0xC0F30, .rodata, vm1/MantidQueen/func_00402BB0]
@@ -3159,18 +3157,7 @@ segments:
       # scored by how often their `jal`s land on a function boundary, they hit
       # 94.8% and 79.5% against the engine's own 88.0% and ~1.2% chance.
       # The third module is not one of these — see vm_overlay_2 below.
-      - [0x14A000, c, vm1/AutomapDraw/func_00400000]
-      - [0x14A1D0, c, vm1/AutomapDraw/func_004001D0]
-      - [0x14A4D8, c, vm1/AutomapDraw/func_004004D8]
-      - [0x14BB30, c, vm1/AutomapDraw/func_00401B30]
-      - [0x14BB70, c, vm1/AutomapDraw/func_00401B70]
-      - [0x14BC1C, c, vm1/AutomapDraw/func_00401C1C]
-      - [0x14BC78, c, vm1/AutomapDraw/func_00401C78]
-      - [0x14BC88, c, vm1/AutomapDraw/func_00401C88]
-      - [0x14BCA8, c, vm1/AutomapDraw/func_00401CA8]
-      - [0x14BCC4, c, vm1/AutomapDraw/func_00401CC4]
-      - [0x14BCE8, c, vm1/AutomapDraw/func_00401CE8]
-      - [0x14BD80, c, vm1/AutomapDraw/func_00401D80]
+      - [0x14A000, c, vm1/AutomapDraw/AutomapDraw]
       - [0x14BE30, c, vm1/MantidQueen/func_00401E30]
       - [0x14BFCC, c, vm1/MantidQueen/func_00401FCC]
       - [0x14C1C8, c, vm1/MantidQueen/func_004021C8]

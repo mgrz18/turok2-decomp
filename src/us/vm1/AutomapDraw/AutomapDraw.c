@@ -1,17 +1,155 @@
 #include "common.h"
+#include "structs/region.h"
+#include "globals/scene.h"
+#include "protos/scene.h"
+#include "globals/game.h"
+
+extern u8 D_800C894C; /* bottom of the stack */
+#ifdef TARGET_PORT
+/* the N64 compares the stack pointer with its main stack's bottom; the host asks its own thread's
+ * stack (t2os_stack_low, port/runtime/t2os.c: the address comparison depended on the layout) */
+int t2os_stack_low(const void *local);
+#define T2_STACK_LOW(local, bottom) t2os_stack_low(local)
+#else
+#define T2_STACK_LOW(local, bottom) ((uptr) (local) < (uptr) (bottom))
+#endif
+#define PLAYER_POS gEngineApp_m_Game.m_Automap.m_vPlayerPos
+#define NEAR(p) (((p)->x - PLAYER_POS.x) * ((p)->x - PLAYER_POS.x) + ((p)->z - PLAYER_POS.z) * ((p)->z - PLAYER_POS.z) < 167772.14f)
+
+/* Marks the regions around the camera, recursing into neighbours that have
+ * a corner within ~410 units of it. */
+void Automap_RevealRegion(CGameRegion *region) {
+    if (region == NULL || T2_STACK_LOW(&region, &D_800C894C)) {
+        return;
+    }
+    if (!(region->m_wFlags & 0x400)) {
+        CScene__SetLevelBit(&gScene, CScene__GetRegionIndex(&gScene, region), 1);
+    }
+    region->m_wFlags |= 0x8400;
+    if (!(NEAR(region->m_pVertices[0]) || NEAR(region->m_pVertices[1]) || NEAR(region->m_pVertices[2]))) {
+        return;
+    }
+    if (region->m_pNeighbours[0] != NULL && !(region->m_pNeighbours[0]->m_wFlags & 0x8000) && (REGION_WORD(region->m_pNeighbours[0]) & 6) != 2) {
+        Automap_RevealRegion(region->m_pNeighbours[0]);
+    }
+    if (region->m_pNeighbours[1] != NULL && !(region->m_pNeighbours[1]->m_wFlags & 0x8000) && (REGION_WORD(region->m_pNeighbours[1]) & 6) != 2) {
+        Automap_RevealRegion(region->m_pNeighbours[1]);
+    }
+    if (region->m_pNeighbours[2] != NULL && !(region->m_pNeighbours[2]->m_wFlags & 0x8000) && (REGION_WORD(region->m_pNeighbours[2]) & 6) != 2) {
+        Automap_RevealRegion(region->m_pNeighbours[2]);
+    }
+}
+
+#include "structs/camera.h"
+#include "structs/player.h"
+#include "structs/game.h"
+#include "globals/engine.h"
+#include "protos/player.h"
+
+/* Free-look camera driven by the C buttons. */
+typedef struct {
+    /* 0x00 */ s32 mode;
+    /* 0x04 */ s32 state;
+    /* 0x08 */ f32 blend;
+    /* 0x0C */ u8 pad0C[0x20 - 0xC];
+    /* 0x20 */ f32 yaw;
+    /* 0x24 */ f32 unk24;
+    /* 0x28 */ f32 pitch;
+    /* 0x2C */ f32 yawTarget;
+    /* 0x30 */ f32 unk30;
+    /* 0x34 */ f32 pitchTarget;
+} Look004001D0;
+s32 MenuPool_CountOpen(u8 *a0);
+void Math_EaseToward(f32 *value, f32 target, f32 rate);
+
+void Automap_Update(Look004001D0 *look) {
+    CPlayer *player;
+    s32 held;
+    GameSettings *sub = &gEngineApp_m_Game.m_Settings;
+
+    if (sub->multiplayer) {
+        return;
+    }
+    player = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
+    if (player == NULL) {
+        return;
+    }
+    if (look->mode == 0) {
+        if (!MenuPool_CountOpen((u8 *)player->m_pCamera->m_MenuPool) && (player->m_ContState.m_dwButtonsSingle & 0x20) && player->m_SniperMode == 0) {
+            look->mode = 1;
+        }
+    } else if (player->m_SniperMode != 0) {
+        look->mode = 0;
+    } else if (look->mode == 1) {
+        if ((player->m_ContState.m_dwButtonsSingleNoHold & 0x20) || !(player->m_ContState.m_dwButtons & 0x20)) {
+            look->mode = 2;
+        }
+    } else if (player->m_ContState.m_dwButtonsSingleNoHold & 0x20) {
+        look->mode = 0;
+    }
+    if (look->mode != 0 && gEngineApp_m_Settings.mode == 13 && gEngineApp_m_Settings.paused == 0) {
+        if (look->state != 1 && look->state != 2) {
+            look->state = 1;
+        }
+    } else if (look->state != 0 && look->state != 3) {
+        look->state = 3;
+    }
+    if (look->state != 0) {
+        held = player->m_ContState.m_dwButtons;
+        if (held & 0x20) {
+            if (held & 0x200) {
+                look->yawTarget += gFrameIncrement * 153.59999f;
+            } else if (held & 0x100) {
+                look->yawTarget -= gFrameIncrement * 153.59999f;
+            }
+            held = player->m_ContState.m_dwButtons;
+            if (held & 0x800) {
+                look->pitchTarget += gFrameIncrement * 153.59999f;
+            } else if (held & 0x400) {
+                look->pitchTarget -= gFrameIncrement * 153.59999f;
+            }
+        } else {
+            look->yawTarget = 0.0f;
+            look->unk30 = 0.0f;
+            look->pitchTarget = 0.0f;
+        }
+        Math_EaseToward(&look->yaw, look->yawTarget, 0.33333334f);
+        Math_EaseToward(&look->pitch, look->pitchTarget, 0.25f);
+    }
+    switch (look->state) {
+        case 2:
+            break;
+        case 1:
+            look->blend += gFrameIncrement * 0.13333334f;
+            if (look->blend >= 1.0f) {
+                look->blend = 1.0f;
+                look->state = 2;
+            }
+            break;
+        case 3:
+            look->blend -= gFrameIncrement * 0.26666668f;
+            if (look->blend <= 0.0f) {
+                look->blend = 0.0f;
+                look->state = 0;
+                look->yaw = 0.0f;
+                look->unk24 = 0.0f;
+                look->pitch = 0.0f;
+                look->yawTarget = 0.0f;
+                look->unk30 = 0.0f;
+                look->pitchTarget = 0.0f;
+            }
+            break;
+    }
+}
+
 #include "gfx.h"
 #include "gbi_t2.h"
 #include "structs/gbi.h"
 #include "structs/vector.h"
-#include "structs/region.h"
 #include "structs/world.h"
-#include "globals/scene.h"
 #include "globals/render.h"
-#include "globals/engine.h"
 #include "globals/automap.h"
-#include "globals/game.h"
 #include "protos/iset.h"
-
 /* The automap: the level's navigation regions are drawn as lines in a 2D
  * orthographic view around the player, with an arrow for the player and a
  * compass in the corner. */
@@ -29,7 +167,6 @@ typedef struct {
     /* 0x14 */ CVector3 pos;
     /* 0x20 */ CVector3 offset;
 } MapView;
-
 typedef struct {
     /* 0x00 */ f32 minX;
     /* 0x04 */ f32 minZ;
@@ -37,14 +174,11 @@ typedef struct {
     /* 0x0C */ f32 maxZ;
     /* 0x10 */ u32 count;
 } Area; /* 0x14 bytes */
-
 typedef struct {
     /* 0x000 */ u8 pad0[0x110];
     /* 0x110 */ void *colorImage;
 } FrameBuffers;
-
 extern Vp gScreenViewport[];
-
 extern void CMtxF__InvertAffine(f32 *out, f32 *m);
 extern void CMtxF__ToMtxAffine(f32 *m, Mtx *out);
 extern void CMtxF__TransformPoint(f32 *m, CVector3 *in, CVector3 *out);
@@ -56,7 +190,6 @@ extern void CMtxF__RotateZ(f32 *m, f32 angle);
 extern f32 func_002974C0(f32 x); /* cos */
 extern void guOrtho(Mtx *m, f32 l, f32 r, f32 b, f32 t, f32 n, f32 f, f32 scale);
 extern f32 func_002982F0(f32 x); /* sin */
-
 #define MIN(a, b) ((b) < (a) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
@@ -629,4 +762,206 @@ draw:
     GFX_CMD(LINE_W0(5, 6), 0);
     GFX_CMD(LINE_W0(6, 7), 0);
 #endif
+}
+
+typedef struct {
+    s32 v[3];
+} Triple;
+typedef struct {
+    /* 0x00 */ u8 pad0[0xC];
+    /* 0x0C */ s32 a;
+    /* 0x10 */ s32 b;
+    /* 0x14 */ Triple c;
+} Obj00401B30;
+void Automap_RevealAroundPlayer(void *automap);
+#ifdef TARGET_PORT
+/* The port: the caller's types (CPlayerPool__Update: the region, the facing as f32 and the
+ * position as a CVector3 by value; as s32 and the Rage Wars Triple they arrived in other
+ * registers on x86-64). The region goes to CAutomap.m_pHostRegion, the N64 word keeps
+ * whether there is one (Automap_Draw tests it). */
+#include "structs/game.h"
+#include "structs/vector.h"
+void Automap_SetPlayer(Obj00401B30 *obj, struct CGameRegion *a, f32 b, CVector3 c) {
+    obj->a = a != NULL;
+    *(f32 *) &obj->b = b;
+    *(CVector3 *) &obj->c = c;
+    ((CAutomap *) obj)->m_pHostRegion = a;
+    Automap_RevealAroundPlayer(obj);
+}
+#else
+
+void Automap_SetPlayer(Obj00401B30 *obj, sptr a, s32 b, Triple c) {
+    obj->a = a;
+    obj->b = b;
+    obj->c = c;
+    Automap_RevealAroundPlayer(obj);
+}
+#endif
+#ifdef TARGET_PORT
+/* The port: the region Automap_SetPlayer keeps pointer-wide (CAutomap.m_pHostRegion). */
+#include "structs/game.h"
+typedef struct {
+    u8 pad0[__builtin_offsetof(CAutomap, m_pHostRegion)];
+    CGameRegion *node;
+} Arg0;
+#else
+typedef struct {
+    /* 0x0 */ u8 pad0[0xC];
+    /* 0xC */ CGameRegion *node;
+} Arg0;
+#endif
+
+void Automap_ClearVisited(CGameRegion *arg0);
+
+/* The caller's CAutomap (structs/game.h), through the view above. */
+void Automap_RevealAroundPlayer(void *automap) {
+    Arg0 *arg0 = automap;
+    CGameRegion *temp_s0;
+    CGameRegion *temp_a0;
+    CGameRegion *temp_a0_2;
+    CGameRegion *temp_a0_3;
+
+    Automap_RevealRegion((sptr) arg0->node);
+    temp_s0 = arg0->node;
+    if (temp_s0 != 0) {
+        temp_a0 = temp_s0->m_pNeighbours[0];
+        temp_s0->m_wFlags = (u16) (temp_s0->m_wFlags & 0x7FFF);
+        if ((temp_a0 != NULL) && (temp_a0->m_wFlags & 0x8000)) {
+            Automap_ClearVisited((sptr) temp_a0);
+        }
+        temp_a0_2 = temp_s0->m_pNeighbours[1];
+        if ((temp_a0_2 != NULL) && (temp_a0_2->m_wFlags & 0x8000)) {
+            Automap_ClearVisited((sptr) temp_a0_2);
+        }
+        temp_a0_3 = temp_s0->m_pNeighbours[2];
+        if ((temp_a0_3 != NULL) && (temp_a0_3->m_wFlags & 0x8000)) {
+            Automap_ClearVisited((sptr) temp_a0_3);
+        }
+    }
+}
+
+#include "m2c_macros.h"
+
+s32 Cinema_PathPlaying();                                /* extern */
+
+s32 Automap_IsShown(void *arg0)
+{
+  s32 var_s0;
+  s32 var_v0;
+  var_s0 = 0;
+  if ((*((s32 *) (((s8 *) arg0) + 4))) != 0)
+  {
+    var_v0 = 0;
+    if (gPersistentDataLoaded != 0)
+    {
+      var_v0 = 0;
+      if (Cinema_PathPlaying() == 0)
+      {
+        var_v0 = gEngineApp_m_Settings.nextMode ^ 1;
+        {
+          var_s0 = ((u32) var_v0) > 0U;
+          goto block_4;
+        }
+      }
+    }
+  }
+  else
+  {
+    block_4:
+    ;
+
+  }
+  return var_s0;
+}
+
+typedef struct {
+    /* 0x0 */ u8 pad0[4];
+    /* 0x4 */ s32 state;
+} Unk00401C78;
+
+s32 Automap_IsOpen(Unk00401C78 *arg0) {
+    return (u32) (arg0->state - 1) < 2U;
+}
+
+void Automap_Open(Unk00401C78 *arg0) {
+    if ((u32) (arg0->state - 1) >= 2U) {
+        arg0->state = 1;
+    }
+}
+
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 state;
+} Phase;
+
+void Automap_Close(Phase *arg0) {
+    s32 temp_v0;
+
+    temp_v0 = arg0->state;
+    if ((temp_v0 != 0) && (temp_v0 != 3)) {
+        arg0->state = 3;
+    }
+}
+
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ u8 padC[0x20 - 0xC];
+    /* 0x20 */ s32 unk20[6];
+} Module;
+
+void Automap_Reset(Module *arg0) {
+    arg0->unk8 = 0;
+    arg0->unk4 = 0;
+    arg0->unk20[0] = 0;
+    arg0->unk20[1] = 0;
+    arg0->unk20[2] = 0;
+    arg0->unk20[3] = 0;
+    arg0->unk20[4] = 0;
+    arg0->unk20[5] = 0;
+}
+
+void Automap_ClearVisited(CGameRegion *arg0) {
+    CGameRegion *temp_a0;
+    CGameRegion *temp_a0_2;
+    CGameRegion *temp_a0_3;
+
+    if (arg0 != NULL) {
+        temp_a0 = arg0->m_pNeighbours[0];
+        arg0->m_wFlags &= 0x7FFF;
+        if ((temp_a0 != NULL) && (temp_a0->m_wFlags & 0x8000)) {
+            Automap_ClearVisited(temp_a0);
+        }
+        temp_a0_2 = arg0->m_pNeighbours[1];
+        if ((temp_a0_2 != NULL) && (temp_a0_2->m_wFlags & 0x8000)) {
+            Automap_ClearVisited(temp_a0_2);
+        }
+        temp_a0_3 = arg0->m_pNeighbours[2];
+        if ((temp_a0_3 != NULL) && (temp_a0_3->m_wFlags & 0x8000)) {
+            Automap_ClearVisited(temp_a0_3);
+        }
+    }
+}
+
+/* Returns 0 when both points are strictly outside the same edge of the quad (x/z plane). */
+s32 Automap_EdgeVisible(f32 (*quad)[3], f32 *a, f32 *b) {
+    s32 i;
+    f32 *p;
+    f32 *q;
+    f32 dz;
+    f32 dx;
+
+    for (i = 0; i < 4; i++) {
+        p = quad[i];
+        q = (i == 3) ? quad[0] : quad[i + 1];
+        dz = q[1] - p[1];
+        dx = p[0] - q[0];
+        if (dz * (a[0] - p[0]) + dx * (a[2] - p[1]) > 0.0f) {
+            if (dz * (b[0] - p[0]) + dx * (b[2] - p[1]) > 0.0f) {
+                return 0;
+            }
+        }
+    }
+    return 1;
 }
