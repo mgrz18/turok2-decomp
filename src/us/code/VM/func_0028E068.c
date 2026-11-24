@@ -4,24 +4,11 @@
 #include "structs/pager.h"
 #include "globals/pager.h"
 #include "protos/ultra.h"
-
-
-typedef struct FaultedThread {
-    /* 0x000 */ u8 pad0[0x12];
-    /* 0x012 */ s16 state;
-    /* 0x014 */ u8 pad14[3];
-    /* 0x017 */ u8 slot;
-    /* 0x018 */ u8 pad18[0x120 - 0x18];
-    /* 0x120 */ u32 cause;
-    /* 0x124 */ u32 badVaddr;
-} FaultedThread;
+#include "protos/vm.h"
 
 extern s32 D_800B7658;
 
 extern FaultedThread *__osGetCurrFaultedThread(void);     /* __osGetCurrFaultedThread */
-extern void VM_MapTLBEntry(s16 page, PageMapping *mapping, s32 slot, u8 *map);
-extern void VM_UnmapTLBEntry(PageMapping *mapping);   /* releases its TLB slot */
-extern PageRegion *VM_FindRegion(u16 page);
 extern void osSetIntMask(s32);
 extern void SavedPlayers_Arm(void);
 

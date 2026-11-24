@@ -1,19 +1,13 @@
-/* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/CODE_8023CBF8.CPP, func_8023CDD4_de, with Turok 2's layouts. */
+/* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/CODE_8023CBF8.CPP, func_8023CDD4_de, with Turok 2's layouts
+ * (round 29, part r2: the request is a PageRegionRequest). */
 #include "common.h"
 #include "structs/pager.h"
 #include "globals/pager.h"
 #include "protos/ultra.h"
 
-typedef struct {
-    u8 pad0[0x4];
-    s32 size;            /* 0x04 */
-    PageRegion *region;      /* 0x08 */
-    void *mq;            /* 0x0C reply queue */
-} RegionDesc;
-
-
-
-void VM_AllocRegion(RegionDesc *desc) {
+/* Appends desc->region after the last region (on an even page), its pages not resident, and
+ * replies with its virtual address. */
+void VM_AllocRegion(PageRegionRequest *desc) {
     PageRegion *p;
     PageRegion *prev;
     PageRegion *r;
@@ -48,5 +42,5 @@ void VM_AllocRegion(RegionDesc *desc) {
     while (i-- != 0) {
         *map++ = fill;
     }
-    osSendMesg(desc->mq, (void *) (start << 12), 1);
+    osSendMesg(desc->reply, (void *) (start << 12), 1);
 }

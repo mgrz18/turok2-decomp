@@ -16,8 +16,8 @@ void memset(void *dst, s32 value, sptr size);
 void CLoader__LoadSync(CLoader *thisx, uptr address, sptr length, void *dest);
 void VM_HandleTLBMiss(void);
 void VM_FinishPageJob(PageJob *job);
-void VM_FreeRegion(PageJob *job);
-void VM_AllocRegion(PageJob *job);
+void VM_FreeRegion(PageFreeRequest *req);
+void VM_AllocRegion(PageRegionRequest *desc);
 void VM_ReaderThread(void *unused);
 
 /* Unlinks a mapping from a doubly linked chain. */

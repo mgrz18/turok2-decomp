@@ -17,8 +17,8 @@ void memset(void *dst, s32 value, sptr size);
 void CLoader__LoadSync(CLoader *thisx, uptr address, sptr length, void *dest);
 void VM_HandleTLBMiss(void);
 void VM_FinishPageJob(PageJob *job);
-void VM_FreeRegion(PageJob *job);
-void VM_AllocRegion(PageJob *job);
+void VM_FreeRegion(PageFreeRequest *req);
+void VM_AllocRegion(PageRegionRequest *desc);
 void VM_ReaderThread(void *unused);
 
 /* Resource manager thread: starts the reader thread, then dispatches requests forever. */
@@ -38,10 +38,10 @@ void VM_ManagerThread(void) {
                 VM_FinishPageJob(request);
                 break;
             case 3:
-                VM_AllocRegion(request);
+                VM_AllocRegion((PageRegionRequest *)request);
                 break;
             case 2:
-                VM_FreeRegion(request);
+                VM_FreeRegion((PageFreeRequest *)request);
                 break;
         }
     }

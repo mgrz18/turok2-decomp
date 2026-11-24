@@ -93,6 +93,34 @@ typedef struct Pager {
     /* 0xCF4 */ u8 _padCF4[4];
 } Pager; /* size 0xCF8 */
 
+/* The libultra thread fields the pager reads of a thread stopped on a TLB miss (VM_HandleTLBMiss,
+ * VM_FinishPageJob). */
+typedef struct FaultedThread {
+    /* 0x000 */ u8 pad0[0x12];
+    /* 0x012 */ s16 state;
+    /* 0x014 */ u8 pad14[3];
+    /* 0x017 */ u8 slot;
+    /* 0x018 */ u8 pad18[0x120 - 0x18];
+    /* 0x120 */ u32 cause;
+    /* 0x124 */ u32 badVaddr;
+} FaultedThread;
+
+/* The other requests VM_ManagerThread takes on gPager.completion (type at 0 as in PageJob). */
+typedef struct PageRegionRequest {   /* type 3: VM_AllocRegion */
+    /* 0x0 */ s16 type;
+    /* 0x2 */ u8 _pad2[2];
+    /* 0x4 */ s32 size;
+    /* 0x8 */ PageRegion *region;      /* filled in; its page map follows it */
+    /* 0xC */ OSMesgQueue *reply;      /* gets the region's virtual address */
+} PageRegionRequest;
+
+typedef struct PageFreeRequest {     /* type 2: VM_FreeRegion */
+    /* 0x0 */ s16 type;
+    /* 0x2 */ u8 _pad2[2];
+    /* 0x4 */ u32 address;             /* the region's virtual address */
+    /* 0x8 */ OSMesgQueue *reply;      /* gets the region back */
+} PageFreeRequest;
+
 /* The counters at the start of the Pager (VM_GetStats copies them out). */
 typedef struct PagerStats {
     /* 0x00 */ s32 requests;
