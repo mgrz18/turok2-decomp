@@ -4,42 +4,17 @@
 #include "globals/scene.h"
 #include "globals/pickup.h"
 
-#ifdef TARGET_PORT
-/* the picker is the CPlayer: the view at its host offsets (round 7 v2); the camera (N64
- * 0x51C) is a pointer, pointer-wide here */
+#include "structs/vector.h"
 #include "structs/player.h"
-#define T2_HOFF_Picker(m) __builtin_offsetof(CPlayer, m)
-typedef struct Picker {
-    union {
-        struct { u8 _hp_x[T2_HOFF_Picker(m_CharacterActor.header.m_vPos)]; s32 x; s32 y; s32 z; }; /* N64 0x4 */
-        struct { u8 _hp_hud[T2_HOFF_Picker(m_pCamera)]; sptr hud; }; /* N64 0x51C */
-        struct { u8 _hp_keys[T2_HOFF_Picker(m_Data.m_KeySet6LevelFlags)]; u8 keys[6]; }; /* N64 0xA02 */
-    };
-} Picker;
-#else
-typedef struct Picker {
-    /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ s32 x;
-    /* 0x008 */ s32 y;
-    /* 0x00C */ s32 z;
-    /* 0x010 */ u8 pad10[0x50C];
-    /* 0x51C */ s32 hud;
-    /* 0x520 */ u8 pad520[0x4E2];
-    /* 0xA02 */ u8 keys[6];
-} Picker;
-#endif
 
 
-s32 CPlayer__IsSpecialPickup(Picker *picker, s32 id);
-void CPlayer__CollectKeyPiece(Picker *picker, s32 id);
+s32 CPlayer__IsSpecialPickup(CPlayer *player, s32 item);
+void CPlayer__CollectKeyPiece(CPlayer *player, s32 id);
 s32 Level_GetHub(s32 arg0);
-void CCamera__StartFlash(sptr hud, s32 a, s32 r, s32 g, s32 b, s32 arg5, s32 arg6, s32 arg7);
-void CCameraPool__AddText(u8 *arg0, sptr hud, u8 *msg);
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
-#define Sound__Play Sound__Play_i3
-#endif
-void Sound__Play(s32 sound, s32 x, sptr y, sptr z, s32 arg4, s32 arg5);
-void Sound__PlaySpeech(s32 arg0);
+void CCamera__StartFlash(void *ui, s32 red, s32 green, s32 blue, s32 alpha, s32 a5, s32 a6, s32 a7);
+void CCameraPool__AddText(void *arg0, void *ui, void *resource);
+s32 Sound__Play(s32 sound, CVector3 position, sptr arg4, sptr arg5);
+void Sound__PlaySpeech(s32 callback);
 
 /* Pickup_FindWeaponEntry */
 static __inline__ CPickupRow18 *FindRowA(s32 id) {
@@ -113,7 +88,7 @@ static __inline__ CPickupRow10 *FindRowE(s32 id) {
 
 /* Pick up an item of type id: the tables' handler takes it if one has it;
  * otherwise a generic pickup with its message, sound and effect. */
-s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
+s32 CPlayer__CollectPickup(CPlayer *player, void *pickup, s32 id) {
     CPickupRow18 *row18;
     CPickupRow14 *row14;
     CPickupRow10 *row10;
@@ -127,42 +102,42 @@ s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
     effect = 0;
     row18 = FindRowA(id);
     if (row18 != NULL) {
-        result = row18->m_pHandler(picker, row18);
+        result = row18->m_pHandler(player, row18);
     }
     if (result != 0) {
         return result;
     }
     row14 = FindRowB(id);
     if (row14 != NULL) {
-        result = row14->m_pHandler(picker, row14);
+        result = row14->m_pHandler(player, row14);
     }
     if (result != 0) {
         return result;
     }
     row18 = FindRowC(id);
     if (row18 != NULL) {
-        result = row18->m_pHandler(picker, row18);
+        result = row18->m_pHandler(player, row18);
     }
     if (result != 0) {
         return result;
     }
     row14 = FindRowD(id);
     if (row14 != NULL) {
-        result = row14->m_pHandler(picker, row14);
+        result = row14->m_pHandler(player, row14);
     }
     if (result != 0) {
         return result;
     }
     row10 = FindRowE(id);
     if (row10 != NULL) {
-        result = row10->m_pHandler(picker, row10, pickup);
+        result = row10->m_pHandler(player, row10, pickup);
     }
     if (result != 0) {
         return result;
     }
-    if (CPlayer__IsSpecialPickup(picker, id)) {
+    if (CPlayer__IsSpecialPickup(player, id)) {
         sound = 0x1388;
-        CPlayer__CollectKeyPiece(picker, id);
+        CPlayer__CollectKeyPiece(player, id);
         if ((u32) (id - 0xFA0) < 0x20) {
             switch (id) {
                 case 0xFB4:
@@ -220,7 +195,7 @@ s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
                     msg = sPickupNameText_Level6Key;
                     key = Level_GetHub(gScene_m_LevelID) - 1;
                     if (key < 6) {
-                        picker->keys[key]++;
+                        player->m_Data.m_KeySet6LevelFlags[key]++;
                     }
                     break;
                 default:
@@ -253,12 +228,12 @@ s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
         } else {
             msg = NULL;
         }
-        CCamera__StartFlash(picker->hud, 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
+        CCamera__StartFlash(player->m_pCamera, 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
         if (msg != NULL) {
-            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, picker->hud, msg);
+            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, player->m_pCamera, msg);
         }
         if (sound != 0) {
-            Sound__Play(sound, picker->x, picker->y, picker->z, 0, -1);
+            Sound__Play(sound, player->m_CharacterActor.header.m_vPos, 0, -1);
         }
         if (effect != 0) {
             Sound__PlaySpeech(effect);
