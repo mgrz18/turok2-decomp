@@ -6,7 +6,7 @@
 #
 # file          first-module data
 func_00451408 0x800C0E84  # "  %02d", "none" (menu)
-func_00452960 0x800C1048  # jtbl of func_00419A00 (menu)
+TitleMenu_2:Menu_DebugModeLabel_2 0x800C1048  # jtbl of func_00419A00 (menu)
 func_0045190C 0x800C0F40  # 1.0f (menu)
 func_00450F4C 0x800C0E7C  # "%02d" (menu)
 func_004514E4 0x800C0E84  # "  %02d", "none" (menu)
@@ -21,14 +21,14 @@ func_00451EA8 0x800C0E84  # "  %02d", "none" (menu)
 func_00451F84 0x800C0E84  # "  %02d", "none" (menu)
 func_00452060 0x800C0FA8  # jtbl (menu)
 func_004521C0 0x800C0FE0  # jtbl (menu)
-func_00452C14 0x800C1030  # strings (menu)
-func_00452D64 0x800C1030  # strings (menu)
+TitleMenu_2:SoundMenu_SpeechVolumeLabel_2 0x800C1030  # strings (menu)
+TitleMenu_2:SoundMenu_MusicVolumeLabel_2 0x800C1030  # strings (menu)
 OptionsMenu_2:OptionsMenu_OpacityText_2 0x800C1310  # string (menu)
 OptionsMenu_2:OptionsMenu_StickHorzText_2 0x800C1318  # strings (menu)
 OptionsMenu_2:OptionsMenu_StickVertText_2 0x800C1318  # strings (menu)
 OptionsMenu_2:OptionsMenu_BrightnessText_2 0x800C1318  # string (menu)
 func_00450D78 0x800C0EE8  # floats
-func_00452EA8 0x800C1030  # "  %2d", " %3d" (menu)
+TitleMenu_2:SoundMenu_SfxVolumeLabel_2 0x800C1030  # "  %2d", " %3d" (menu)
 CheatMenu_2:CheatsMenu_Init_2 0x800C11B0  # jtbl of func_0041A4D0
 CheatMenu_2:CheatMenu_WarpText_2 0x800C12B0  # jtbl of func_0041B05C
 func_00459B50 0x800C1438  # jtbl
@@ -126,7 +126,7 @@ func_0045C514 0x800C1430  # copy of func_004235F4, which now owns the pool
 Pak_2:Pak_SaveNoteVerified_2 0x800C18B0  # copy of func_00426164, which now owns the pool
 Pak_2:Pak_AllocDirectory_2 0x800C18A0  # copy of func_004263DC, which now owns the pool
 CPlayer_2:CPlayerPool__NewGame_2 0x800A7080  # copy of func_0042E4CC, which now owns the pool
-func_0045302C 0x800C1040  # copy of func_0041A0CC, which now owns the pool
+TitleMenu_2:SoundMenu_MusicTrackLabel_2 0x800C1040  # copy of func_0041A0CC, which now owns the pool
 OptionsMenu_2:OptionsMenu_ToggleResolution_2 0x800C132C  # copy of func_0041C788, which now owns the pool
 func_00446F70 0x800C090C  # copy of func_0040DF70 (round 25: was asm), which owns the pool
 func_00447108 0x800C0910  # copy of func_0040E108 (round 25: was asm), which owns the pool
