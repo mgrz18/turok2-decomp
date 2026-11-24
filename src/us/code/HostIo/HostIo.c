@@ -653,6 +653,8 @@ s32 HostIo_Call(s32 cmd, s32 arg0, s32 arg1, s32 arg2) {
     } while (HostIo_ReadWord(0xB1FFFFE0) != 0);
     return HostIo_ReadWord(0xB1FFFFDC);
 }
+#else
+s32 HostIo_Call(s32 cmd, s32 arg0, s32 arg1, s32 arg2); /* declared only: no host definition, nothing linked calls it (port/cmake/game.cmake) */
 #endif
 
 /* I/O thread: serve the requests sent through sHostIoRequestQueue (send block, run command, read block, reply). */
