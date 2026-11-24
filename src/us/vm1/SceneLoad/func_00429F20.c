@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/world.h"
 
-void MtxPool_Reset(MtxPool *);
+void MtxPool_Reset(void *pool);
 void guMtxIdent(void *);
 
 /* Sets every block of the pool (arg2 blocks at arg1) to identity; two halves of arg2 / 2. */

@@ -7,13 +7,32 @@
 #include "globals/math.h"
 #include "globals/engine.h"
 #include "globals/scene.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__AdvanceInstances(void *);
+void CScene__AdvanceListedInstances(void *);
+void CScene__BuildActorLists(struct CScene *);
+void CScene__ClearListCounts(void *);
+void CScene__CollectSectorObjects(struct CScene *);
+void CScene__DrawWarpFade(struct CScene *);
+void CScene__LoadVisibleGridSections(struct CScene *);
+void CScene__ReleaseSectors(void *);
+void CScene__Update(struct CScene *);
+void CScene__UpdateDelayedEvents(void *);
+void CScene__UpdateWarp(struct CScene *);
 
 /* The input state the controller reader fills (gEngineApp_m_Settings, 0x184 bytes). */
 
-extern u8 gEngineApp_m_Game_m_CameraPool[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
+/* The camera pool as bytes (globals/camera.h declares the CCameraPool): this view keeps the ROM's code. */
+extern u8 gCameraPoolBytes[] __asm__("gEngineApp_m_Game_m_CameraPool");
 
-void MtxPool_Reset(void *);
+void MtxPool_Reset(void *pool);
 void RibbonVtxPool_Reset(void *);
 void CPlayerPool__PreUpdate(void *);
 void CPlayerPool__AnimateWeapons(void *);
@@ -57,7 +76,7 @@ void CScene__Update(CScene *world) {
     if (world->m_WarpState == 0) {
         CPlayerPool__AnimateWeapons(&gEngineApp_m_Game.m_PlayerList);
     }
-    CCameraPool__Draw(gEngineApp_m_Game_m_CameraPool, world);
+    CCameraPool__Draw(gCameraPoolBytes, world);
     CParticleSystem__Update(&world->m_ParticleSystem);
 #ifdef TARGET_PORT
     /* The port: GameSettings.paused by member (CGame + 0x40 + 0x13F4 on the N64; on the host the
@@ -65,7 +84,7 @@ void CScene__Update(CScene *world) {
      * no CPlayerPool__Update, no player input). */
     if (world->m_WarpState == 0 && gEngineApp_m_Settings.paused == 0) {
 #else
-    if (world->m_WarpState == 0 && *(s32 *)(gEngineApp_m_Game_m_CameraPool + 0x13F4) == 0) {
+    if (world->m_WarpState == 0 && *(s32 *)(gCameraPoolBytes + 0x13F4) == 0) {
 #endif
         SwooshSystem_Update(&gEngineApp_m_SwooshSystem);
         CScene__AdvanceInstances(world);

@@ -6,7 +6,7 @@
 
 
 extern s32 SavedPlayers_IsActive(void);
-extern void CLoader__LoadSync(CLoader *reader, sptr, sptr, void *);
+void CLoader__LoadSync(void *reader, sptr address, sptr length, void *dest);
 
 
 void CScene__LoadBitSections2(CScene *menu) {

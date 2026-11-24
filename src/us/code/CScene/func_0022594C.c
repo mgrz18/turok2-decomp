@@ -28,10 +28,7 @@ void *CScene__FindNearestCover(void *arg0, void *arg1) {
     return best;
 }
 #else
-
-typedef signed char s8;
-typedef signed int s32;
-typedef float f32;
+#include "common.h"
 void *CScene__FindNearestCover(void *arg0, void *arg1)
 {
   f32 temp_f0;

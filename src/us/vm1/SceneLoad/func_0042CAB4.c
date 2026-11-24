@@ -3,9 +3,18 @@
 
 #include "rw/abu_types.h"
 #include "protos/iset.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__DecompressParticles(sptr, void ***);
+s32 CScene__GetObject(struct CScene *, s32);
 
-extern s32 ProPackDecompress(void ***, s32);
+s32 ProPackDecompress(void *handle, s32 arg1);
 #ifdef TARGET_PORT
 void T2Port_ParticlesBuild(void *scene, void *data); /* port/game/t2particles.c */
 #endif

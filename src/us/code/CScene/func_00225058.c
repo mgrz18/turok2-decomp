@@ -4,11 +4,20 @@
 #include "structs/game_object.h"
 #include "common.h"
 #include "structs/world.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__GetInstanceEventRecords(struct CScene *, struct CGameObjectInstance *, struct CSceneRecord **, s32 *);
+s32 CScene__GetInstanceIndex(void *, void *);
 
 /* Turok 2 layouts (Rage Wars offsets in comments). */
 
-extern s32 BinaryRange(s32 *index, s32 count, s32 key, s32 *first, s32 *last);
+s32 BinaryRange(void *array, s32 count, u32 key, s32 *first, s32 *last);
 
 /* Index of actor in the world's actor array, or -1 (same as CScene__GetInstanceIndex). */
 static __inline__ s32 World_ActorIndex(CScene *world, CGameObjectInstance *actor) {

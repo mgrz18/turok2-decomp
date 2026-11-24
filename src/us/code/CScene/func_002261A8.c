@@ -7,7 +7,7 @@
 #include "common.h"
 #include "structs/world.h"
 
-void CVector3__Subtract(CVector3 *out, CVector3 *a, u8 *b);
+void CVector3__Subtract(void *out, void *a, void *b);
 s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
     CVector3 d;
     f32 bestIdx = -1.0f;
@@ -46,7 +46,7 @@ s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
  * .text stays in the engine. The second module's copy is CScene__DecompressIntelligence_2.c.
  * docs/VMASM.md. */
 
-s32 ProPackDecompress(void ***resource, s32 index);
+s32 ProPackDecompress(void *handle, s32 arg1);
 
 typedef struct {
     /* 0x00 */ s32 type;

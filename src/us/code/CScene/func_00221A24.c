@@ -7,7 +7,16 @@
 #include "globals/camera.h"
 #include "globals/scene.h"
 #include "protos/iset.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__CollectSectorObjects(struct CScene *);
+void CScene__GetLightsAt(struct CScene *, void *, void *);
 
 typedef struct List {
     s32 pad0;
@@ -16,8 +25,8 @@ typedef struct List {
 } List;
 
 void CStaticObject__TouchLitVertices(CStaticObject *inst);
-s32 GameObject_IsSolid(CStaticObject *inst);
-f32 GameObject_GetCollisionHeight(CLevelActor *actor);
+s32 GameObject_IsSolid(void *actor);
+f32 GameObject_GetCollisionHeight(void *actor);
 void CLevelActor__Update(CLevelActor *actor);
 void CLevelActorPool__CollectVisible(CLevelActorPool *arg0, CScene *world);
 

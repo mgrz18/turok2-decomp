@@ -13,14 +13,14 @@ typedef struct Handle {
     void *data;
 } Handle;
 
-extern s32 ProPackDecompress(Handle **handle, s32);
+s32 ProPackDecompress(void *handle, s32 arg1);
 extern sptr CScene__GetRegion(CScene *world, s32);
 extern s32 CScene__FindNearestWarpDest(CScene *world, CVector3 *pos, s32 group, void *info);
 extern s32 CScene__FindWarpDests(CScene *world, s32 group, s32 key, CWarpPoint *out, s32 max);
 extern s32 *CScene__GetIntelligence(CScene *world, u16 id);
 extern void CGameObjectInstance__ConstructFromRecord(CGameObjectInstance *obj, CObjectRecord *rec, s32 mode, s32 index);
 extern sptr CScene__FindRegionAt(CScene *world, CVector3 *pos);
-extern void Angle_Wrap(f32 *angle);
+void Angle_Wrap(f32 *value);
 extern void CPlayer__SetupActors(CPlayer *player, CObjectRecord *rec, s32 mode, s32 index);
 extern s32 GameObject_IsFollower(CGameObjectInstance *obj);
 extern s32 GameObject_IsLeader(CGameObjectInstance *obj);

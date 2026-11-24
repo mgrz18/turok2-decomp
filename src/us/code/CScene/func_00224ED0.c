@@ -6,7 +6,15 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__SpawnPoolActor(struct CScene *, s32, CVector3, s32, f32);
 CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 a, CVector3 z, CVector3 v, sptr b, f32 f);
 void CScene__SpawnPoolActor(CScene *lv, s32 a1, CVector3 v, s32 x, f32 f) {
     CVector3 z;

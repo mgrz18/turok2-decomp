@@ -1,7 +1,15 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "protos/iset.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__SetLevelActorKilledInLevel(void *, s32, s32, s32);
 #ifdef TARGET_PORT
 #include "structs/world.h"
 #endif

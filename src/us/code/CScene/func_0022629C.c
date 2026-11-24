@@ -12,7 +12,15 @@ void **CCache__LoadPersistantSubBlock_v() __asm__("CCache__LoadPersistantSubBloc
 #include "structs/world.h"
 #include "structs/cache.h"
 #include "protos/iset.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__GetLevelName(struct CScene *, s32, void *, s32);
 
 
 void *func_0029E460(void *, void *, s32);           /* memcpy */

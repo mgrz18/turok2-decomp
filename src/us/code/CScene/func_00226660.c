@@ -3,9 +3,17 @@
 
 #include "common.h"
 #include "structs/world.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__GetEventRecords(struct CScene *, s32, s32, struct CSceneRecord **, s32 *);
 
-s32 BinaryRange(sptr a, s32 b, s32 c, s32 *lo, s32 *hi);
+s32 BinaryRange(void *array, s32 count, u32 key, s32 *first, s32 *last);
 void CScene__GetEventRecords(CScene *lv, s32 which, s32 id, CSceneRecord **outRecs, s32 *outCount) {
     s32 lo;
     s32 hi;

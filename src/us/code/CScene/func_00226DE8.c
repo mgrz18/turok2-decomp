@@ -7,7 +7,7 @@
 #include "structs/intelligence.h"
 #include "structs/game_object.h"
 
-void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+void CVector3__Subtract(void *out, void *a, void *b);
 s32 Blast_IsLivingEnemyInRange(CGameObjectInstance *e, CVector3 *target) {
     CVector3 d;
     f32 dist;

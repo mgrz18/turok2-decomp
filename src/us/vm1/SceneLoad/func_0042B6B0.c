@@ -18,7 +18,7 @@
 
 
 
-extern s32 ProPackDecompress(CollisionBuildMeshHandle **handle, s32);
+s32 ProPackDecompress(void *handle, s32 arg1);
 extern void UnpackScaledVec4(CollisionBuildVertex *v);
 extern void CGameRegion__Unpack(CollisionBuildTriangle *tri, CollisionBuildFace *face, CollisionBuildVertex *verts,
                           s32 nverts, CollisionBuildTriangle *tris, s32 ntris);

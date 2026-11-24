@@ -5,8 +5,8 @@
 #include "structs/world.h"
 #include "protos/iset.h"
 
-typedef struct { u8 pad0[0x13]; u8 unk13; } Src;
-void CScene__SetEventFired(CScene *lv, Src *s, s32 set) {
+typedef struct { u8 pad0[0x13]; u8 unk13; } Src_00224A68;
+void CScene__SetEventFired(CScene *lv, Src_00224A68 *s, s32 set) {
     s32 bit = s->unk13;
     s32 idx = lv->m_nLevel;
     s32 *t = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(lv->m_pBitSections, 0), idx), 2);

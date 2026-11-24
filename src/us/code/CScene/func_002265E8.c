@@ -2,21 +2,29 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/game_object.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+s32 CScene__GetInstanceIndex(void *, void *);
 
 
 /* Turok 2 layouts (Rage Wars offsets in comments). */
 
-typedef struct Container {
+typedef struct Container_002265E8 {
     u8 pad0[0xE0];
     CGameObjectInstance *actors;        /* 0xE0 (0x138) */
     s32 unkE4;
     s32 actorCount;            /* 0xE8 (0x140) */
-} Container;
+} Container_002265E8;
 
 /* Index of arg1 in the scene's actor array, or -1. */
 s32 CScene__GetInstanceIndex(void *arg0, void *arg1) {
-    Container *scene = arg0;
+    Container_002265E8 *scene = arg0;
     CGameObjectInstance *actor = arg1;
     void *base;
     if (actor->m_dwFlags & 0x80000) {

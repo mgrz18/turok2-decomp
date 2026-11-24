@@ -4,9 +4,17 @@
 #include "structs/game_object.h"
 #include "common.h"
 #include "structs/world.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+struct CGameObjectInstance *CScene__FindNearestActor(struct CScene *, struct CGameObjectInstance *, s32, s32, s32);
 
-/* Turok 2 LevelActor: 0x288 bytes (Rage Wars 0x2E8). */
+/* Turok 2 LevelActor_00225778: 0x288 bytes (Rage Wars 0x2E8). */
 
 /* Nearest other actor matching team/kind (-1 = any), optionally alive only. */
 CGameObjectInstance *CScene__FindNearestActor(CScene *world, CGameObjectInstance *self, s32 team, s32 kind, s32 activeOnly) {

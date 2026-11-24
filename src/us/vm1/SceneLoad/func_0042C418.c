@@ -9,12 +9,12 @@ typedef struct {
     /* 0x28 */ s32 unk28;
     /* 0x2C */ u8 pad2C[4];
     /* 0x30 */ s32 unk30;
-} Arg0;
+} Arg0_0042C418;
 
-s32 CLoader__LoadSync(CLoader *reader, sptr, sptr, sptr);
+void CLoader__LoadSync(void *reader, sptr address, sptr length, void *dest);
 s32 SavedPlayers_IsActive();                                /* extern */
 
-void CScene__LoadBitSections(Arg0 *arg0) {
+void CScene__LoadBitSections(Arg0_0042C418 *arg0) {
     if (SavedPlayers_IsActive() == 0) {
         CLoader__LoadSync(&gLoader, arg0->unk28, arg0->unk30, (sptr) &gLoadSavePersistentData);
         arg0->done = 1;

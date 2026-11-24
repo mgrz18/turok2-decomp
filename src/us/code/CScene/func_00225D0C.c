@@ -8,8 +8,17 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
-#include "protos/scene.h"
-struct LevelActor;
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__SetInstanceSavedBit(struct CScene *, void *, s32);
+void CScene__UnmarkGeneratorsSaved(void *);
+struct LevelActor_00225D0C;
 struct Box;
 typedef struct Box Box;
 struct Box;
@@ -35,9 +44,9 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
+struct LevelActor_00225D0C;
+struct LevelActor_00225D0C;
+struct LevelActor_00225D0C;
 struct Def;
 struct Def {
     s32 type;
@@ -46,9 +55,9 @@ struct Def {
     s16 id;
 };
 struct Def;
-struct LevelActor;
-typedef struct LevelActor LevelActor;
-struct LevelActor {
+struct LevelActor_00225D0C;
+typedef struct LevelActor_00225D0C LevelActor_00225D0C;
+struct LevelActor_00225D0C {
     u8 kind;
     s8 team;
     char pad2;
@@ -134,20 +143,20 @@ struct LevelActor {
     s32 renderFlags;
     s32 flags2E4;
 };
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
+struct LevelActor_00225D0C;
+struct LevelActor_00225D0C;
+struct LevelActor_00225D0C;
 struct Def;
 typedef struct Def Def;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
+struct LevelActor_00225D0C;
+struct LevelActor_00225D0C;
+struct LevelActor_00225D0C;
 void CScene__UnmarkGeneratorsSaved(void *arg0) {
     CScene *object;
     s32 count;
     s32 i;
     s32 offset;
-    LevelActor *entry;
+    LevelActor_00225D0C *entry;
     s32 field;
     s32 three;
     object = arg0;
@@ -166,7 +175,7 @@ void CScene__UnmarkGeneratorsSaved(void *arg0) {
                 CScene__SetInstanceSavedBit(arg0, entry, 0);
                 i += 1;
             }
-            offset += (s32)sizeof(CGameObjectInstance); /* sizeof(LevelActor) in Turok 2 */
+            offset += (s32)sizeof(CGameObjectInstance); /* sizeof(LevelActor_00225D0C) in Turok 2 */
         } while (i < count);
     }
 }

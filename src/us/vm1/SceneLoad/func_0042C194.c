@@ -29,7 +29,7 @@ typedef struct Placed {
 } Placed; /* 0x14 */
 
 
-extern s32 BinaryRange(s32 *keys, s32 count, s32 key, s32 *first, s32 *last);
+s32 BinaryRange(void *array, s32 count, u32 key, s32 *first, s32 *last);
 
 /* Copies up to max placed objects of the given kind (-1: any) whose key matches into out; returns how many. */
 s32 CScene__FindWarpDests(void *world, s32 kind, s32 key, Placed *out, s32 max) {

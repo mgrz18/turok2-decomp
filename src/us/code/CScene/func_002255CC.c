@@ -2,13 +2,21 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__FileInstance(struct CScene *, struct CGameObjectInstance *);
 
 
-s32 GameObject_IsSolid(sptr);
-s32 GameObject_IsMover(sptr);
+s32 GameObject_IsSolid(void *actor);
+s32 GameObject_IsMover(void *actor);
 
-s32 CGameObjectInstance__ClearDrawMatrices(sptr);                         /* extern */
+void CGameObjectInstance__ClearDrawMatrices(void *actor);
 
 /* Files a new actor into every actor list of the world it belongs to. */
 void CScene__FileInstance(CScene *arg0, CGameObjectInstance *arg1) {

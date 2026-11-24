@@ -6,7 +6,17 @@
 #include "structs/game.h"
 #include "globals/engine.h"
 #include "globals/scene.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+s32 CScene__FindWarpDests(void *, s32, s32, void *, s32);
+void CScene__LoadLevel(struct CScene *, s32, s32);
+void CScene__UpdateWarp(struct CScene *);
 
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 

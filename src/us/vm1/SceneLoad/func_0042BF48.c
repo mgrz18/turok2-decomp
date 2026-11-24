@@ -4,7 +4,16 @@
 #include "structs/world.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__DecompressGridSection(struct CScene *, s32 ***);
+void CScene__StreamAllSections(struct CScene *);
 #include "structs/twin_sceneload.h"
 
 
@@ -39,7 +48,7 @@ typedef struct ObjB {
 #endif
 
 
-extern void CStaticObject__RequestLitVertices(ObjA *a, s32);
+void CStaticObject__RequestLitVertices(void *object, void *camera);
 extern void *CStaticObject__LoadGeometry(ObjA *a);
 extern void *CLevelActor__LoadGeometry(ObjB *b);
 extern void Model_RequestTextures(void *handle);

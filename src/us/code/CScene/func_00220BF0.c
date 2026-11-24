@@ -21,7 +21,7 @@ struct Entity {
     char pad10[3];
     unsigned char index;
 };
-extern void LevelEvent_Fire(Entity *entity);
+void LevelEvent_Fire(void *event);
 #ifdef TARGET_PORT
 /* The port (round 13 b2): the world by member. The N64 view reads the bit sections at 0x6C and the
  * level at 0x18FA8, other members of the host CScene: no fired event was ever restored when a level

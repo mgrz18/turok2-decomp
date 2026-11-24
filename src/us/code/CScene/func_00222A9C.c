@@ -10,7 +10,7 @@ typedef struct B19bV3f { f32 x, y, z; } B19bV3f;
  * array view: through it the compiler bases both loads on gEngineApp_m_Settings + 0xC, as
  * the ROM does; through the struct it bases them on gEngineApp_m_Settings. */
 typedef struct B19bG8 { u32 flags; u8 pad4[0x8]; u32 fC; } B19bG8;
-extern B19bG8 gEngineApp_m_Settings[]; /* local type: array view, see above */
+extern B19bG8 gSettingsView[] __asm__("gEngineApp_m_Settings"); /* local type: array view, see above */
 typedef struct B19bLObj {
               u8 pad0[4];
               f32 f4;
@@ -29,9 +29,9 @@ s32 Actors_GetLightVolumeFalloff(void *, B19bV3f, void *, f32 *);
 #endif
 void CVector3__Add(void *, void *, void *);
 void CMtxF__TransformPointProjective(void *, void *, void *);
-void CVector3__Subtract(void *, void *, void *);
+void CVector3__Subtract(void *out, void *a, void *b);
 void CVector3__Normalize(void *);
-void CVector3__Scale(void *, void *, f32);
+void CVector3__Scale(void *out, void *in, f32 scale);
 f32 LightVolume_GetFlicker(void *);
 void CScene__ComputeLights(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
     f32 w[128];
@@ -53,9 +53,9 @@ void CScene__ComputeLights(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
     f32 m1_3, m2_3;
     f32 m1_4, m2_4;
     f32 m1_5, m2_5;
-    scale = (f32)gEngineApp_m_Settings->fC * 0.003921569f;
+    scale = (f32)gSettingsView->fC * 0.003921569f;
     last = 0;
-    if (gEngineApp_m_Settings->flags & 0x4000) {
+    if (gSettingsView->flags & 0x4000) {
         out[0] = out[4] = 0;
         out[1] = out[5] = 0;
         out[2] = out[6] = 0;

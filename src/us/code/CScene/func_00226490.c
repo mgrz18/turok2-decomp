@@ -11,8 +11,8 @@
 
 /* The global at gEngineApp_m_Game: what this reads of it. */
 
-void CGameObjectInstance__UpdateAI(CGameObjectInstance *actor);
-void CGameObjectInstance__UpdateAnimation(CGameObjectInstance *actor);
+void CGameObjectInstance__UpdateAI(void *actor);
+void CGameObjectInstance__UpdateAnimation(void *actor);
 void CPlayerPool__Update(CPlayerPool *list);
 s32 CPlayerPool__CheckAllReady(CPlayerPool *list);
 void CEngineApp__QuitToLegal(u8 *);

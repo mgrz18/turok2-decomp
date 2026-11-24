@@ -12,7 +12,16 @@
 #include "globals/scene.h"
 #include "protos/iset.h"
 #include "protos/cache.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__BuildGeometryDisplayList(struct CScene *);
+void CScene__DrawSortedList(void *, void *);
 
 /* Builds (once per frame) the display list of the level geometry: for every
  * grid region seen by one of the views, every static object and every level
@@ -32,9 +41,9 @@ extern ViewState gEngineApp_m_Settings_difficulty; /* local type: the field's re
 
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
-s32 Frustum_TestBox(void *, CBox *);
-void CStaticObject__Draw(CStaticObject *, CCamera *);
-void CLevelActor__Draw(CLevelActor *);
+s32 Frustum_TestBox(void *frustum, void *box);
+void CStaticObject__Draw(void *object, void *camera);
+void CLevelActor__Draw(void *actor);
 
 void CScene__BuildGeometryDisplayList(CScene *w) {
     s32 r;

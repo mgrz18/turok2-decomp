@@ -8,7 +8,7 @@
  * offsets. */
 #include "structs/world.h"
 
-s32 LevelEvent_Fire(sptr);
+void LevelEvent_Fire(void *event);
 f32 HalfToFloat(u16);
 void CScene__QueueDelayedEvent(CScene *scene, LevelEvent *event) {
     CDelayedEvent *d = scene->m_FreeDelayedEvents.m_pHead;
@@ -34,7 +34,7 @@ typedef struct {
     /* 0x00 */ u8 links[8];
     /* 0x08 */ s32 def;
     /* 0x0C */ f32 length;
-} Voice;
+} Voice_00225354;
 
 typedef struct {
     /* 0x0000 */ u8 pad0[0x1180];
@@ -42,13 +42,13 @@ typedef struct {
     /* 0x1194 */ CList freeVoices;
 } VoiceOwner;
 
-s32 LevelEvent_Fire(sptr);
+void LevelEvent_Fire(void *event);
 
 f32 HalfToFloat(u16);                             /* extern */
 
 void CScene__QueueDelayedEvent(VoiceOwner *arg0, LevelEvent *arg1) {
     f32 temp_f0;
-    Voice *var_s0;
+    Voice_00225354 *var_s0;
 
     var_s0 = arg0->freeVoices.m_pHead;
     if (var_s0 != 0) {

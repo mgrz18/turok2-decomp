@@ -1,5 +1,15 @@
 
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__MarkGeneratorsSaved(void *);
+void CScene__SetInstanceSavedBit(struct CScene *, void *, s32);
+void CScene__UnmarkGeneratorsSaved(void *);
 #ifdef TARGET_PORT
 #include "structs/world.h"
 

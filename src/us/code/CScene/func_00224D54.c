@@ -2,9 +2,9 @@
 #include "protos/iset.h"
 #include "protos/cache.h"
 
-s32 BinarySearch(sptr, s32, sptr);
+s32 BinarySearch(void *array, u32 count, u32 key);
 
-s32 ProPack__Decompress();
+s32 ProPack__Decompress(s32 unused, void **res);
 
 typedef struct {
     /* 0x0 */ u8 pad0[4];

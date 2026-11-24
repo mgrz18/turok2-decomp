@@ -21,7 +21,24 @@ void **CCache__LoadPersistantSubBlock_v() __asm__("CCache__LoadPersistantSubBloc
 #include "globals/sysrc.h"
 #include "globals/audio.h"
 #include "protos/iset.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__ClearListCounts(void *);
+void CScene__DecompressAnimatedInstances(struct CScene *, void *);
+void CScene__DecompressCollision(void *, void *);
+void CScene__DecompressLinks(void *, void ***);
+void CScene__DecompressPaths(void *, s32 ***);
+void CScene__GetLevelName(struct CScene *, s32, void *, s32);
+void CScene__LoadLevel(struct CScene *, s32, s32);
+void CScene__LoadLightSettings(void *);
+void CScene__ReleaseSectors(void *);
+void CScene__StreamAllSections(struct CScene *);
 #include "protos/player.h"
 #include "protos/game.h"
 #ifdef TARGET_PORT
@@ -33,12 +50,12 @@ void **CCache__LoadPersistantSubBlock_v() __asm__("CCache__LoadPersistantSubBloc
  * level's data blocks and spawns its actors. */
 
 
-extern s32 ProPack__Decompress(s32, sptr);
+s32 ProPack__Decompress(s32 unused, void **res);
 extern void CCollisionInfo__Reset(void);
 extern void CDecompressor__Flush(CDecompressor *thisx);
-extern void CGameObjectInstance__UpdateAnimation(u8 *actor);
+void CGameObjectInstance__UpdateAnimation(void *actor);
 extern void CGameObjectInstance__InitAIType(u8 *actor);
-extern void CGameObjectInstance__UpdateAI(u8 *actor);
+void CGameObjectInstance__UpdateAI(void *actor);
 extern void Sound__StopFlags(s32);
 extern void Sound__DetachAll(void);
 extern void LoopSounds_Construct(void *, void *, s32);
@@ -57,7 +74,7 @@ extern void CDLightSet__Construct(void *);
 /* the particle data is a pointer: m_pParticleEffects is the cache handle (read pointer-wide) */
 extern void CParticleSystem__Construct(CParticleSystem *, sptr);
 extern void SwooshSystem_Construct(void *);
-extern void CPlayerPool__LevelStart(void *);
+void CPlayerPool__LevelStart(void *pool);
 extern void CPlayer__StopLoopingSounds(void *);
 extern void COnScreen__ResetBossBars(void *);
 extern void CCameraPool__ResetEmitterPools(void *);

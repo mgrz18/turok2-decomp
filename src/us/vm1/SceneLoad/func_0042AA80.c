@@ -7,7 +7,7 @@
 
 
 extern f32 func_00298470(f32);
-extern void CVector3__Scale(f32 *out, f32 *in, f32 scale);
+void CVector3__Scale(void *out, void *in, f32 scale);
 
 /* Loads the level's light colours into the scene light and its direction, normalised to 127, into the menu. */
 void CScene__LoadLightSettings(CScene *menu) {

@@ -18,8 +18,8 @@ void **CCache__LoadPersistantSubBlock_v() __asm__("CCache__LoadPersistantSubBloc
  * sets, object types, objects, intelligence, particle effects, binaries, swooshes, lights, curves, rumbles,
  * graphic sets, cinemas, link groups), then loads five geometry headers (objects 0xDAC-0xDB0). */
 
-extern s32 ProPack__Decompress();
-extern s32 Model_DecompressCallback();
+s32 ProPack__Decompress(s32 unused, void **res);
+void Model_DecompressCallback(sptr arg0, sptr arg1);
 extern s32 CScene__DecompressIntelligence();
 extern s32 CScene__DecompressParticles();
 
@@ -29,7 +29,7 @@ extern void CScene__ClearListCounts();
 extern void CScene__LoadLevel(CScene *w, s32, s32);
 extern void CScene__InitPersistentData(CScene *w, s32 file);
 extern void CScene__ConstructWarp(CScene *w);
-extern void CPlayerPool__LevelStart(CPlayerPool *);
+void CPlayerPool__LevelStart(void *pool);
 
 /* Copies the header of object id's geometry (or clears it when the object is missing). */
 static __inline__ void loadGeomHeader(CScene *w, CGeomHeader *out, s32 id) {

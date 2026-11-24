@@ -11,9 +11,9 @@
 #include "globals/scene.h"
 #include "protos/player.h"
 
-typedef struct Entity Entity;
+typedef struct Entity_00223A94 Entity_00223A94;
 #ifdef TARGET_PORT
-struct Entity {
+struct Entity_00223A94 {
 /* the view at the host offsets of CListedInstance (tools/port/hostview.py): each field in its own
  * member of one union, placed by __builtin_offsetof of the member it reads */
 #define T2_HOFF_Entity(m) __builtin_offsetof(CListedInstance, m)
@@ -25,11 +25,11 @@ struct Entity {
         struct { u8 _hp_ai[T2_HOFF_Entity(m_Instance.m_AI.m_dwFlags)]; u8 ai[4]; }; /* N64 0x140 */
         struct { u8 _hp_health[T2_HOFF_Entity(m_Instance.m_AI.m_Health)]; s32 health; }; /* N64 0x144 */
         struct { u8 _hp_state[T2_HOFF_Entity(m_Instance.m_AI.m_Mode)]; s8 state; }; /* N64 0x174 */
-        struct { u8 _hp_next[T2_HOFF_Entity(m_pNext)]; Entity *next; }; /* N64 0x28C */
+        struct { u8 _hp_next[T2_HOFF_Entity(m_pNext)]; Entity_00223A94 *next; }; /* N64 0x28C */
     };
 };
 #else
-struct Entity {
+struct Entity_00223A94 {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[3];
     /* 0x004 */ CVector3 pos;
@@ -43,18 +43,18 @@ struct Entity {
     /* 0x148 */ u8 pad148[0x174 - 0x148];
     /* 0x174 */ s8 state;
     /* 0x175 */ u8 pad175[0x28C - 0x175];
-    /* 0x28C */ Entity *next;
+    /* 0x28C */ Entity_00223A94 *next;
 };
 #endif
 
 
-void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
-void DamageEvent_Set(DamageEvent *event, sptr source, s32 damage, f32 radius, s32 flags, sptr arg5);
-void CAI__CallHurt(Entity *e, void *ai, DamageEvent *event);
-s32 CAI__SetMode(Entity *e, void *ai, s32 state);
+void CVector3__Subtract(void *out, void *a, void *b);
+void DamageEvent_Set(void *event, sptr source, s32 damage, f32 radius, s32 flags, sptr frame);
+void CAI__CallHurt(void *obj, void *ai, void *event);
+s32 CAI__SetMode(void *obj, void *ai, s32 mode);
 
 /* Blast_GetStrength inlined: the strength (0 or 0xFF) a blast at `target` hits `e` with. */
-static __inline__ s32 blastStrength(Entity *e, CVector3 *target) {
+static __inline__ s32 blastStrength(Entity_00223A94 *e, CVector3 *target) {
     CVector3 d;
     f32 dist;
     u32 t;
@@ -78,7 +78,7 @@ static __inline__ s32 blastStrength(Entity *e, CVector3 *target) {
 }
 
 /* Blast_IsLivingEnemyInRange inlined: a living enemy within 2560 units of `target`. */
-static __inline__ s32 inBlastRange(Entity *e, CVector3 *target) {
+static __inline__ s32 inBlastRange(Entity_00223A94 *e, CVector3 *target) {
     CVector3 d;
     f32 dist;
     u32 t;
@@ -106,17 +106,17 @@ static __inline__ s32 inBlastRange(Entity *e, CVector3 *target) {
 void CScene__Blast(CScene *world, CVector3 *target) {
     DamageEvent event;
     CVector3 d;
-    Entity *e;
+    Entity_00223A94 *e;
     CListedInstance *node;
-    Entity *actor;
-    Entity *player;
+    Entity_00223A94 *actor;
+    Entity_00223A94 *player;
     s32 count;
     s32 i;
     s32 strength;
 
     count = world->m_nKind1;
     for (i = 0; i < count; i++) {
-        e = (Entity *)world->m_pKind1[i];
+        e = (Entity_00223A94 *)world->m_pKind1[i];
         strength = blastStrength(e, target);
         if (strength != 0) {
             DamageEvent_Set(&event, 0, strength << 8, 102.399994f, 0x400000, 0);
@@ -127,7 +127,7 @@ void CScene__Blast(CScene *world, CVector3 *target) {
         }
     }
     for (node = gScene.m_InstancePool.m_ActiveList.m_pHead; node != NULL; node = node->m_pNext) {
-        actor = (Entity *)&node->m_Instance;
+        actor = (Entity_00223A94 *)&node->m_Instance;
         strength = blastStrength(actor, target);
         if (strength != 0) {
             DamageEvent_Set(&event, 0, strength << 8, 102.399994f, 0x400000, 0);

@@ -5,7 +5,15 @@
 #include "structs/intelligence.h"
 #include "structs/world.h"
 #include "globals/scene.h"
-#include "protos/scene.h"
+#include "structs/vector.h"
+/* protos/scene.h's prototypes of what this file calls (the module defines them all; the
+ * merged file declares them from the definitions). */
+struct CCamera;
+struct CGameObjectInstance;
+struct CScene;
+struct CSceneRecord;
+struct LevelEvent;
+void CScene__BuildActorLists(struct CScene *);
 #include "globals/camera.h"
 #ifdef TARGET_PORT
 #include "structs/game.h"
@@ -26,16 +34,16 @@ typedef struct {
     s32 mask;               /* 0x00 */
     u8 pad4[0xD];
     u8 unk11;               /* 0x11 */
-} ViewState;
+} ViewState_00221210;
 
-extern ViewState gEngineApp_m_Settings_difficulty; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern ViewState_00221210 gEngineApp_m_Settings_difficulty; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void CPlayerPool__RegisterActors(void *, CScene *);
 s32 Cinema_PathPlaying(void);
-s32 GameObject_IsSolid(CGameObjectInstance *);
-s32 GameObject_IsMover(CGameObjectInstance *);
-s32 Frustum_TestBox(void *, f32 *);
-void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *);
+s32 GameObject_IsSolid(void *actor);
+s32 GameObject_IsMover(void *actor);
+s32 Frustum_TestBox(void *frustum, void *box);
+void CGameObjectInstance__ClearDrawMatrices(void *actor);
 void CInstancePool__UpdateVisibility(void *, CScene *);
 
 void CScene__BuildActorLists(CScene *w) {
