@@ -38,7 +38,7 @@ typedef struct {
 /* on MIPS the instance reaches it in $a0 (the caller's first argument, untouched) */
 s32 GameObject_CastsShadow(CGameObjectInstance *);
 #define GameObject_CastsShadow() GameObject_CastsShadow(a)
-void *MtxPool_Alloc(void *, s32);
+void *MtxPool_Alloc(void *pool, s32 count);
 f32 func_00298470(f32);     /* sqrtf */
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define DLights_GetAtPoint DLights_GetAtPoint_f3
@@ -46,12 +46,12 @@ f32 func_00298470(f32);     /* sqrtf */
 void DLights_GetAtPoint(void *, f32, f32, f32, CVector3 *, f32 *);
 void CVector3__Normalize(CVector3 *);
 void CMtxF__SetShadowProjection(void *, CVector3 *, f32);
-void CMtxF__Translate(void *, f32, f32, f32);
+void CMtxF__Translate(void *m, f32 x, f32 y, f32 z);
 void CMtxF__ScaleColumns(void *, f32, f32, f32);
-void CQuaternion__ToMatrix(void *, void *);
-void CMtxF__MultiplyAffine(void *, void *, void *);
+void CQuaternion__ToMatrix(void *q, void *m);
+void CMtxF__MultiplyAffine(void *out, void *a, void *b);
 void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *, ShadowParams *, void *, u8);
-void Shadow_DrawBlob(CGameObjectInstance *, sptr, s32);
+void Shadow_DrawBlob(); /* (ShadowActor *, CVector3 *offset, s32), func_0021E03C.c: the blob type travels as the offset */
 
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, sptr unused, ShadowParams *s) {
     CVector3 dir;

@@ -6,11 +6,11 @@
 #include "globals/object.h"
 
 extern void CVector3__Normalize(CVector3 *);
-extern void CMtxF__Copy(f32 *, f32 *);
+void CMtxF__Copy(void *dst, void *src);
 extern void CVector3__Scale(CVector3 *, CVector3 *, f32);
-extern void CMtxF__Translate(f32 *, f32, f32, f32);
-extern void CMtxF__SetAxisAngle(f32 *, f32, f32, f32, f32);
-extern void CMtxF__MultiplyAffine(f32 *, f32 *, f32 *);
+void CMtxF__Translate(void *m, f32 x, f32 y, f32 z);
+void CMtxF__SetAxisAngle(void *m, f32 angle, f32 x, f32 y, f32 z);
+void CMtxF__MultiplyAffine(void *out, void *a, void *b);
 void CGameObjectInstance__WobbleBone(s32 time, s32 flags, f32 *matrix) {
     f32 rotation[16];
     f32 inverse[16];

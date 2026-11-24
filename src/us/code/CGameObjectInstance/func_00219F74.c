@@ -17,9 +17,9 @@ typedef struct {
 
 
 s32 BinarySearch(s32 *, s32, sptr);
-void WeightedTable_Clear(RandList *);
-void WeightedTable_Add(RandList *, s16, s32);
-s16 WeightedTable_Pick(RandList *); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
+void WeightedTable_Clear(void *table);
+s32 WeightedTable_Add(void *table, s16 id, s16 weight);
+s16 WeightedTable_Pick(void *table); /* ABI: returns s16 (the host leaves the upper bits of the return register undefined) */
 
 sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, sptr action, sptr skip) {
     RandList list;

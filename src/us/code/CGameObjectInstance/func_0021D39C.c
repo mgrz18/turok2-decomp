@@ -23,11 +23,11 @@
  * count as loops for GCC's register priorities (refs weighted by loop
  * depth): they put anim before inView and model before view, as in the ROM. */
 
-typedef struct Actor Actor;
+typedef struct DrawActor DrawActor;
 
 #ifdef TARGET_PORT
 #include "structs/game_object.h"
-struct Actor {
+struct DrawActor {
 /* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
  * member of one union, placed by __builtin_offsetof of the member it reads */
 #define T2_HOFF_Actor(m) __builtin_offsetof(CGameObjectInstance, m)
@@ -43,12 +43,12 @@ struct Actor {
         struct { u8 _hp_flags[T2_HOFF_Actor(m_dwFlags)]; s32 flags; }; /* N64 0xD4 */
         struct { u8 _hp_lights[T2_HOFF_Actor(m_Lights)]; u8 lights[2][0x18]; }; /* N64 0x110 (CLights1[2]) */
         struct { u8 _hp_ai[T2_HOFF_Actor(m_AI)]; u8 ai[0xF4]; }; /* N64 0x140 */
-        struct { u8 _hp_draw[T2_HOFF_Actor(m_AI.m_pfDraw)]; void (*draw)(Actor *, void *, CDrawArgs *); }; /* N64 0x234 */
-        struct { u8 _hp_update[T2_HOFF_Actor(m_AI.m_pfCalculateOrientationMatrix)]; void (*update)(Actor *, void *); }; /* N64 0x244 */
+        struct { u8 _hp_draw[T2_HOFF_Actor(m_AI.m_pfDraw)]; void (*draw)(DrawActor *, void *, CDrawArgs *); }; /* N64 0x234 */
+        struct { u8 _hp_update[T2_HOFF_Actor(m_AI.m_pfCalculateOrientationMatrix)]; void (*update)(DrawActor *, void *); }; /* N64 0x244 */
     };
 };
 #else
-struct Actor {
+struct DrawActor {
     u8 pad0[0x4];
     CVector3 pos;               /* 0x04 */
     CGameRegion *region;         /* 0x10 */
@@ -65,20 +65,20 @@ struct Actor {
     u8 padD8[0x38];
     u8 lights[2][0x18];     /* 0x110 */
     u8 ai[0xF4];            /* 0x140 */
-    void (*draw)(Actor *, void *, CDrawArgs *);  /* 0x234 */
+    void (*draw)(DrawActor *, void *, CDrawArgs *);  /* 0x234 */
     u8 pad238[0xC];
-    void (*update)(Actor *, void *);            /* 0x244 */
+    void (*update)(DrawActor *, void *);            /* 0x244 */
 };
 #endif
 
 
-void CMtxF__TransformBox(void *, sptr, f32 *);
+void CMtxF__TransformBox(void *m, void *in, void *out);
 s32 Frustum_TestBox(void *, f32 *);
-void **CGameObjectInstance__LoadGeometry(Actor *);
-s32 CGameObjectInstance__BuildBoneMatrices(Actor *, void *, sptr);
-f32 GameObject_GetCollisionHeight(Actor *);
+void **CGameObjectInstance__LoadGeometry(DrawActor *);
+s32 CGameObjectInstance__BuildBoneMatrices(DrawActor *, void *, sptr);
+f32 GameObject_GetCollisionHeight(void *obj);
 
-void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
+void CGameObjectInstance__Draw(DrawActor *actor, CCamera *view) {
     f32 offset[3];
     f32 box[6];
     CVector3 pos;
@@ -108,7 +108,7 @@ void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
     info = CISet__GetBlock(*anim, 0);
     if (gEngineApp_m_Settings.paused != 0) {
         actor->update(actor, actor->ai);
-        CMtxF__TransformBox(actor->matrix, info, actor->boxMin);
+        CMtxF__TransformBox(actor->matrix, (void *) info, actor->boxMin);
     }
     if (!(actor->flags & 0x300000)) {
         inView = 0;

@@ -12,11 +12,11 @@ typedef struct Swing {
 } Swing;
 
 
-void CMtxF__Copy(f32 *dst, f32 *src);
+void CMtxF__Copy(void *dst, void *src);
 void CVector3__Scale(CVector3 *dst, CVector3 *src, f32 scale);
-void CMtxF__Translate(f32 *mtx, f32 x, f32 y, f32 z);
-void CMtxF__SetAxisAngle(f32 *mtx, f32 angle, f32 x, f32 y, f32 z);
-void CMtxF__MultiplyAffine(f32 *dst, f32 *a, f32 *b);
+void CMtxF__Translate(void *m, f32 x, f32 y, f32 z);
+void CMtxF__SetAxisAngle(void *m, f32 angle, f32 x, f32 y, f32 z);
+void CMtxF__MultiplyAffine(void *out, void *a, void *b);
 
 /* Rotates the matrix about its own origin by the swing angle of this step. */
 void CGameObjectInstance__SwingBone(s32 arg0, Swing *swing, f32 *matrix, s32 active, s32 dir) {

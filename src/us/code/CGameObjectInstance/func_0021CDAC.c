@@ -25,7 +25,7 @@ typedef struct AnimChannel {
     /* 0x10 */ void *resource; /* CAnimationState.pmeAnimData */
 } AnimChannel;
 
-typedef struct KeyLookup {
+typedef struct AnimKeyLookup {
     /* 0x00 */ void *posKeys;
     /* 0x04 */ void *rotKeys;
     /* 0x08 */ void *posTracks;
@@ -35,7 +35,7 @@ typedef struct KeyLookup {
     /* 0x18 */ s32 rootOffset0;
     /* 0x1C */ s32 rootOffset1;
     /* 0x20 */ f32 frac;
-} KeyLookup;
+} AnimKeyLookup;
 
 #ifdef TARGET_PORT
 typedef struct AnimObject {
@@ -84,7 +84,7 @@ typedef struct AnimObject {
 #endif
 
 /* What CGameObjectInstance__PoseBone reads to pose the skeleton. */
-typedef struct PoseContext {
+typedef struct AnimPoseContext {
     /* 0x00 */ AnimObject *obj;
     /* the bone matrices (PoseBone's `out`): pointer-wide on the host */
     /* 0x04 */ sptr animIndex;
@@ -94,8 +94,8 @@ typedef struct PoseContext {
     /* 0x14 */ sptr arg2;
     /* 0x18 */ AnimChannel *channel;
     /* 0x1C */ AnimChannel *blendChannel;
-    /* 0x20 */ KeyLookup keys;
-    /* 0x44 */ KeyLookup blendKeys;
+    /* 0x20 */ AnimKeyLookup keys;
+    /* 0x44 */ AnimKeyLookup blendKeys;
     /* 0x68 */ s32 visible;
     /* 0x6C */ s32 blend;
     /* 0x70 */ s32 moving;
@@ -109,7 +109,7 @@ typedef struct PoseContext {
     /* 0x8C */ u8 *boneData;
     /* 0x90 */ s32 bone;
     /* 0x94 */ u8 pad94[4];
-} PoseContext;
+} AnimPoseContext;
 
 /* A profile slot (osGetCount timings). */
 typedef struct Profile {
@@ -124,19 +124,21 @@ typedef struct Profile {
     /* 0x28 */ f32 average;
 } Profile;
 
-extern char D_800A5AF8[];
+/* "animations index", CGameObjectInstance__AdvanceAnimation's cache name (func_0021A7EC.c), 4 bytes past
+ * D_800A5AF8 (CGameObjectInstance__AlignToGround's 1.0f, a float elsewhere). */
+extern char sAnimIndexName_view[] __asm__("D_800A5AF8");
 extern Profile sBoneMatrixProfile;
 extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
 
 s32 Cinema_PathPlaying(void);
-sptr MtxPool_Alloc(void *table, s32 id);
-void CAnimationState__SwitchToQueued(AnimChannel *channel, sptr anims, s32 file, s32, sptr, sptr);
-void CAnimationState__FindKeys(AnimChannel *channel, KeyLookup *keys);
-void CAnimationState__Release(AnimChannel *channel);
-s32 CAnimationState__IsLoaded(AnimChannel *channel);
-void CGameObjectInstance__PoseBone(AnimObject *obj, PoseContext *ctx, s32, f32 mtx[4][4]);
+void *MtxPool_Alloc(void *pool, s32 count);
+void CAnimationState__SwitchToQueued(void *channel, sptr anims, s32 file, s32 primary, void *active, void *other);
+void CAnimationState__FindKeys(AnimChannel *channel, AnimKeyLookup *keys);
+void CAnimationState__Release(void *channel);
+s32 CAnimationState__IsLoaded(void *channel);
+void CGameObjectInstance__PoseBone(AnimObject *obj, AnimPoseContext *ctx, s32, f32 mtx[4][4]);
 void SwooshSystem_AddBonePoints(void *effects, AnimObject *obj, void *bones);
-void GameObject_EmitHotPoints(void *list, s32 count, void *bones, AnimObject *obj, void *anims);
+void GameObject_EmitHotPoints(void *list, s32 count, void *bones, void *obj, void *anims);
 
 /* OS_CYCLES_TO_USEC */
 static __inline__ void addMicroseconds(f32 *usec, u32 cycles) {
@@ -145,7 +147,7 @@ static __inline__ void addMicroseconds(f32 *usec, u32 cycles) {
 }
 
 s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2) {
-    PoseContext ctx;
+    AnimPoseContext ctx;
     u8 bones[0x2000];
     f32 mtx[4][4];
     s32 *anims;
@@ -168,7 +170,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
     s32 *data;
 
     anims = CISet__GetBlock(file, 3);
-    obj->animIndex = MtxPool_Alloc(gScene.m_Heap, *anims);
+    obj->animIndex = (sptr) MtxPool_Alloc(gScene.m_Heap, *anims);
     if (obj->animIndex == 0) {
         return 0;
     }
@@ -176,7 +178,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
     hidden = obj->flags & 1;
     isType9 = *obj->def == 9;
     inCinema = 0;
-    handle = (void *) CCache__Request(0, obj->animFile, ((obj->animCount * 4) + 0xF) & ~7, 4, 0, 0, D_800A5AF8 + 4, 0);
+    handle = (void *) CCache__Request(0, obj->animFile, ((obj->animCount * 4) + 0xF) & ~7, 4, 0, 0, sAnimIndexName_view + 4, 0);
     if (handle != NULL) {
         channel = &obj->channel;
         blendChannel = &obj->blendChannel;

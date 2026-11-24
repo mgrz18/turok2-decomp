@@ -46,7 +46,7 @@ typedef struct ModelRef {
 } ModelRef;
 #endif
 
-Mtx *MtxPool_Alloc(void *pool, s32 count);
+void *MtxPool_Alloc(void *pool, s32 count);
 void CMtxF__Multiply(f32 (*mf)[4], void *arg1, void *arg2);
 void CMtxF__ClampEntries(f32 (*mf)[4]);
 void CMtxF__ToMtx(f32 (*mf)[4], Mtx *m);

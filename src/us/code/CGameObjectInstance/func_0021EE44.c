@@ -1,7 +1,7 @@
 #include "common.h"
 #include "protos/iset.h"
 
-extern void GameObject_EmitHotPoints(s32 *arg0, s32 arg1, sptr arg2, void *arg3, s32 *arg4);
+void GameObject_EmitHotPoints(void *list, s32 count, void *bones, void *obj, void *anims);
 
 void CGameObjectInstance__EmitFlaggedHotPoints(u8 *actor, s32 *data, s32 arg2) {
     s32 *countp;
@@ -23,7 +23,7 @@ void CGameObjectInstance__EmitFlaggedHotPoints(u8 *actor, s32 *data, s32 arg2) {
             value = entry[1];
             if (value != 0) {
                 params = entry + 2;
-                GameObject_EmitHotPoints(params, value, arg2, actor, CISet__GetBlock(data, 3));
+                GameObject_EmitHotPoints(params, value, (void *) (sptr) arg2, actor, CISet__GetBlock(data, 3));
             }
         }
     }

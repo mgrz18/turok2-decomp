@@ -5,23 +5,23 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
-struct LevelActor;
-struct Triple;
-struct Box;
-typedef struct Box Box;
-struct Box;
-struct Box {
+struct RootActor;
+struct RootTriple;
+struct RootBox;
+typedef struct RootBox RootBox;
+struct RootBox;
+struct RootBox {
     CVector3 min;
     CVector3 max;
 };
-struct Triple;
-struct Triple {
+struct RootTriple;
+struct RootTriple {
     s32 x;
     s32 y;
     s32 z;
 };
-struct Triple;
-typedef struct Triple Triple;
+struct RootTriple;
+typedef struct RootTriple RootTriple;
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
 struct Shared_ParticleLighting {
     u8 ambient[3], reserved3;
@@ -40,9 +40,9 @@ struct CQuatern_t {
     float z;
     float w;
 };
-struct LevelActor;
-typedef struct LevelActor LevelActor;
-struct LevelActor {
+struct RootActor;
+typedef struct RootActor RootActor;
+struct RootActor {
     u8 kind;
     s8 team;
     char pad2;
@@ -71,7 +71,7 @@ struct LevelActor {
     u16 type;
     u8 stateE6;
     u8 stateE7;
-    Box bounds;
+    RootBox bounds;
     s32 flags;
     f32 animationTime;
     s16 animation;
@@ -120,26 +120,26 @@ struct LevelActor {
     s32 renderFlags;
     s32 flags2E4;
 };
-typedef struct AnimChannel {
+typedef struct RootChannel {
     f32 time;
     s16 current,next,frames;
     u8 active,blending;
     char padc[4]; void *resource;
-} AnimChannel;
-struct LevelActor;
-struct LevelActor;
-struct Triple;
-struct Triple;
-struct Triple;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct Triple;
-struct LevelActor;
-extern void CMtxF__SetRotateY(void *matrix, f32 angle);
-extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern void CAnimationState__GetBonePosition(AnimChannel *, s32, f32, f32 *);
-void *CGameObjectInstance__GetRootOffset(Triple *arg0, void *arg1, AnimChannel *arg2) {
+} RootChannel;
+struct RootActor;
+struct RootActor;
+struct RootTriple;
+struct RootTriple;
+struct RootTriple;
+struct RootActor;
+struct RootActor;
+struct RootActor;
+struct RootTriple;
+struct RootActor;
+void CMtxF__SetRotateY(void *m, f32 angle);
+void CMtxF__TransformPoint(void *m, void *in, void *out);
+void CAnimationState__GetBonePosition(void *channel, s32 bone, f32 t, f32 *out);
+void *CGameObjectInstance__GetRootOffset(RootTriple *arg0, void *arg1, RootChannel *arg2) {
     char *o1 = (char *) arg1;
     char mtx[0x40];
     f32 spVec[3];
@@ -149,11 +149,11 @@ void *CGameObjectInstance__GetRootOffset(Triple *arg0, void *arg1, AnimChannel *
     inVec[0] = spVec[0];
     inVec[1] = spVec[2];
     inVec[2] = spVec[1];
-    CMtxF__SetRotateY(mtx, ((LevelActor *)o1)->yaw);
+    CMtxF__SetRotateY(mtx, ((RootActor *)o1)->yaw);
     CMtxF__TransformPoint(mtx, inVec, outVec);
-    outVec[0] *= ((LevelActor *)o1)->scale.x;
-    outVec[1] *= ((LevelActor *)o1)->scale.y;
-    outVec[2] *= ((LevelActor *)o1)->scale.z;
-    *arg0 = *(Triple *) outVec;
+    outVec[0] *= ((RootActor *)o1)->scale.x;
+    outVec[1] *= ((RootActor *)o1)->scale.y;
+    outVec[2] *= ((RootActor *)o1)->scale.z;
+    *arg0 = *(RootTriple *) outVec;
     return arg0;
 }

@@ -2,7 +2,7 @@
 #include "protos/cache.h"
 
 extern s32 **CGameObjectInstance__LoadGeometry();
-extern u8 *CISet__GetBlock(void *base, s32 index);
+#include "protos/iset.h"
 
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CGameObjectInstance__LoadGeometry receives CGameObjectInstance__GetGeometryKind's own argument
  * registers (pass-through); the host passes them. */
@@ -13,7 +13,7 @@ s32 CGameObjectInstance__GetGeometryKind(void * pt0) {
     value = -1;
     res = CGameObjectInstance__LoadGeometry(pt0);
     if (res != NULL) {
-        value = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(*res, 3), 0), 1)[0x66];
+        value = ((u8 *) CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(*res, 3), 0), 1))[0x66];
         CCache__Unlock(0, res);
     }
     return value;

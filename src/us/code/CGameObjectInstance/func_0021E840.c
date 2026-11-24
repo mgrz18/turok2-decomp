@@ -6,7 +6,7 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
-struct LevelActor;
+struct OrientActor;
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
@@ -27,8 +27,8 @@ struct CQuatern_t {
     float z;
     float w;
 };
-typedef struct LevelActor LevelActor;
-struct LevelActor {               /* Turok 2 layout (Rage Wars offsets in comments) */
+typedef struct OrientActor OrientActor;
+struct OrientActor {               /* Turok 2 layout (Rage Wars offsets in comments) */
     u8 kind;
     s8 team;
     char pad2;
@@ -44,27 +44,27 @@ struct LevelActor {               /* Turok 2 layout (Rage Wars offsets in commen
     f32 eyeHeight;                /* 0x54 (0x70) */
     f32 transform[16];            /* 0x58 (0x74) */
 };
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
-struct LevelActor;
+struct OrientActor;
+struct OrientActor;
+struct OrientActor;
+struct OrientActor;
+struct OrientActor;
+struct OrientActor;
 extern s32 Cinema_PathPlaying(void);
 #ifndef TARGET_PORT
 extern void GameObject_GetFloorTilt(CQuatern *arg0, void *arg1);
 #endif
-extern void CQuaternion__Multiply(CQuatern *arg0, CQuatern *arg1, CQuatern *arg2);
-extern void CQuaternion__ToMatrix(void *, void *);
-extern void CMtxF__ScaleAxes(void *arg0, f32 sx, f32 sy, f32 sz);
-extern s32 CVector3__ClampLength(f32 *arg0, f32 arg1);
-extern void CMtxF__Translate(char *, f32, f32, f32);
+void CQuaternion__Multiply(void *out, void *a, void *b);
+void CQuaternion__ToMatrix(void *q, void *m);
+void CMtxF__ScaleAxes(void *m, f32 x, f32 y, f32 z);
+void CVector3__ClampLength(void *v, f32 length);
+void CMtxF__Translate(void *m, f32 x, f32 y, f32 z);
 extern void CMtxF__SwapYZRows(void *);
 #ifdef TARGET_PORT
 #include "structs/game_object.h"
 CQuaternion GameObject_GetFloorTilt(CGameObjectInstance *obj);
 
-/* Host body on CGameObjectInstance: the LevelActor view has the N64 header size (a 4-byte
+/* Host body on CGameObjectInstance: the OrientActor view has the N64 header size (a 4-byte
  * intelligence pointer), and GameObject_GetFloorTilt returns its quaternion by value (MIPS
  * passes a hidden result pointer, x86-64 returns it in registers). */
 void CGameObjectInstance__CalculateOrientationMatrix(void *arg0) {
@@ -105,31 +105,31 @@ void CGameObjectInstance__CalculateOrientationMatrix(void *arg0) {
     f32 scale;
     f32 sine;
     f32 angle;
-    copy = ((struct LevelActor *)(arg0))->rotation;
+    copy = ((struct OrientActor *)(arg0))->rotation;
     copy_ptr = &copy;
     if (Cinema_PathPlaying() != 0) {
         GameObject_GetFloorTilt(copy_ptr, arg0);
     }
-    angle = ((struct LevelActor *)(arg0))->yaw;
+    angle = ((struct OrientActor *)(arg0))->yaw;
     scale = (0.5f);
     sine = func_002982F0(angle * scale);
     trig.x = 0.0f;
     trig.y = sine;
     trig.z = 0.0f;
-    angle = ((struct LevelActor *)(arg0))->yaw * scale;
+    angle = ((struct OrientActor *)(arg0))->yaw * scale;
     gQuaternionSin = sine;
     trig.w = func_002974C0(angle);
     product_ptr = &product;
     CQuaternion__Multiply(product_ptr, &trig, copy_ptr);
-    transform = &((struct LevelActor *)(arg0))->transform[0];
+    transform = &((struct OrientActor *)(arg0))->transform[0];
     CQuaternion__ToMatrix(product_ptr, transform);
-    CMtxF__ScaleAxes(transform, ((struct LevelActor *)(arg0))->scale.x,
-                    ((struct LevelActor *)(arg0))->scale.y,
-                    ((struct LevelActor *)(arg0))->scale.z);
-    CVector3__ClampLength(&((struct LevelActor *)(arg0))->position0.x, 20000.0f);
-    CMtxF__Translate(transform, ((struct LevelActor *)(arg0))->position0.x,
-                   ((struct LevelActor *)(arg0))->position0.y,
-                   ((struct LevelActor *)(arg0))->position0.z);
+    CMtxF__ScaleAxes(transform, ((struct OrientActor *)(arg0))->scale.x,
+                    ((struct OrientActor *)(arg0))->scale.y,
+                    ((struct OrientActor *)(arg0))->scale.z);
+    CVector3__ClampLength(&((struct OrientActor *)(arg0))->position0.x, 20000.0f);
+    CMtxF__Translate(transform, ((struct OrientActor *)(arg0))->position0.x,
+                   ((struct OrientActor *)(arg0))->position0.y,
+                   ((struct OrientActor *)(arg0))->position0.z);
     CMtxF__SwapYZRows(transform);
 }
 #endif

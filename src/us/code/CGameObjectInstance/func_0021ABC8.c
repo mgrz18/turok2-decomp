@@ -13,17 +13,17 @@ int T2Port_AnimEventsEnabled(void); /* port/game/t2actors.c */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34_2.CPP, func_802476C8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct IntPair {
-    int field_0;
-    int field_4;
-};
+typedef struct AnimEventPair {
+    s32 a;
+    s32 b;
+} AnimEventPair; /* an animation event's value (structs/particle.h CEventValue's two words) */
 typedef struct CROMEventEntry {
     u16 frame;
     u16 effect;
     s16 bone;
     s16 pad6;
     CVector3 local;
-    struct IntPair params;
+    AnimEventPair params;
 } CROMEventEntry;
 /* Turok 2 offsets (Rage Wars in parentheses): pos 0x4 (0x8), transform 0x58
  * (0x74), bone matrices 0x98 (0xB8), type id 0xB8 (0xE4), flags 0xD4 (0x100),
@@ -63,12 +63,12 @@ typedef struct BoneInfo {
     char pad0[0x6C];
     s32 mask;
 } BoneInfo;
-extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern CROMEventEntry *CAnimationState__GetEvents(void *);
-extern s32 CAnimationState__GetEventCount(void *);
+void CMtxF__TransformPoint(void *m, void *in, void *out);
+void *CAnimationState__GetEvents(void *channel);
+s32 CAnimationState__GetEventCount(void *channel);
 extern s32 *CGameObjectInstance__LoadGeometry(ObjectLinks *);
-extern void CMtxF__FromMtxAffine(f32 *, char *);
-extern void ImpactEvent_Send(ObjectLinks *, ObjectLinks *, u16, s32, CVector3, struct IntPair);
+void CMtxF__FromMtxAffine(void *out, void *in);
+void ImpactEvent_Send(void *src, void *dst, u16 effect, s32 id, CVector3 pos, AnimEventPair value);
 /* Fires the animation events whose frame lies in [from, to). */
 void CGameObjectInstance__FireAnimEvents(ObjectLinks *obj, void *anim, f32 from, f32 to) {
     CVector3 pos;

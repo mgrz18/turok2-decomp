@@ -36,10 +36,14 @@ struct B10H {
 };
 extern f32 D_800A5AF8;
 s32 GameObject_IsOnGround(void *actor);
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
-#define GameObject_GetGroundRotation GameObject_GetGroundRotation_sret
+/* The ground rotation through an out pointer: the definition's struct return (its hidden first
+ * argument) under its own name on the N64, the port's shim (port/game/t2abi.c, ABI.md struct_scalar). */
+#ifdef TARGET_PORT
+void GameObject_GetGroundRotation_sret(f32 *loc, B10Obj *o);
+#define GameObject_GetGroundRotation_o GameObject_GetGroundRotation_sret
+#else
+void GameObject_GetGroundRotation_o(f32 *loc, B10Obj *o) __asm__("GameObject_GetGroundRotation");
 #endif
-void GameObject_GetGroundRotation(f32 *loc, B10Obj *o);
 s32 GameObject_TiltsToGround(B10Obj *o);
 void CQuaternion__TurnToward(f32 *a, f32 *loc);
 void CQuaternion__SlerpFast(f32 *a, f32 t, f32 *b, f32 *loc);
@@ -60,7 +64,7 @@ void CGameObjectInstance__AlignToGround(B10Obj *o) {
     if (o->p14 == 0) {
         return;
     }
-    GameObject_GetGroundRotation(loc, o);
+    GameObject_GetGroundRotation_o(loc, o);
     s = o->p14->h2 & 1;
     if (GameObject_TiltsToGround(o) == 0) {
         return;

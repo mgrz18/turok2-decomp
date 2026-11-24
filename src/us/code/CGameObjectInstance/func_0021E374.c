@@ -14,10 +14,10 @@ typedef struct Box {
 
 
 void **CGameObjectInstance__LoadGeometry(CGameObjectInstance *actor);
-void CVector3__Add(CVector3 *dst, CVector3 *a, CVector3 *b);    /* add */
+void CVector3__Add(void *out, void *a, void *b);
 void CVector3__Scale(CVector3 *dst, CVector3 *src, f32 scale);
-void CMtxF__FromMtxAffine(CMtxF *dst, CMtxF *src);
-void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
+void CMtxF__FromMtxAffine(void *out, void *in);
+void CMtxF__TransformPoint(void *m, void *in, void *out);
 void CVector3__Subtract(CVector3 *dst, CVector3 *a, CVector3 *b);    /* subtract */
 
 /* Copies the actor's bounding box whose center is nearest to pos into out. */

@@ -79,16 +79,16 @@ typedef struct {
 } AnimActor;
 #endif
 
-void CAnimationState__SwitchToQueued(AnimTrack *track, sptr data, s32 key, s32 primary, s32 *active, AnimTrack *other);
-s32 CAnimationState__IsLoaded(AnimTrack *track);
+void CAnimationState__SwitchToQueued(void *channel, sptr anims, s32 file, s32 primary, void *active, void *other);
+s32 CAnimationState__IsLoaded(void *channel);
 AnimBlendEntry *CAnimationState__GetKeyHeader(AnimTrack *track);
-void CAnimationState__Release(AnimTrack *track);
+void CAnimationState__Release(void *channel);
 void CAnimationState__GetRootMotion(AnimTrack *track, CVector3 *delta, f32 *turn, AnimActor *actor);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 f32 Angle_Lerp(f32 t, f32 a, f32 b);
 void Angle_Wrap(f32 *angle);
-void CMtxF__SetRotateY(CMtxF *m, f32 angle);
-void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
+void CMtxF__SetRotateY(void *m, f32 angle);
+void CMtxF__TransformPoint(void *m, void *in, void *out);
 
 /* Advances an actor's animation and applies its root motion: the turn and,
  * with flag 0x20000, the move, blended over the transition from the previous

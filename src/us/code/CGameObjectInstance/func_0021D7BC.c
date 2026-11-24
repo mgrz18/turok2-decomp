@@ -10,7 +10,7 @@
 
 
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, sptr, CDrawArgs *);
-void Render_QueueModelInstance(sptr, sptr, s32, void *, sptr, s32, s32);
+void Render_QueueModelInstance(sptr model, sptr matrix, s32 segment, void *lights, void *textures, s32 lod, s32 pass);
 
 static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0, s32 *set1) {
     CIntelligence *intel = actor->header.m_pIntelligence;

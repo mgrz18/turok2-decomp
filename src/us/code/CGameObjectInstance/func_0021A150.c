@@ -4,15 +4,16 @@
 #include "protos/cache.h"
 
 #ifdef TARGET_PORT
-/* The port: the same through CGameObjectInstance (structs/game_object.h); the Actor view below
+/* The port: the same through CGameObjectInstance (structs/game_object.h); the SetupActor view below
  * has the N64 offsets (the pointers before 0xA4 and in CAI make the host ones larger). */
 #include "structs/game_object.h"
 #include "structs/cache.h"
+struct CGameObjectInstance;
 
 
-void CMtxF__TransformBox(void *, void *, void *);
-void CAnimationState__Reset(void *);
-sptr CGameObjectInstance__PickRandomAnim(CGameObjectInstance *, sptr, sptr);
+void CMtxF__TransformBox(void *m, void *in, void *out);
+void CAnimationState__Reset(void *state);
+sptr CGameObjectInstance__PickRandomAnim(struct CGameObjectInstance *actor, sptr action, sptr skip);
 
 void CGameObjectInstance__SetupAnimation(CGameObjectInstance *actor, s32 *a1, s32 a2, s32 anim) {
     CMemEntry *model;
@@ -47,7 +48,7 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *actor, s32 *a1, s3
             actor->m_nAnims = (u16) ((u32 *) CISet__GetBlock((void *)(sptr)setTree, 1))[1];
             actor->m_dwFlags |= 0x40000;
             if (anim > 0) {
-                anim = CGameObjectInstance__PickRandomAnim(actor, anim, -1);
+                anim = CGameObjectInstance__PickRandomAnim((struct CGameObjectInstance *) actor, anim, -1);
             } else {
                 anim = -anim;
             }
@@ -72,9 +73,9 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *actor, s32 *a1, s3
  * animation: `anim` > 0 is an action to pick at random (CGameObjectInstance__PickRandomAnim),
  * otherwise -anim is the entry itself. */
 
-typedef struct Actor Actor;
+typedef struct SetupActor SetupActor;
 
-struct Actor {
+struct SetupActor {
     u8 pad0[0x2];
     u16 unk2;               /* 0x002 */
     u8 pad4[0x54];
@@ -101,15 +102,15 @@ struct Actor {
     u8 pad176[0x90];
     s8 unk206;              /* 0x206 */
     u8 pad207[0x3D];
-    void (*init)(Actor *, void *);  /* 0x244 */
+    void (*init)(SetupActor *, void *);  /* 0x244 */
 };
 
 
-void CMtxF__TransformBox(void *, void *, void *);
-void CAnimationState__Reset(void *);
-sptr CGameObjectInstance__PickRandomAnim(Actor *, sptr, sptr);
+void CMtxF__TransformBox(void *m, void *in, void *out);
+void CAnimationState__Reset(void *state);
+sptr CGameObjectInstance__PickRandomAnim(struct CGameObjectInstance *actor, sptr action, sptr skip);
 
-void CGameObjectInstance__SetupAnimation(Actor *actor, sptr a1, s32 a2, sptr anim) {
+void CGameObjectInstance__SetupAnimation(SetupActor *actor, sptr a1, s32 a2, sptr anim) {
     s32 *model;
     s32 *set;
     s32 id;
@@ -136,7 +137,7 @@ void CGameObjectInstance__SetupAnimation(Actor *actor, sptr a1, s32 a2, sptr ani
             actor->setId = ((u16 *) CISet__GetBlock(setTree, 1))[3];
             actor->flags |= 0x40000;
             if (anim > 0) {
-                anim = CGameObjectInstance__PickRandomAnim(actor, anim, -1);
+                anim = CGameObjectInstance__PickRandomAnim((struct CGameObjectInstance *) actor, anim, -1);
             } else {
                 anim = -anim;
             }

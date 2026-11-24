@@ -4,14 +4,15 @@
 #include "rw/abu_types.h"
 
 #include "structs/vector.h"
+struct CGameObjectInstance;
 
 /* Host body (docs/port/ABI.md, abicheck struct_class/struct_scalar): every caller passes
  * (CVector3 *out, actor, CVector3 v). The MIPS view took v as an IntPair and left the actor in
  * a1 for CGameObjectInstance__GetRotation, which returns its CQuaternion through a hidden
  * pointer there and in registers on the host. */
-extern CQuaternion CGameObjectInstance__GetRotation(void *actor);
-extern void CQuaternion__ToMatrix(f32 *q, f32 *m);
-extern void CMtxF__TransformPoint(void *mf, CVector3 *in, CVector3 *out);
+extern CQuaternion CGameObjectInstance__GetRotation(struct CGameObjectInstance *actor);
+void CQuaternion__ToMatrix(void *q, void *m);
+void CMtxF__TransformPoint(void *m, void *in, void *out);
 CVector3 *CGameObjectInstance__LocalToWorld(CVector3 *out, void *actor, CVector3 v) {
     CQuaternion q;
     f32 m[16];

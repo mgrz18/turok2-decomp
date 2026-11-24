@@ -13,10 +13,10 @@
  * that produced: the new position is taken back out, turned by the actor's
  * rotation, collided along (CGameObjectInstance__MoveWithCollision), then the animation is applied. */
 
-typedef struct Actor Actor;
+typedef struct MoveActor MoveActor;
 
 #ifdef TARGET_PORT
-struct Actor {
+struct MoveActor {
 /* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
  * member of one union, placed by __builtin_offsetof of the member it reads */
 #define T2_HOFF_Actor(m) __builtin_offsetof(CGameObjectInstance, m)
@@ -30,11 +30,11 @@ struct Actor {
         struct { u8 _hp_flags[T2_HOFF_Actor(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
         struct { u8 _hp_ai[T2_HOFF_Actor(m_AI)]; u8 ai[0x54]; }; /* N64 0x140 */
         struct { u8 _hp_unk194[T2_HOFF_Actor(m_AI.m_vDesiredPos)]; u8 unk194[0xC]; }; /* N64 0x194 */
-        struct { u8 _hp_init[T2_HOFF_Actor(m_AI.m_pfCalculateOrientationMatrix)]; void (*init)(Actor *, void *); }; /* N64 0x244 */
+        struct { u8 _hp_init[T2_HOFF_Actor(m_AI.m_pfCalculateOrientationMatrix)]; void (*init)(MoveActor *, void *); }; /* N64 0x244 */
     };
 };
 #else
-struct Actor {
+struct MoveActor {
     u8 pad0[0x4];
     CVector3 pos;               /* 0x004 */
     u8 pad10[0x4];
@@ -50,19 +50,19 @@ struct Actor {
     u8 padD8[0x68];
     u8 ai[0x54];            /* 0x140 */
     u8 unk194[0xB0];        /* 0x194 */
-    void (*init)(Actor *, void *);  /* 0x244 */
+    void (*init)(MoveActor *, void *);  /* 0x244 */
 };
 #endif
 
 
-void CMtxF__TransformBox(void *, void *, void *);
-void CVector3__Add(CVector3 *, CVector3 *, void *);
+void CMtxF__TransformBox(void *m, void *in, void *out);
+void CVector3__Add(void *out, void *a, void *b);
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
-void CGameObjectInstance__AlignToGround(Actor *);
-void CGameObjectInstance__MoveWithCollision(Actor *, CVector3 *);
-void CGameObjectInstance__AdvanceAnimation(Actor *);
+void CGameObjectInstance__AlignToGround(MoveActor *);
+void CGameObjectInstance__MoveWithCollision(char *arg0, CVector3 *arg1);
+void CGameObjectInstance__AdvanceAnimation(MoveActor *);
 
-void CGameObjectInstance__UpdateAnimation(Actor *actor) {
+void CGameObjectInstance__UpdateAnimation(MoveActor *actor) {
     CVector3 oldPos;
     CVector3 newPos;
     sptr *set;
@@ -85,7 +85,7 @@ void CGameObjectInstance__UpdateAnimation(Actor *actor) {
         if (!moving && *actor->region != 0) {
             CVector3__Subtract(&newPos, &newPos, &oldPos);
             CVector3__Add(&newPos, &newPos, actor->unk194);
-            CGameObjectInstance__MoveWithCollision(actor, &newPos);
+            CGameObjectInstance__MoveWithCollision((char *) actor, &newPos);
             if (*actor->region == 1) {
                 CScene__CheckAutoActivation(game, actor, &oldPos, &actor->pos);
             }

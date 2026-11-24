@@ -4,10 +4,13 @@
 #include "rw/abu_types.h"
 #include "protos/iset.h"
 
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
-#define CQuaternion__Slerp CQuaternion__Slerp_i
+/* The amount passed as its word: the port's shim (port/game/t2abi.c, ABI.md float_int), the N64
+ * definition under its own name. */
+#ifdef TARGET_PORT
+void CQuaternion__Slerp_i(void *out, s32 amount, void *a, void *b);
+#else
+void CQuaternion__Slerp_i(void *out, s32 amount, void *a, void *b) __asm__("CQuaternion__Slerp");
 #endif
-extern void CQuaternion__Slerp(void *arg0, s32 arg1, void *arg2, void *arg3);
 void Anim_GetBoneRotationSlerp(ObjectLinks24_2 *arg0, s32 arg1, Vector4f *arg2) {
     ObjectLinks24_2 *o = arg0;
     ObjRecAt2V1 *indices;
@@ -27,7 +30,7 @@ void Anim_GetBoneRotationSlerp(ObjectLinks24_2 *arg0, s32 arg1, Vector4f *arg2) 
         return;
     }
     base = CISet__GetBlock(o->unk_C, (s32)idx);
-    CQuaternion__Slerp(arg2, o->unk_20,
+    CQuaternion__Slerp_i(arg2, o->unk_20,
                     (char *)base + o->unk_10 * 4,
                     (char *)base + o->unk_14 * 4);
 }

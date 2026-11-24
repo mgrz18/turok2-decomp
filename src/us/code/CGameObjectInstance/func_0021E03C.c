@@ -26,10 +26,10 @@ s32 CGameRegion__IsSteep(ObjDef *def);
 void *MtxPool_Alloc(void *pool, s32 count);
 f32 GameObject_GetGroundHeight(ShadowActor *actor, s32 arg1);    /* ground height */
 f32 GameObject_GetWallRadius(ShadowActor *actor);              /* radius */
-void CVector3__ClampLength(CVector3 *v, f32 arg1);
-void CQuaternion__ToMatrix(void *rot, CMtxF *m);
-void CMtxF__ScaleAxes(CMtxF *m, f32 x, f32 y, f32 z);  /* scale */
-void CMtxF__Translate(CMtxF *m, f32 x, f32 y, f32 z);  /* translate */
+void CVector3__ClampLength(void *v, f32 length);
+void CQuaternion__ToMatrix(void *q, void *m);
+void CMtxF__ScaleAxes(void *m, f32 x, f32 y, f32 z);
+void CMtxF__Translate(void *m, f32 x, f32 y, f32 z);
 void CMtxF__ToMtxAffine(CMtxF *m, void *dst);
 void Render_DrawShadowQuad(void *mtx, s32 arg1, s32 alpha);
 

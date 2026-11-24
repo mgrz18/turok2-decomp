@@ -129,19 +129,19 @@ _Static_assert(__builtin_offsetof(PoseContext, bone) == __builtin_offsetof(T2Pos
 _Static_assert(sizeof(PoseContext) == sizeof(T2PoseContext), "pose ctx");
 #endif
 
-void CMtxF__MultiplyAffine(f32 (*out)[4], f32 (*a)[4], f32 (*b)[4]);
+void CMtxF__MultiplyAffine(void *out, void *a, void *b);
 void CQuaternion__Slerp(CQuaternion *out, f32 amount, CQuaternion *a, CQuaternion *b);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
-void CMtxF__SetAxisAngle(f32 (*m)[4], f32 angle, f32 x, f32 y, f32 z);
-void CMtxF__Copy(f32 (*dst)[4], f32 (*src)[4]);
-void CMtxF__Translate(f32 (*m)[4], f32 x, f32 y, f32 z);
-void CMtxF__ScaleAxes(f32 (*m)[4], f32 x, f32 y, f32 z);
+void CMtxF__SetAxisAngle(void *m, f32 angle, f32 x, f32 y, f32 z);
+void CMtxF__Copy(void *dst, void *src);
+void CMtxF__Translate(void *m, f32 x, f32 y, f32 z);
+void CMtxF__ScaleAxes(void *m, f32 x, f32 y, f32 z);
 /* The N64 passes the object itself as the wobble's phase (CGameObjectInstance__WobbleBone reads the low 16 bits of
  * its address); on the host that is an ASLR-dependent host address: pass the address the object
  * would have in the N64 heap (port/runtime/t2boot.c), the same in every run. */
 void CGameObjectInstance__WobbleBone(s32 time, s32 flags, f32 (*m)[4]);
 u32 T2Port_N64Address(const void *p);
-f32 GameObject_GetCollisionHeight(PoseObject *obj);
+f32 GameObject_GetCollisionHeight(void *obj);
 f32 CGameRegion__GetCeilingHeight(CGameRegion *region, f32 x, f32 z); /* the ceiling height */
 
 static __inline__ void trackPos(KeyLookup *t, s32 i, CVector3 *out) {

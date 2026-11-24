@@ -12,7 +12,7 @@
 
 f32 func_002982F0(f32);     /* sinf */
 f32 func_002974C0(f32);     /* cosf */
-void CQuaternion__Multiply(CQuaternion *, CQuaternion *, CQuaternion *);
+void CQuaternion__Multiply(void *out, void *a, void *b);
 
 CQuaternion CGameObjectInstance__GetRotation(CGameObjectInstance *actor) {
     CQuaternion result;

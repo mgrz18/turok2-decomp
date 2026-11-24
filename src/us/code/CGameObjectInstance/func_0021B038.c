@@ -15,17 +15,21 @@ typedef struct B10Mt {
 /* Turok 2 layout (Rage Wars: pos 0x8, f70 0x70, flags 0x100, f174 0x174). */
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-#ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar) */
-#define CGameObjectInstance__GetRotation CGameObjectInstance__GetRotation_sret
+/* The rotation through an out pointer: the N64 definition's struct return (its hidden first
+ * argument) under its own name, the port's shim (port/game/t2abi.c, ABI.md struct_scalar). */
+#ifdef TARGET_PORT
+void CGameObjectInstance__GetRotation_sret(B10Q4 *out, CGameObjectInstance *o);
+#define CGameObjectInstance__GetRotation_o CGameObjectInstance__GetRotation_sret
+#else
+void CGameObjectInstance__GetRotation_o(B10Q4 *out, CGameObjectInstance *o) __asm__("CGameObjectInstance__GetRotation");
 #endif
-void CGameObjectInstance__GetRotation(B10Q4 *out, CGameObjectInstance *o);
-f32 GameObject_GetCollisionHeight(CGameObjectInstance *o);
+f32 GameObject_GetCollisionHeight(void *obj);
 void CVector3__Subtract(CVector3 *o, CVector3 *a, CVector3 *b);
 void CVector3__Cross(CVector3 *o, CVector3 *a, CVector3 *b);
 void CVector3__Normalize(CVector3 *v);
-void CMtxF__TransformPoint(B10Mt *m, CVector3 *a, CVector3 *b);
-void CQuaternion__Multiply(B10Q4 *o, B10Q4 *a, B10Q4 *b);
-void CQuaternion__ToMatrix(B10Q4 *q, B10Mt *m);
+void CMtxF__TransformPoint(void *m, void *in, void *out);
+void CQuaternion__Multiply(void *out, void *a, void *b);
+void CQuaternion__ToMatrix(void *q, void *m);
 f32 Math_AcosLookup(f32 x);
 f32 func_00298470(f32 x); /* sqrtf */
 B10Q4 *CGameObjectInstance__GetAutoAimRotation(B10Q4 *out, CGameObjectInstance *self, CVector3 dir, B10Q4 *outq, f32 angle) {
@@ -53,7 +57,7 @@ B10Q4 *CGameObjectInstance__GetAutoAimRotation(B10Q4 *out, CGameObjectInstance *
     v20.x = 0;
     v20.y = 0;
     v20.z = 1.0f;
-    CGameObjectInstance__GetRotation(&q70, self);
+    CGameObjectInstance__GetRotation_o(&q70, self);
     if (new_var2 == 0.0f) {
         if (outq) {
             outq->x = outq->y = outq->z = 0;
