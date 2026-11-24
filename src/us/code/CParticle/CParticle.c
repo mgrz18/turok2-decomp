@@ -2309,9 +2309,7 @@ void CParticle__DrawShadow(ShadowActor *actor, void *view) { /* view: unused (CP
  * emits the colour and draw commands. */
 
 
-#ifndef STRUCTS_GBI_H /* the port includes structs/gbi.h through structs/game.h */
-typedef struct { u8 pad0[0x40]; } Mtx;
-#endif
+#include "structs/gbi.h"
 /* The leading 0x34 bytes of a game object, as the collision test reads them. */
 #ifdef TARGET_PORT
 typedef struct ParticleHead {
