@@ -999,6 +999,65 @@ the compiler, 3 refused: `code/CScene` and `vm1/SceneLoad`, whose `.rodata` inte
 
 None needs a ROM change.
 
+## Round 28, part q3: the VM bosses (`vm1/{TotemDefense, MantidQueen, Primagen}`, `vm2/Primagen`)
+
+**Merged (4 directories, 179 files -> 4):** `vm1/TotemDefense`, `vm1/MantidQueen`, `vm1/Primagen`, `vm2/Primagen`.
+`make verify` byte-exact and `tools/asm_diff.py --base b9bb8125` 0 over the tree; the port builds from a fresh
+gendata (aligncheck 0 sites, `port_layout` regenerated), the merged files have no implicit declaration under clang
+`-Wimplicit-function-declaration` (N64 and `TARGET_PORT`). Port md5s unchanged: boot + 3 demos 6ab97584, default whole game af8bd840.
+
+*The `.rodata` order: a deferred tail written early.* In all three vm1 objects one function late in `.text`
+emits its literals before an earlier function's (TotemDefense: `TotemDefense_Init`'s `"Enemies"`/`"Time"` and
+`TotemDefense_DrawTotem`'s `"lit vertices"` before `TotemDefense_Complete`'s floats; MantidQueen: the `"Queen"` of
+0x402BB0 before `MantidQueen_ChooseAttack`'s floats; Primagen: the `"Primagen"` of 0x407C20 before 0x405AC8's).
+The source order that gives it: every function from the late one to the end of the object is `DEFERRED`
+(`inline`: output after the others, in the order of their first declaration, literals at the definition) and
+defined before the function whose `.rodata` follows. `--inline all` is wrong here: GCC then inlines a deferred
+function into a later caller (`TotemDefense_UpdateFight` grew by `TotemDefense_Complete`/`_Fail`, +0xC14). So
+the tail must not be called (only have its address taken) by the functions compiled after it; checked for the
+three. `tools/merge_module.py` learned:
+
+- `--before A,B..:C`: files A,B.. (their `.text` order kept) go right before file C in the source order;
+- `--inline` also writes `DEFERRED` on the definitions inside a conditional block (`#ifdef TARGET_PORT ..
+  #else .. #endif`: `TotemDefense_Init`, `MantidQueen_UpdateMode6`, `MantidQueen_NextStep`), which take their place
+  in the output order (their early prototype is the block's first definition's signature, so both bodies take
+  the same parameter types: `MantidQueen_NextStep(void *)`);
+- an early prototype of a deferred function takes the type declarations it needs with it (`move_types`,
+  recursive), and a conditional block's struct typedefs count as its types.
+
+Header work (each step `asm_diff` 0):
+
+- *`AI_TurnClamped`* (vm1/MantidQueen): the definition takes `f32, f32` (`protos/ai.h`, the asm passes the
+  angle in a3 either way); the two callers that passed `*(s32 *)&angle` now pass `CAITargets.m_Path.m_Angle`, with
+  `CAITargets`/`CAI` instead of the per-file views `Info00403144`/`Item00403144` (the port's `AI_TurnClamped_i`
+  shim no longer needed there). The Rage Wars type dump of `MantidQueen_EnterDeath`'s file is gone.
+- *One-element and byte views of a global*: `tools/view_label.py FILE NAME..` (new) turns a file's own
+  `extern T NAME[..];` into an asm-label alias `NAME_v<stem>` and its uses (the CPlayer precedent):
+  `gTotemDefense*` (TotemDefense_Init), `gTotemDefense_kills`, the player-list head, `gMantidQueen` as bytes
+  (`#ifndef TARGET_PORT`), and in vm1/Primagen `gLevelScript` (3 files), `gLevelScript_spawnsLeft`,
+  `_script_current`, `_timer`, `_values`, `_unk3CA`, `_armed`. No symbol or gendata change was needed.
+- *Calls that pass more than the definition takes* go through a cast of their own: `COnScreen__SetBoss` with the
+  CAI in a3 (`COnScreen__SetBoss_4`), `Primagen_RunSpawnStep`/`_RunSoundStep` with three arguments;
+  `Sound__Play` with its CVector3 as three words is `Sound__Play_Words` (asm label).
+- `LevelScriptF950` once, in `structs/twin_primagen.h`; the two `State` views renamed by file; `CInstancePool__Spawn`
+  as `protos/game.h` declares it; `WeightedTable_PickStatic(void *)`, `ScriptAnimator_SetScript(void *, void *)`,
+  `CGameObjectInstance__PickRandomAnim(void *, sptr, sptr)` one form each.
+- *vm2/Primagen follows vm1*: `tools/twin_text.py --base b9bb8125 vm1/Primagen vm2/Primagen 8f57b138` (57 of 58
+  files; `--base` is new).
+
+**A trap: vm2 text is not a port-safe source for vm1.** `tools/twin_text.py --to-vm1` (new: each vm1 file as its
+vm2 twin's text) gave vm1/Pak and 13 TotemDefense files merge-ready text at `asm_diff` 0, and the merged ROM
+verified, but the port crashed at boot: vm2's `Pak_AllocDirectory` reads the cache handle's data pointer as an
+`s32` (the vm2 copy never runs on the port, so its host bugs were never found). Both directories went back to
+their own text; `--to-vm1` stays for a check of the N64 side only.
+
+**Left of the part (3):** `vm1/Pak` (its own text has the CCache family in three forms: `protos/cache.h` in 6 files,
+`void **CCache__Allocate(s32, s32, s32, char *)` in 3; `Pak_Mount`, `Controller_Lock` `s32`/`void`, `osMotorInit`,
+`gPakFileSystems`, `Pak_DecodeText`, `Str_Compare` with two forms; its `.rodata` needs the tail from
+`Pak_AllocDirectory` (0x4263DC) defined before `Pak_SaveNoteVerified` (0x426164): `--inline T --before
+T:func_00426164`, verified byte-exact with the vm2-text files), `vm1/PakMenu` and `vm2/PakMenu` (128 files each,
+not started: no time left).
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
