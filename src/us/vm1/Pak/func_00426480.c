@@ -8,13 +8,13 @@
 #include "protos/cache.h"
 
 
-extern void Controller_Lock(s32);
+extern s32 Controller_Lock(s32 arg0);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size);
 extern s32 Pak_Mount(s32 ch);
 extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
-extern s32 osMotorInit(void *queue, void *pfs, s32 channel);
+s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
 
 /* Probes the pak in slot ch and records its state: 2 for a Rumble Pak, otherwise 3 or 1 depending on Pak_Mount. */
 void Pak_ProbeSlot(s32 ch) {
