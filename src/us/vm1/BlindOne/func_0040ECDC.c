@@ -3,10 +3,10 @@
 #include "globals/onscreen.h"
 #include "globals/boss.h"
 
-s32 Animator_Update(sptr);
+void Animator_Update(void *slot);
 s32 BlindOne_UpdateMover(sptr);
 s32 BlindOne_GetHealthPercent(sptr);
-s32 COnScreen__SetBossPercent(s32 *, s32);
+void COnScreen__SetBossPercent(void *hud, s32 value);
 
 void BlindOne_UpdateFight(BlindOneState *arg0)
 {
@@ -25,7 +25,7 @@ void BlindOne_UpdateFight(BlindOneState *arg0)
     var_s1 = 0x3C;      /* faders[i] */
     do
     {
-      Animator_Update((sptr) ((u8 *) arg0 + var_s1));
+      Animator_Update((void *) ((u8 *) arg0 + var_s1));
       var_s0 += 1;
       var_s1 += sizeof(ScriptAnimator);
       var_s0++;

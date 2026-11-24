@@ -1,6 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "globals/scene.h"
+#include "blindone_scene.h"
 #include "protos/game.h"
 
 

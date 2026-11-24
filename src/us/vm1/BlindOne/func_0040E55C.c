@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/boss.h"
-#include "globals/scene.h"
+#include "blindone_scene.h"
 #include "protos/scene.h"
 
 /* Only what this reads and writes. */

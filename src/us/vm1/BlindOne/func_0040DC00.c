@@ -1,5 +1,4 @@
 #include "common.h"
-#include "rw/abu_protos.h"
 #include "structs/game_object.h"
 
 f32 Random_Blend(f32 arg0, f32 arg1);

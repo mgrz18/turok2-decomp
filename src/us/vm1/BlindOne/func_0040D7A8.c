@@ -11,7 +11,7 @@ extern void BlindOne_ActorUpdate(void);
 extern void BlindOne_ActorHurt(void);
 extern void EnemyAI_HeadNodeCallback(void);
 extern void BlindOne_Group3Draw(void);
-extern void BlindOne_Draw(void);
+void BlindOne_Draw(CGameObjectInstance *actor, CAI *ai, struct CDrawArgs *info);
 
 void BlindOne_Group2Init(CGameObjectInstance *obj, CAI *ai) {
     void *player;

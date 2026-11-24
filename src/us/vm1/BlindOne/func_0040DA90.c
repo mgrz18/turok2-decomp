@@ -11,10 +11,10 @@
  * update, then updates the slots, the three movers and the boss' health bar. */
 
 
-extern void Animator_Update(void *slot);
+void Animator_Update(void *slot);
 extern void BlindOne_UpdateMover(BlindOneMover *mover);
 extern s32 BlindOne_GetHealthPercent(BlindOneState *state);
-extern void COnScreen__SetBossPercent(void *hud, s32 value);
+void COnScreen__SetBossPercent(void *hud, s32 value);
 
 void BlindOne_BossUpdate(void *obj, CAI *ai) {
     BlindOneState *state = &gBlindOne;

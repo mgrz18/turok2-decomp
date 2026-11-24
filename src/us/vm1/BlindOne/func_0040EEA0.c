@@ -8,8 +8,8 @@
 #include "protos/game.h"
 
 s32 CGameObjectInstance__DrawModel(sptr, sptr, sptr);
-s32 ScreenTint_UpdateMode(void);
-s32 ScriptAnimator_Apply(void *);
+void ScreenTint_UpdateMode(void);
+void ScriptAnimator_Apply(ScriptAnimator *light);
 
 void BlindOne_Group3Draw(CGameObjectInstance *arg0, CAI *arg1, CDrawArgs *arg2)
 {

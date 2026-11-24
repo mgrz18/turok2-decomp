@@ -5,7 +5,7 @@
 #include "globals/game.h"
 #include "globals/boss.h"
 #include "globals/onscreen.h"
-#include "globals/scene.h"
+#include "blindone_scene.h"
 #include "globals/engine.h"
 #include "protos/scene.h"
 #include "protos/ai.h"
