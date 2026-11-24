@@ -1,7 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
-#include "protos/cache.h"
 #include "protos/player.h"
 
 /* Releases the object the player is carrying (0xBB0) and throws it ahead of

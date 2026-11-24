@@ -24,7 +24,6 @@
 #endif
 #include "globals/engine.h"
 #include "globals/player.h"
-#include "protos/cache.h"
 #include "protos/scene.h"
 #include "protos/game.h"
 

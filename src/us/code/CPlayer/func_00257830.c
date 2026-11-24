@@ -1,6 +1,5 @@
 #include "common.h"
 #include "globals/strings.h"
-#include "protos/cache.h"
 
 typedef struct {
     /* 0x00 */ s32 *block;

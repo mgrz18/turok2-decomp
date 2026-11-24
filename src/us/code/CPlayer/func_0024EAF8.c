@@ -6,7 +6,6 @@
 #include "structs/collision.h"
 #include "globals/collision.h"
 #include "globals/player.h"
-#include "protos/cache.h"
 #include "protos/player.h"
 
 /* The creature to mount (an AI actor). */

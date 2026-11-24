@@ -4,7 +4,6 @@
 #include "structs/game_object.h"
 #include "structs/camera.h"
 #include "protos/iset.h"
-#include "protos/cache.h"
 
 /* The weapon actor's owner, at 0x1A8 (inside m_AI). */
 #define OWNER(obj) ((*(CPlayer **)&((CGameObjectInstance *)(obj))->m_AI.m_pParent))

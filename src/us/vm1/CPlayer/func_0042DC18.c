@@ -12,7 +12,7 @@
 extern s32 Demo_GetPlayerCount(void);
 extern s32 SavedPlayers_IsActive(void);
 extern u8 *CCameraPool__AllocCamera(void *);
-extern void CBarrel__Reset(void *strokes);
+void CBarrel__Reset(void *);
 extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 extern void CPlayer__ResetHealth(CPlayer *p);
 /* The port: the three window descs are data (MenuDesc), not functions: declared as such so

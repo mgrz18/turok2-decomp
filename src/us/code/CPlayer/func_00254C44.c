@@ -33,8 +33,9 @@ struct Menu_254C44 {
 struct Menu_254C44;
 typedef struct Menu_254C44 Menu_254C44;
 struct Menu_254C44;
-extern void CBarrel__Reset(Menu_254C44 *menu);
-void CBarrel__Reset(Menu_254C44 *menu) {
+void CBarrel__Reset(void *menu_) {
+    Menu_254C44 *menu = menu_;
+
     s32 i;
     menu->active = 0;
     menu->pad4 = 0;

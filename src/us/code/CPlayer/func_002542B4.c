@@ -3,7 +3,6 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "protos/iset.h"
-#include "protos/cache.h"
 
 extern void CGameObjectInstance__UpdateBounds(CGameObjectInstance *, void *);
 extern void Shadow_DrawBlob(CGameObjectInstance *, CVector3 *, s32);

@@ -4,7 +4,6 @@
 #include "common.h"
 #include "structs/list.h"
 #include "globals/game.h"
-#include "protos/cache.h"
 
 #ifdef TARGET_PORT
 struct ObjectPool {
