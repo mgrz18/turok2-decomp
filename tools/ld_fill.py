@@ -14,7 +14,8 @@ versions/ld_fill.us.txt, one fix a line (`#` comments):
   <splat path> .data after <splat piece>
       A C file's `.data` inside a segment that splat otherwise fills with `.rodata` pieces
       (code_rodata: the engine's initialised data follows its .rodata). splat writes the line
-      `<path>.c.o(.data)` in the segment's DATA group, ahead of every `.rodata` line; it is moved
+      `<path>.c.o(.data)` in that segment's DATA group, ahead of every `.rodata` line, and again in
+      the C file's own segment (the .c subsegment's auto-linked .data); the one line kept is moved
       to right after the line of the piece before it in ROM (`build/asm/data/<piece>.o(.rodata)`).
 
 `--check` says whether us/turok2.ld has every fix.
@@ -46,11 +47,14 @@ def apply(lines, fills, moves):
     """-> (new lines, problems)."""
     probs = []
     for src, after in moves:
+        # splat writes the line twice: in the C file's own segment (its .c subsegment's auto-linked
+        # .data) and in the segment of the .data subsegment; one is kept, after the piece before it
         idx = [i for i, l in enumerate(lines) if l.strip() == src]
-        if len(idx) != 1:
-            probs.append(f"{len(idx)} lines `{src}`"); continue
-        ind = lines[idx[0]][: len(lines[idx[0]]) - len(lines[idx[0]].lstrip())]
-        del lines[idx[0]]
+        if not idx:
+            probs.append(f"no line `{src}`"); continue
+        ind = lines[idx[-1]][: len(lines[idx[-1]]) - len(lines[idx[-1]].lstrip())]
+        for i in reversed(idx):
+            del lines[i]
         at = [i for i, l in enumerate(lines) if l.strip() == after]
         if len(at) != 1:
             probs.append(f"{len(at)} lines `{after}`"); continue
