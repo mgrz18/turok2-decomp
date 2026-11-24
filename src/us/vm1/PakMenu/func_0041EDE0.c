@@ -9,17 +9,10 @@
 #include "protos/menu.h"
 #include "structs/pak.h"
 #include "protos/pak.h"
+#include "globals/pak.h"
 
-extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakMenuPort; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-extern s32 gPakMenuIsSave; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u8 gPakProfile[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern char gPakCharacterNoteName[]; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-extern char gPakGameCode[]; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-extern s32 gSaveBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-extern s32 gLoadBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
-void CCache__Flush(s32 a);
-void CCache__Deallocate(sptr a, sptr b);
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
+extern void CCache__Deallocate(sptr, void *);
 /* Static inlines in the Rage Wars source file (dropped by the importer). */
 static inline u8 *O01Pick(PakQuery *sel) {
     u8 *p;
@@ -42,7 +35,7 @@ static inline u8 *O01Pick(PakQuery *sel) {
 }
 static inline void O01FreeAll(void) {
     if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
     }
     if (gSaveBufferHandle != 0) {
         CCache__Deallocate(0, gSaveBufferHandle);
@@ -87,7 +80,7 @@ s32 PakMenu_WriteProfile(sptr unused, Menu *own, s32 unused3) {
                     if (r == 0) {
                         flag = 1;
                         nv = pad.channel;
-                        r = Pak_SaveNoteVerified(nv, 0x18, gPakProfile, gPakCharacterNoteName, ext, gPakGameCode);
+                        r = Pak_SaveNoteVerified(nv, 0x18, &gPakProfile, gPakCharacterNoteName, ext, gPakGameCode);
                     }
                 }
             }

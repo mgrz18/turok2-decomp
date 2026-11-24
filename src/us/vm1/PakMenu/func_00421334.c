@@ -6,16 +6,16 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 extern void * memset(void *arg0, int arg1, uptr arg2);
-extern void CCache__Flush(s32 a);
-extern void CCache__Deallocate(void *arg0, void *arg1);
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
+extern void CCache__Deallocate(sptr, void *);
 extern void **CCache__Allocate(s32, s32, s32, char *);
-void CCache__Deallocate(void *, void *);
-void CCache__Flush(s32);
+extern void CCache__Deallocate(sptr, void *);
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
 void Pak_AllocBuffer(void ***handle, void **data, s32 units) {
     void **block;
     void *first;
     if (*handle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
         CCache__Deallocate(0, *handle);
     }
     if (units != 0) {

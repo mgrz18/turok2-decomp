@@ -19,9 +19,9 @@
 void *memset(void *s, int c, uptr n);
 s32 PakMenu_CheckPak();
 void PakMenu_UpdateNoteRows();
-void CCache__Flush();
-void CCache__Deallocate(sptr, sptr); /* prototyped: the 0 reaches the sptr as a full word (the handle is an sptr) */
-CMemEntry *CCache__Allocate();
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
+extern void CCache__Deallocate(sptr, void *);
+extern void **CCache__Allocate(s32, s32, s32, char *);
 void *memset();
 /* Game code / company code check on the controller-pak note (inlined). */
 static __inline__ s32 k7_chk(u8 *gc, u8 *cc) {
@@ -91,7 +91,7 @@ L004079A0:
     if (s2 != 0) goto L00407AD0;
     s0 = sp4C;
     if (gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
         CCache__Deallocate(0, gLoadBufferHandle);
     }
     if (s0 == 0) {
@@ -170,7 +170,7 @@ L00407CDC:
     if (Str_Compare(sp38, gPakGameNoteName) != 0) goto L00407EE8;
     s0 = sp4C;
     if (gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
         CCache__Deallocate(0, gLoadBufferHandle);
     }
     if (s0 == 0) {
@@ -192,7 +192,7 @@ L00407CDC:
 L00407E70:
     s2 = 1;
     if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
     }
     if (gSaveBufferHandle != 0) {
         CCache__Deallocate(0, gSaveBufferHandle);

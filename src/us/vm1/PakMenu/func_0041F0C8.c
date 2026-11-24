@@ -15,14 +15,14 @@
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
 
-void CCache__Flush(s32 a);
-void CCache__Deallocate(sptr a, sptr b);
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
+extern void CCache__Deallocate(sptr, void *);
 void Cinema_StopAtEnd(void);
 void Cinema_RequestById(s32 a);
 
 static __inline__ void FreeAll(void) {
     if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
     }
     if (gSaveBufferHandle != 0) {
         CCache__Deallocate(0, gSaveBufferHandle);

@@ -15,8 +15,8 @@
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
-void CCache__Flush(s32 a);
-void CCache__Deallocate(sptr a, sptr b);
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
+extern void CCache__Deallocate(sptr, void *);
 CPlayer *CPlayerPool__FindByController(void *a, void *b);
 
 s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
@@ -30,7 +30,7 @@ s32 PakMenu_SelectCancel(s32 a0, Menu *arg) {
     CPlayer *u;
 
     if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
     }
     if (gSaveBufferHandle != 0) {
         CCache__Deallocate(0, gSaveBufferHandle);

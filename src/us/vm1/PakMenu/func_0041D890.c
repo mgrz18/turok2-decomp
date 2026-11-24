@@ -7,9 +7,9 @@
 #include "globals/scene.h"
 
 
-extern void CCache__Flush(s32);
+extern void CCache__Flush_Arg(s32) __asm__("CCache__Flush"); /* the calls pass 0; the definition (code/CCache) takes none */
 extern void CCache__Deallocate(sptr, void *);
-extern s32 *CCache__Allocate(s32, s32, s32, void *);
+extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void memset(void *dst, s32 value, sptr size);
 extern void func_0029E460(char *dst, char *src, s32 n);
 
@@ -26,7 +26,7 @@ void SaveGame_Build(CPlayer *p) {
     SaveGame *buf;
 
     if (gSaveBufferHandle != NULL) {
-        CCache__Flush(0);
+        CCache__Flush_Arg(0);
         CCache__Deallocate(0, gSaveBufferHandle);
     }
     allocSize = SaveFileSize();
