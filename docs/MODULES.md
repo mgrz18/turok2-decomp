@@ -738,6 +738,68 @@ three smallest were taken through one declaration per name and merged (`asm_diff
 
 None needs a ROM change.
 
+## Round 27, part p4: the engine/VM objects (`.text_vm`)
+
+**Merged: `code/CCamera` + `vm1/Demo` -> `code/CCamera/CCamera.c` (66 + 28 = 94 files), `make verify`
+byte-exact, `asm_diff --base 88d57333` 0 over the tree.** The original object is `CCamera.cpp`: 66
+functions in the engine (0x27BD10..0x28233C) and 28 in the paged VM module (0x42EC30..0x430068:
+`CCamera__Construct`, `CCameraPool__NewGame`, `CCameraPool__Construct`, `CEmitterPool__Construct`,
+the demo stream decoder...), one `.rodata` run at 0x800AA3D0 with the VM functions' literals
+(`CCamera__Construct`'s at 0xAA3F0, `CCameraPool__NewGame`'s strings at 0xAA600) between the engine
+ones.
+
+The route (the one `code/CScene/func_002261A8.c` already used for its one VM half, docs/VMASM.md):
+
+- `VM_TEXT` (`include/common.h`): `__attribute__((section(".text_vm")))` on the N64 build, nothing on
+  the port. cc1 writes the function into `.section .text_vm,"ax"`; its literals stay in the object's
+  `.rodata`, in source order.
+- `tools/merge_module.py <engine dir> --vm <vm dir>`: one source order, the two parts' `.text` orders
+  interleaved by the `.rodata` run (a file without `.rodata` goes with the next one of its own part
+  that has some; the rest at the end); `VM_TEXT` on every definition of the VM part, also inside its
+  `#ifdef TARGET_PORT .. #else .. #endif` blocks (`CCameraPool__ResetEmitterPools`: the first build
+  left that one in `.text`, 0x6C too long, and `make verify` caught it); in the yaml the engine
+  part's first `c` subsegment and the run's first `.rodata` one name the merged file, the VM part's
+  first `c` subsegment becomes `{start: 0x178C30, type: c, name: code/CCamera/CCamera,
+  linker_section: .text_vm}` and the VM part's `.rodata` slices go with the merge (`--rodata-free`).
+- No linker-script rewrite at `make setup`: splat 0.50 writes `CCamera.c.o(.text_vm)` for the dict
+  subsegment itself. The `.data`/`.bss` lines it also writes for that subsegment in `virtual`'s
+  sections match nothing (the engine part's lines come first in the script and take the sections).
+- `tools/merge_check.py --rodata-free --margs "--vm src/us/vm1/Demo" code/CCamera`: the VM part's files
+  are references too, and `.text_vm` functions are compared.
+
+Header work (one declaration per name; every file the same assembly against 88d57333 before the
+merge): `CCameraViewParams__Construct` takes `CCameraViewParams *` in both bodies (the N64 one reads it
+through its `ObjInit` view); `CEmitterPool__Construct`, `CMtxF__Identity`, `CGameRegion__GetHeight`,
+`CEngineApp__DrawFilledRect` the definitions' parameter types (casts at the calls); `memset` libc's;
+the module does not include `protos/cache.h` (its `CCache__Flush(void)` is the definition's, every
+caller passes the heap: `void CCache__Flush(s32)` in the module, with `CCache__Allocate` returning
+`struct CMemEntry *` and taking the description as `char *`). The two alias-order views of
+`gDefaultVisBits` (`extern s32 gDefaultVisBits[]` in `CCameraPool__Advance` and the N64
+`CCameraViewParams__Construct`) are one `u32` now, read there through `CVisBits` (new in
+`structs/camera.h`: the struct view `CCameraPool__Advance` already ORed `gCameraVisBits` through),
+same code; `CCamera__Construct`'s `IntPair gCameraVisBits` (a store to `gScreenClearTime` addressed
+off `gCameraVisBits`) is a `CCameraVisPair` view of the header's `gCameraVisBits`.
+
+**Not merged:**
+
+- `code/CScene` + `vm1/SceneLoad` (96 + 24 files): 199 compiler error lines merged (`CCache__*`,
+  `CScene__*`, `CList__*`, `CISet__GetBlock` declared several ways); and its engine `.rodata` is not in
+  engine `.text` order (`func_00224D54`'s `"binary block"`, `func_00224DF4`'s `"graphicset"` come
+  before `func_00220D00`'s `0.5f`), so it also needs the deferred-function (`--inline`) analysis
+  before the route applies. `func_002261A8.c` holds its own VM half already (`.text_vm`): the
+  merged file takes it in as one more VM-part function.
+- `code/CPlayer` + `vm1/CPlayer` (245 + 13 files): about 100 error lines merged, many of them
+  per-file struct views of shared types (`Record14`, `Controller`, `Voice`, `Tuning`,
+  `gEngineApp_m_Game_m_DebugLines` as `CAutomap` and as `s32`, `gEngineApp_m_Game_m_CameraPool` as
+  `CCameraPool` and `CGameFromCameraPool`) and prototypes with different arities
+  (`CBarrel__RunButtons`, `CPlayer__UpdateFlashlight`, `CPlayer__RamWithMount`, `CPlayer__TryMount`).
+  Its `.rodata` is in order in both parts (92 slices, 6 of the VM part), so the route applies once
+  it compiles.
+
+Both lists show how to proceed: `tools/merge_check.py --rodata-free --margs "--vm src/us/<vm dir>"
+<engine dir>` for the first conflicts, fix in the one-function files with `asm_diff --base` 0, then
+`merge_module.py <engine dir> --vm <vm dir> --rodata-free`.
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
