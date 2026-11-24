@@ -10,13 +10,12 @@
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
-extern B12Mgr D_800D7BE0;
 s32 CDecompressor__DecompressAsync(CDecompressor *port, B12Msg *n, void *q);
 void CHeap__Free(CHeap *heap, sptr key);
 #include "structs/cache.h"
 #include "globals/cache.h"
 /* The port: typed on gCache (structs/cache.h) and CMemEntry/CCacheEntry. The ROM reaches the
- * cache through D_800D7BE0 (gCache - 0x5F0) and B12Node/B12Msg views at N64 offsets: on the host
+ * cache through a B12Mgr view of gCache (Rage Wars offsets) and B12Node/B12Msg views at N64 offsets: on the host
  * they missed the cache's own fields (the display-list locks landed in CMemEntry.lockCount, so
  * a model still in the frame's display list could be freed; the cache thread waited on a queue
  * that was never created, so async loads and display-list releases never completed). */
