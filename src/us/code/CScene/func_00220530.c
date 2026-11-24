@@ -1,4 +1,5 @@
 #include "common.h"
+#include "protos/cache.h"
 #include "globals/swoosh.h"
 #include "structs/world.h"
 #include "structs/game.h"
@@ -12,9 +13,7 @@
 
 extern u8 gEngineApp_m_Game_m_CameraPool[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 
-void CCache__SetFrameDelay(s32, s32);
 void MtxPool_Reset(void *);
-void CCache__LockForDisplayList(s32, void **);
 void RibbonVtxPool_Reset(void *);
 void CPlayerPool__PreUpdate(void *);
 void CPlayerPool__AnimateWeapons(void *);
@@ -42,7 +41,7 @@ void CScene__Update(CScene *world) {
     }
     if (old != gLitVerticesKey) {
         gLitVerticesKeyChanged = 1;
-        CCache__SetFrameDelay(8, old);
+        ((void (*)(s32, s32)) CCache__SetFrameDelay)(8, old); /* the definition takes one argument */
     } else {
         gLitVerticesKeyChanged = 0;
     }

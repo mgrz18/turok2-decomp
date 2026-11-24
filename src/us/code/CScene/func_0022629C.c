@@ -1,4 +1,12 @@
 #include "common.h"
+#include "protos/cache.h"
+/* The request CCache__LoadPersistantSubBlock leaves in v0 (protos/cache.h declares the N64 definition
+ * void): the N64 symbol by another C name, returning it; the port's definition returns it. */
+#ifdef TARGET_PORT
+#define CCache__LoadPersistantSubBlock_v(...) ((void **) CCache__LoadPersistantSubBlock(__VA_ARGS__))
+#else
+void **CCache__LoadPersistantSubBlock_v() __asm__("CCache__LoadPersistantSubBlock");
+#endif
 #include "globals/strings.h"
 #include "m2c_macros.h"
 #include "structs/world.h"
@@ -6,9 +14,6 @@
 #include "protos/iset.h"
 #include "protos/scene.h"
 
-s32 CCache__Deallocate(sptr, sptr);
-sptr CCache__LoadPersistantIndex(s32, sptr, sptr, sptr);
-sptr CCache__LoadPersistantSubBlock(s32, sptr, s32, s32, sptr, sptr, sptr);
 
 void *func_0029E460(void *, void *, s32);           /* memcpy */
 
@@ -23,7 +28,7 @@ void CScene__GetLevelName(struct CScene *arg0, s32 arg1, void *arg2, s32 arg3) {
 
     temp_v0 = CISet__GetROMAddress((sptr) arg0->m_pLevels, arg0->m_LevelsKey, arg1);
     temp_s2 = CCache__LoadPersistantIndex(0, (sptr) &sp20, temp_v0, (sptr) &sCSceneCacheDesc_LevelIndex);
-    temp_v0_2 = (CMemEntry *) CCache__LoadPersistantSubBlock(0, sp20, 8, temp_v0, (sptr) arg0, 0, (sptr) &sCSceneCacheDesc_LevelName);
+    temp_v0_2 = (CMemEntry *) CCache__LoadPersistantSubBlock_v(0, sp20, 8, temp_v0, (sptr) arg0, 0, (sptr) &sCSceneCacheDesc_LevelName);
     var_a2 = temp_v0_2->size;
     if (arg3 < var_a2) {
         var_a2 = arg3;

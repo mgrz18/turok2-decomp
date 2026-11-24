@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "protos/iset.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028D268.c, func_0028D268.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -7,7 +8,6 @@
 #include "structs/world.h"
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, u8 *b);
-void *CISet__GetBlock(s32 *table, s32 index);
 s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
     CVector3 d;
     f32 bestIdx = -1.0f;
@@ -47,7 +47,6 @@ s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) {
  * docs/VMASM.md. */
 
 s32 ProPackDecompress(void ***resource, s32 index);
-void *CISet__GetBlock(s32 *table, s32 index);
 
 typedef struct {
     /* 0x00 */ s32 type;

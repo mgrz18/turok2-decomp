@@ -11,7 +11,6 @@ void *CScene__GetSwoosh(CScene *arg0, s32 index) {
     return CISet__GetBlock(arg0->m_pSwooshes, index);
 }
 #else
-void CISet__GetBlock(s32);                            /* extern */
 
 void CScene__GetSwoosh(CScene *arg0) {
     CISet__GetBlock((sptr)arg0->m_pSwooshes);
