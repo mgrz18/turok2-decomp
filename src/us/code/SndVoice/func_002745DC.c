@@ -1,26 +1,16 @@
 #include "structs/vector.h"
 #include "globals/audio.h"
+#include "structs/sound.h"
+#include "structs/camera.h"
 
-/* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AUDIO/8025A3EC_4.CPP, func_8025C368_de, with Turok 2's layouts. */
-
-
-typedef struct {
-    char pad0[0x34];
-    CVector3 position;          /* 0x34 */
-    char pad40[0x4];
-    s8 curve;                   /* 0x44 */
-} SoundSpatialSource;
-
-typedef struct {
-    char pad0[0x114];
-    CVector3 position;          /* 0x114 (0x128 in Rage Wars) */
-} GameplayCamera;
+/* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AUDIO/8025A3EC_4.CPP, func_8025C368_de, with Turok 2's layouts
+ * (round 29, part r2: the sound is a SndVoiceParams, the camera a CCamera). */
 
 
 /* Volume attenuation of a sound by its squared distance to the camera. */
-f32 Sound_DistanceAttenuation(SoundSpatialSource *sound, GameplayCamera *camera) {
-    CVector3 *a = &sound->position;
-    CVector3 *b = &camera->position;
+f32 Sound_DistanceAttenuation(SndVoiceParams *sound, CCamera *camera) {
+    CVector3 *a = &sound->pos;
+    CVector3 *b = &camera->m_vPos;
     f32 dx = a->x - b->x;
     f32 dy;
     f32 dz;
@@ -38,7 +28,7 @@ f32 Sound_DistanceAttenuation(SoundSpatialSource *sound, GameplayCamera *camera)
     } else {
         t = 1.0f - d / sSoundHearingRangeSq;
     }
-    switch (sound->curve) {
+    switch (sound->distanceMode) {
     case 2:
         return t;
     case 0:

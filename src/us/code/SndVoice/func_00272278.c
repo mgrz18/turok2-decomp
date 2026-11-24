@@ -2,12 +2,11 @@
 #include "structs/sound.h"
 #include "structs/camera.h"
 #include "globals/audio.h"
+#include "protos/half.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00259F88.c, func_00259F88.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-f32 HalfToFloat(u16 x);
-u16 FloatToHalf(f32 x);
 s32 Cinema_PathPlaying();
 SndEnv *CAudioWorld__GetVolumeEnvelope(CAudioWorld *c, s16 id);
 f32 Random_Float(f32 x);

@@ -2,10 +2,10 @@
 #include "structs/sound.h"
 #include "structs/camera.h"
 #include "protos/sndp.h"
+#include "protos/half.h"
 
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0025A864.c, func_0025A864, with Turok 2's layouts. */
 
-f32 HalfToFloat(u16 x);                /* Trunc16ToF32 */
 s32 CAudioWorld__GetStereo(CAudioWorld *c);
 s32 Sound_CalcPan(f32 *pos, CCamera *t);
 

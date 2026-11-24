@@ -4,11 +4,11 @@
 #include "structs/sound.h"
 #include "globals/audio.h"
 #include "protos/sndp.h"
+#include "protos/half.h"
 
 #define PITCH_TABLE sPitchRatioTable
 
 extern void SndVoice_UpdateDoppler(SndVoice *s);
-extern f32 HalfToFloat(s32 halfFloat);
 
 static __inline__ f32 centsToPitch(f32 x) {
     f32 pos = (x + 6000.0f) * 0.016666668f;

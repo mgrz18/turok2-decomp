@@ -2,11 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/sound.h"
+#include "protos/half.h"
 
-SndEnv *CAudioWorld__GetPanEnvelope(CAudioWorld *m, s16 id);
-s32 CAudioWorld__GetStereo(CAudioWorld *m, s16 id);
+SndEnv *CAudioWorld__GetPanEnvelope(CAudioWorld *m, s32 id);
+s32 CAudioWorld__GetStereo(CAudioWorld *m);
 s16 Sound_CalcPan(CVector3 *pos, CAudioWorld *m);
-f32 HalfToFloat(u16 v);
 void SndVoice_InitPan(SndVoice *v, SoundEffectInfo *info) {
     f32 d;
     s16 id;
@@ -22,10 +22,10 @@ void SndVoice_InitPan(SndVoice *v, SoundEffectInfo *info) {
     } else {
         v->hasEnv = 0;
         if (v->soundId < 0x100) {
-            if (v->reset == 0 && CAudioWorld__GetStereo(v->mgr, id) != 0) {
+            if (v->reset == 0 && CAudioWorld__GetStereo(v->mgr) != 0) {
                 v->vp.pan = (s8)v->mgr->cueVolume;
             }
-        } else if (v->reset == 0 && CAudioWorld__GetStereo(v->mgr, id) != 0) {
+        } else if (v->reset == 0 && CAudioWorld__GetStereo(v->mgr) != 0) {
             v->vp.pan = Sound_CalcPan(&v->vp.pos, (CAudioWorld *)v->mgr->listener);
         }
     }
