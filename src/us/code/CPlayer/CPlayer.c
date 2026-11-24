@@ -30,6 +30,12 @@
 #include "structs/weapon.h"
 #include "globals/camera.h"
 #include "globals/strings.h"
+/* The cache calls of the module, as protos/cache.h declares them (the header itself is not included: its
+ * CCache__Flush(void) against callers that pass the heap) */
+void CCache__LockForDisplayList(s32, struct B12Node *);
+struct CMemEntry *CCache__Request(s32, uptr, u32, u32, sptr, void *, char *, u32);
+void CCache__SetFrameDelay(s32);
+void CCache__Unlock(s32, struct CMemEntry *);
 #include "structs/collision.h"
 #include "structs/region.h"
 #include "structs/particle.h"
