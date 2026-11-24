@@ -1,4 +1,4 @@
-/* WRONG CUT: REAL Str_CompareN size 0x48 (splat cut it into Str_CompareN + func_00426FC4). */
+/* WRONG CUT: REAL Str_CompareN size 0x48 (splat cut it into Str_CompareN + func_0045FEE4). Second-module copy of Str_CompareN. */
 #include "common.h"
 
 /* strncmp. */

@@ -1,12 +1,12 @@
-/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80403E90_de_6.c, func_804053E0_de.
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80403BCC_8.CPP, func_804053E0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "rw/abu_types.h"
+#include "common.h"
 #include "structs/pak.h"
 #include "globals/pak.h"
 
 extern s32 Pak_GetNotePages(s32 index, s32 entry, s32 *out);
-extern s32 Pak_BytesToPages(sptr);
+extern s32 Pak_BytesToPages(s32);
 s32 Pak_GetNotePages(s32 index, s32 entry, s32 *out) {
     if (gPakState[index] != 3) {
         return -2;

@@ -1,3 +1,5 @@
+/* The second VM module's copy of src/us/vm1/Pak/func_00426C88.c (byte for byte, at the same link address or 0xE0 below
+ * it, docs/VMASM.md), with the second module's names. */
 /* WRONG CUT: REAL Pak_DecodeText size 0x4C (splat cut it into Pak_DecodeText + func_00426CAC). */
 #include "common.h"
 #include "globals/pak.h"

@@ -1,4 +1,4 @@
-/* WRONG CUT: REAL Pak_ReadNote size 0x15C (splat cut it into Pak_ReadNote + func_0042662C + func_004266C0). */
+/* Second-module copy of Pak_ReadNote (first module; this one at link address 0x004264D0), calling this module's own functions at their link addresses. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_6.CPP, func_80404958_read, with Turok 2's layouts. */
 #include "common.h"
 #include "globals/menu_text.h"
@@ -9,16 +9,12 @@
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);
 extern void CCache__Deallocate(sptr, void **);
-extern void Controller_Lock(s32);
+extern s32 Controller_Lock(s32 flag);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size);
-extern s32 Pak_Mount(s32 ch);
 extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
 
-#ifdef TARGET_PORT
-void T2Save_FromPak(void *dst, s32 size);
-#endif
 
 /* Reads note file_no of the pak on channel ch into dst. */
 s32 Pak_ReadNote(s32 ch, s32 file_no, void *dst, s32 size) {
@@ -43,10 +39,6 @@ s32 Pak_ReadNote(s32 ch, s32 file_no, void *dst, s32 size) {
         }
         if (result == 0) {
             func_0029E460(dst, buf, size);
-#ifdef TARGET_PORT
-            /* the port: a big-endian save record to host order (port/game/t2save.c) */
-            T2Save_FromPak(dst, size);
-#endif
         }
     }
     Controller_Unlock();

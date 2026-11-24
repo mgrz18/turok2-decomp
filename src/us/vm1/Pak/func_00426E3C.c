@@ -1,9 +1,9 @@
-typedef signed int s32;
-typedef unsigned char u8;
+#include "common.h"
 
+/* Returns 1 if a "~" occurs in the first len + 1 bytes of str. */
 s32 Pak_TextHasInvalidChar(u8 *str, s32 len) {
     do {
-        if (*str++ == '~') {
+        if (*str++ == 0x7E) {
             return 1;
         }
     } while (--len != -1);
