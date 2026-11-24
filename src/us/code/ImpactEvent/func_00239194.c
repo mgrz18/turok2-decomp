@@ -3,17 +3,17 @@
 #include "globals/scene.h"
 
 
-typedef struct EventParams {
+typedef struct SpawnEventParams {
     s32 unk0;           /* 0x0 */
     f32 size;           /* 0x4 */
-} EventParams;
+} SpawnEventParams;
 
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define CInstancePool__SpawnAnimInstance CInstancePool__SpawnAnimInstance_i
 #endif
 extern void CInstancePool__SpawnAnimInstance(void *arg0, s32 arg1, sptr arg2, CVector3 pos, s32 arg6, CVector3 rot, CVector3 scale, sptr arg13);
 
-void ImpactEvent_SpawnAnimInstance(CGameObjectInstance *actor, s32 arg1, s32 arg2, CVector3 arg3, EventParams params) {
+void ImpactEvent_SpawnAnimInstance(CGameObjectInstance *actor, s32 arg1, s32 arg2, CVector3 arg3, SpawnEventParams params) {
     CVector3 scale;
     CVector3 rot;
 

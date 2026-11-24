@@ -12,16 +12,7 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #endif
-struct Triple;
-struct Triple;
-struct Triple {
-    s32 x;
-    s32 y;
-    s32 z;
-};
-struct Triple;
-typedef struct Triple Triple;
-#include "structs/triple.h"
+#include "protos/scene.h"
 
 struct func_8024E8F0_S1;
 struct func_8024E8F0_S1 {
@@ -70,8 +61,7 @@ struct Context_func_802681A8_de {
 };
 struct Triple;
 struct Triple;
-extern void CScene__StartRumbles(void *, void *, s32, Triple, f32, f32);
-void ImpactEvent_Rumble(func_8024E8F0_S1 *arg0, Context_func_802681A8_de *arg1, s32 arg2, Triple arg3, Params_func_802681A8_de arg6) {
+void ImpactEvent_Rumble(func_8024E8F0_S1 *arg0, Context_func_802681A8_de *arg1, s32 arg2, CVector3 arg3, Params_func_802681A8_de arg6) {
     void *resource;
 #ifdef TARGET_PORT
     /* Host members (STABILITY.md section 7): the N64 view read the actor's flags at 0xD4, its
@@ -91,6 +81,6 @@ void ImpactEvent_Rumble(func_8024E8F0_S1 *arg0, Context_func_802681A8_de *arg1, 
     } else {
         resource = &gRumblePool;
     }
-    CScene__StartRumbles(&gScene, resource, arg6.value, arg3,
+    CScene__StartRumbles(&gScene, (sptr) resource, arg6.value, arg3,
                   arg6.angle * 10.24f, arg6.scale * 0.003921569f);
 }

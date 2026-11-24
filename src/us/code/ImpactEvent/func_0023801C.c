@@ -5,26 +5,26 @@
 #include "structs/game_object.h"
 #endif
 
-typedef struct Kind {
+typedef struct ObjectKind {
     s32 value;
-} Kind;
+} ObjectKind;
 
 typedef struct Object {
     u8 type;            /* 0x0 */
     u8 pad1[0x13];
-    Kind *kind;         /* 0x14 */
+    ObjectKind *kind;         /* 0x14 */
     u8 pad18[0x80 - 0x18];
     s32 value;          /* 0x80 */
 } Object;
 
-typedef struct EventParams {
+typedef struct PitchedSoundParams {
     s32 id;         /* 0x0 */
     s32 unk4;       /* 0x4 */
-} EventParams;
+} PitchedSoundParams;
 
 extern s32 Sound__PlayPitched(s32 id, CVector3 pos, s32 arg4, sptr selected, f32 scale);
 
-void ImpactEvent_PlayPitchedSound(s32 arg0, Object *obj, s32 arg2, CVector3 pos, EventParams params) {
+void ImpactEvent_PlayPitchedSound(s32 arg0, Object *obj, s32 arg2, CVector3 pos, PitchedSoundParams params) {
     s32 *global = &gEngineApp_m_Settings.paused;
     sptr selected;
     f32 scale;

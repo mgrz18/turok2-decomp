@@ -2,23 +2,23 @@
 #include "structs/vector.h"
 #include "globals/scene.h"
 
-typedef struct EventParams {
+typedef struct LevelSpecialParams {
     s32 unk0;
     s32 unk4;
-} EventParams;
+} LevelSpecialParams;
 
-extern void MantidQueen_SpawnMinion(sptr arg0, sptr arg1, s32 arg2, CVector3 pos, EventParams params);
+extern void MantidQueen_SpawnMinion(sptr arg0, sptr arg1, s32 arg2, CVector3 pos, LevelSpecialParams params);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define Primagen_HandleAnimEvent Primagen_HandleAnimEvent_ev
 #endif
-extern void Primagen_HandleAnimEvent(sptr arg0, sptr arg1, s32 arg2, CVector3 pos, EventParams params);
+extern void Primagen_HandleAnimEvent(sptr arg0, sptr arg1, s32 arg2, CVector3 pos, LevelSpecialParams params);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define MotherBoss_AnimEvent MotherBoss_AnimEvent_ev
 #endif
-extern void MotherBoss_AnimEvent(sptr arg0, sptr arg1, s32 arg2, CVector3 pos, EventParams params);
+extern void MotherBoss_AnimEvent(sptr arg0, sptr arg1, s32 arg2, CVector3 pos, LevelSpecialParams params);
 
 /* the actors pointer-wide (sptr: s32 on the N64, the same code) */
-void ImpactEvent_LevelSpecial(sptr arg0, sptr arg1, s32 arg2, CVector3 pos, EventParams params) {
+void ImpactEvent_LevelSpecial(sptr arg0, sptr arg1, s32 arg2, CVector3 pos, LevelSpecialParams params) {
     switch (gScene_m_LevelID) {
         case 0x1D4D:
             MantidQueen_SpawnMinion(arg0, arg1, arg2, pos, params);

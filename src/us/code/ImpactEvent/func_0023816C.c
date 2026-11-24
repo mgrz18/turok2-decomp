@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "protos/impact_event.h"
 
 
 extern void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
-extern f32 GameObject_GetCollisionHeight(CPlayer *player);
 
 s32 Blast_GetSourcePos(CGameObjectInstance *actor, CVector3 *pos) {
     s32 ret = 0;

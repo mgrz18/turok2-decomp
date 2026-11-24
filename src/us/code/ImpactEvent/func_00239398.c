@@ -4,10 +4,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 struct IntPair;
-struct IntPair {
-    int field_0;
-    int field_4;
-};
+#include "rw/abu_types.h"
 struct IntPair;
 struct IntPair;
 struct IntPair;

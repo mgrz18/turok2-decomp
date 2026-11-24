@@ -5,11 +5,11 @@
 #include "globals/game.h"
 #include "globals/collision.h"
 #include "globals/player.h"
+#include "protos/impact_event.h"
 
 
 f32 CVector3__Distance(CVector3 *a, CVector3 *b);
 s32 CGameObjectInstance__GetNearestBox(CGameObjectInstance *a, CVector3 pos, HitFrame *out);
-f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);
 
 /* How much of a blast at `p` reaches `a`: its armour, then (with falloff) a linear drop over

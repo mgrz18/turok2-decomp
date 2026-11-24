@@ -1,17 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_3/80268160.CPP, func_8026835C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-struct Triple;
-struct Triple;
-struct Triple {
-    s32 x;
-    s32 y;
-    s32 z;
-};
-struct Triple;
-typedef struct Triple Triple;
+#include "common.h"
+#include "rw/abu_types.h"
 #include "structs/triple.h"
 
 struct ObjRecAt1;
@@ -22,10 +13,6 @@ struct ObjRecAt1 {
 struct ObjRecAt1;
 typedef struct ObjRecAt1 ObjRecAt1;
 struct IntPair;
-struct IntPair {
-    int field_0;
-    int field_4;
-};
 struct IntPair;
 struct IntPair;
 struct IntPair;

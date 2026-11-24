@@ -6,23 +6,25 @@
 #include "structs/camera.h"
 #endif
 
-typedef struct EventParams {
+typedef struct MessageEventParams {
     s32 index;          /* 0x0 */
     s32 unk4;           /* 0x4 */
-} EventParams;
+} MessageEventParams;
 
-extern u8 gEngineApp_m_Game_m_CameraPool[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
+#include "globals/camera.h"
+/* The camera pool as bytes (the pool and its main camera at +0x40): the byte view is what keeps the ROM's code. */
+#define sCameraPoolBytes ((u8 *) &gEngineApp_m_Game_m_CameraPool)
 extern void CCameraPool__AddText(void *arg0, void *arg1, char *text);
 extern void Sound__PlaySpeech(s32 arg0);
 
-void ImpactEvent_PlaySoundAndEffect(s32 arg0, CGameObjectInstance *actor, s32 arg2, CVector3 pos, EventParams params) {
+void ImpactEvent_PlaySoundAndEffect(s32 arg0, CGameObjectInstance *actor, s32 arg2, CVector3 pos, MessageEventParams params) {
     if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x300000)) {
-        CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, ((CPlayer *)actor->m_AI.m_pParent)->m_pCamera, gLevelMessages[params.index].text);
+        CCameraPool__AddText(sCameraPoolBytes, ((CPlayer *)actor->m_AI.m_pParent)->m_pCamera, gLevelMessages[params.index].text);
     } else {
 #ifdef TARGET_PORT
-        CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, gEngineApp_m_Game_m_CameraPool + T2_OFFSETOF(CCameraPool, m_MainCamera), gLevelMessages[params.index].text);
+        CCameraPool__AddText(sCameraPoolBytes, sCameraPoolBytes + T2_OFFSETOF(CCameraPool, m_MainCamera), gLevelMessages[params.index].text);
 #else
-        CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, gEngineApp_m_Game_m_CameraPool + 0x40, gLevelMessages[params.index].text);
+        CCameraPool__AddText(sCameraPoolBytes, sCameraPoolBytes + 0x40, gLevelMessages[params.index].text);
 #endif
     }
     if (gLevelMessages[params.index].speech != 0) {

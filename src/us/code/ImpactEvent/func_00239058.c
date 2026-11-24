@@ -3,26 +3,20 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002683F0.c, func_002683F0.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef struct B15Blk8 {
-    s16 a, b;
-    s32 c;
-} B15Blk8;
-/* Turok 2: pos at 0x4 (Rage Wars 0x8). */
-typedef struct B15Src {
-    u8 type;
-    u8 pad1[3];
-    CVector3 pos;          /* 0x04 */
-} B15Src;
-void ImpactEvent_ApplyBlast(B15Src *a, sptr b, s32 c, CVector3 pos, B15Blk8 blk, s32 e, s32 f, s32 g);
+#include "common.h"
+#include "structs/game_object.h"
+#include "structs/particle_event.h"
+
+void ImpactEvent_ApplyBlast(CGameObjectInstance *victim, CGameObjectInstance *source, s32 hit, CVector3 pos, CImpactBlast blast, s32 falloff, s32 push, u32 flags);
 /* Static inline in the Rage Wars source file (dropped by the importer);
  * Turok 2 passes 0x400000 where Rage Wars passes 0x200. */
-static inline void w(B15Src *a, sptr b, s32 c, CVector3 pos, B15Blk8 blk) {
-    ImpactEvent_ApplyBlast(a, b, c, pos, blk, 1, 0, 0x400000);
+static inline void applyAreaBlast(CGameObjectInstance *a, sptr b, s32 c, CVector3 pos, CImpactBlast blk) {
+    ImpactEvent_ApplyBlast(a, (CGameObjectInstance *) b, c, pos, blk, 1, 0, 0x400000);
 }
-void ImpactEvent_BlastSameHeight(B15Src *a, sptr b, s32 c, CVector3 pos, B15Blk8 blk) {
+void ImpactEvent_BlastSameHeight(CGameObjectInstance *a, sptr b, s32 c, CVector3 pos, CImpactBlast blk) {
     f32 d;
-    d = a->pos.y - pos.y;
+    d = a->header.m_vPos.y - pos.y;
     if (d < 0.0f ? -d <= 76.799995f : d <= 76.799995f) {
-        w(a, b, c, pos, blk);
+        applyAreaBlast(a, b, c, pos, blk);
     }
 }

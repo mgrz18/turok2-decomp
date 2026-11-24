@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "protos/impact_event.h"
 
-extern f32 CGameObjectInstance__GetAverageScale(sptr);
 
 f32 Blast_GetSourceScale(u8 *arg0) {
     if (*arg0 == 1) {

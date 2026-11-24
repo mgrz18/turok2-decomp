@@ -6,6 +6,7 @@
 #include "globals/scene.h"
 #include "protos/scene.h"
 #include "protos/game.h"
+#include "protos/impact_event.h"
 
 /* Applies a hit from an attacker to a target: marks the attacker, shakes the
  * target player's camera for heavy and medium hits, sprays blood from a
@@ -27,7 +28,6 @@ typedef struct {
 extern void CCamera__SetShake(PlayerCamera *camera, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos);
 extern void CPlayer__TransformByView(CPlayer *player, CVector3 *v);
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
-extern void GameObject_TraceMove(CGameObjectInstance *actor, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 flagA, s32 flagB);
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a + b */
 extern f32 AI_AngleToPoint(CGameObjectInstance *actor, CVector3 point);
 

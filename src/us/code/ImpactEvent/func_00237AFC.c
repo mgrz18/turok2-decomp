@@ -9,11 +9,10 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/particle_event.h"
+#include "protos/impact_event.h"
 
 s32 Blast_CanHit(CGameObjectInstance *victim, CGameObjectInstance *source);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
-f32 GameObject_GetCollisionHeight(void *actor);
-f32 CGameObjectInstance__GetAverageScale(CGameObjectInstance *actor);
 s32 CGameObjectInstance__GetNearestBox(CGameObjectInstance *actor, CVector3 pos, HitFrame *out);
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *actor);
 f32 CVector3__Distance(CVector3 *a, CVector3 *b);

@@ -37,7 +37,7 @@ typedef struct B15Src {
                u8 pad18[0x68];
                void *unk80;     /* 0x80 (0xD0 in Rage Wars) */
 } B15Src;
-void Sound__PlayPitched(s16 id, CVector3 pos, s32 a, void *src, f32 vol);
+s32 Sound__PlayPitched(s32 id, CVector3 pos, s32 arg4, sptr selected, f32 scale);
 s32 GameObject_GetFloorKind(void *a);
 void ImpactEvent_PlayFloorSound(B15Src *act, B15Src *src, s32 c, CVector3 pos, B15Blk8 k) {
     f32 vol = 1.0f;
@@ -58,6 +58,6 @@ void ImpactEvent_PlayFloorSound(B15Src *act, B15Src *src, s32 c, CVector3 pos, B
             }
             break;
         }
-        Sound__PlayPitched(k.b, pos, 0, s, vol);
+        Sound__PlayPitched(k.b, pos, 0, (sptr) s, vol);
     }
 }

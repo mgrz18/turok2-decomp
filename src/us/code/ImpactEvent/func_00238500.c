@@ -4,6 +4,7 @@
 #include "globals/scene.h"
 #include "protos/scene.h"
 #include "protos/game.h"
+#include "protos/impact_event.h"
 
 typedef struct ViewInfo {
     /* 0x000 */ u8 pad0[0x114];
@@ -18,7 +19,6 @@ typedef struct ShotActor {
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 void CPlayer__TransformByView(CPlayer *pl, CVector3 *v);
-void GameObject_TraceMove(ShotActor *a, CVector3 pos, CVector3 *outPos, s32 *outArg, s32 x, s32 y);
 
 /* Fires the player's shot of kind 0xE9 at `pos`, aimed along `dir` from the eye, and plays its sound. */
 void ImpactEvent_FirePlayerShot(void *unused, ShotActor *actor, CVector3 pos, CVector3 dir, s32 mode) {
