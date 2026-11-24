@@ -9,6 +9,7 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 #include "globals/automap.h"
+#include "globals/game.h"
 #include "protos/iset.h"
 
 /* The automap: the level's navigation regions are drawn as lines in a 2D
@@ -42,9 +43,6 @@ typedef struct {
     /* 0x110 */ void *colorImage;
 } FrameBuffers;
 
-extern s32 gEngineApp_m_Settings; /* local type: GameSettings.cheatFlags; globals/game.h would bring frame.h, whose gEngineApp_m_pCurrentFrameData clashes with the array view above */
-extern s32 gEngineApp_m_Settings_nextMode; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
-extern FrameBuffers *gEngineApp_m_pCurrentFrameData[]; /* local type: CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (gEngineApp.m_pCurrentFrameData would need game.h, whose gEngineApp_m_Settings is not this file's s32) */
 extern Vp gScreenViewport[];
 
 extern void CMtxF__InvertAffine(f32 *out, f32 *m);
@@ -219,7 +217,7 @@ void Automap_Draw(MapView *view) {
     GFX_CMD(0xDE000000, GBI_ADDR(gRdpInitDL));
     GFX_CMD(0xED000000, ((((s32) ((f32) (gScreenWidth - 1) * 4.0f)) & 0xFFF) << 12) |
                         (((s32) ((f32) (gScreenHeight - 1) * 4.0f)) & 0xFFF)); /* gDPSetScissor */
-    GFX_CMD(0xFF100000 | ((gScreenWidth - 1) & 0xFFF), GBI_ADDR(gEngineApp_m_pCurrentFrameData[0]->colorImage)); /* gDPSetColorImage */
+    GFX_CMD(0xFF100000 | ((gScreenWidth - 1) & 0xFFF), GBI_ADDR(((FrameBuffers *)gEngineApp.m_pCurrentFrameData)->colorImage)); /* gDPSetColorImage */
     GFX_CMD(0xDC080008, GBI_ADDR(vp));                          /* gSPViewport */
     GFX_CMD(0xE7000000, 0);                                 /* gDPPipeSync */
     GFX_CMD(0xE3000A01, 0);                                 /* gDPSetCycleType(G_CYC_1CYCLE) */
@@ -292,7 +290,7 @@ void Automap_Draw(MapView *view) {
     nIdx = 0;
     base = 0;
     nVtx = 0;
-    showAll = TestFlag(gEngineApp_m_Settings, 0x2000) != 0;
+    showAll = TestFlag(gEngineApp_m_Settings_cheatFlags, 0x2000) != 0;
     for (n = 0; n < areaCount; n++) {
         area = &areas[n];
         if (area->maxX > box.minX && area->minX < box.maxX && area->maxZ > box.minZ && area->minZ < box.maxZ) {

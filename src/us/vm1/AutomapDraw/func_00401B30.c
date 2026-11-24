@@ -11,7 +11,7 @@ typedef struct {
     /* 0x14 */ Triple c;
 } Obj00401B30;
 
-void Automap_RevealAroundPlayer(Obj00401B30 *obj);
+void Automap_RevealAroundPlayer(void *automap);
 
 #ifdef TARGET_PORT
 /* The port: the caller's types (CPlayerPool__Update: the region, the facing as f32 and the

@@ -18,7 +18,9 @@ typedef struct {
 s32 Automap_RevealRegion(sptr);
 s32 Automap_ClearVisited(sptr);
 
-void Automap_RevealAroundPlayer(Arg0 *arg0) {
+/* The caller's CAutomap (structs/game.h), through the view above. */
+void Automap_RevealAroundPlayer(void *automap) {
+    Arg0 *arg0 = automap;
     CGameRegion *temp_s0;
     CGameRegion *temp_a0;
     CGameRegion *temp_a0_2;
