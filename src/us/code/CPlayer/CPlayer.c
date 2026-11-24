@@ -5991,14 +5991,8 @@ VM_TEXT void CPlayer__SetCharacter(CPlayer *p, s32 character) {
 
 #define PLAYER_LAST T2_OFFSETOF(CPlayer, m_pLast)
 #define PLAYER_NEXT T2_OFFSETOF(CPlayer, m_pNext)
+#include "structs/cache.h"
 
-typedef struct PlayerList_42E5AC {
-    /* 0x00 */ CPlayer **handle;
-    /* 0x04 */ CPlayer *players;
-    /* 0x08 */ s32 count;
-    CPlayerCList list0[1];
-    CPlayerCList list1[1];
-} PlayerList_42E5AC;
 struct CMemEntry *CCache__Allocate(s32, s32, u32, char *);
 void CCache__Deallocate(sptr, void *);
 void CCache__Flush(s32);
@@ -6019,51 +6013,51 @@ VM_TEXT static __inline__ void initPlayer(CPlayer *p, s32 index, CPlayerOptions 
     CPlayer__Reset(p);
 }
 
-VM_TEXT void CPlayerPool__NewGame(PlayerList_42E5AC *list, s32 count, s32 arg2) {
+VM_TEXT void CPlayerPool__NewGame(CPlayerPool *list, s32 count, s32 arg2) {
     GameSettings *flags;
     CPlayerOptions *options;
     CPlayer *p;
     s32 i;
 
-    CList__Construct(list->list0, PLAYER_LAST, PLAYER_NEXT);
-    CList__Construct(list->list1, PLAYER_LAST, PLAYER_NEXT);
+    CList__Construct(&list->m_IdleList, PLAYER_LAST, PLAYER_NEXT);
+    CList__Construct(&list->m_ActiveList, PLAYER_LAST, PLAYER_NEXT);
     Controller_SetRumbleOptionAll(0);
     CCache__Flush(0);
     flags = &gEngineApp_m_Settings;
-    if (list->handle != NULL) {
-        CCache__Deallocate(0, list->handle);
-        list->handle = NULL;
-        list->players = NULL;
-        list->count = 0;
+    if (list->m_pmePlayers != NULL) {
+        CCache__Deallocate(0, list->m_pmePlayers);
+        list->m_pmePlayers = NULL;
+        list->m_Players = NULL;
+        list->m_nPlayers = 0;
     }
     if (count == 0) {
         return;
     }
-    list->count = count;
-    list->handle = CCache__Allocate(0, count * sizeof(CPlayer), 0x23, "Players");
-    list->players = *list->handle;
-    memset(list->players, 0, count * sizeof(CPlayer));
-    for (i = 0; i < list->count; i++) {
-        CList__AddTail(list->list0, &list->players[i]);
+    list->m_nPlayers = count;
+    list->m_pmePlayers = CCache__Allocate(0, count * sizeof(CPlayer), 0x23, "Players");
+    list->m_Players = list->m_pmePlayers->data;
+    memset(list->m_Players, 0, count * sizeof(CPlayer));
+    for (i = 0; i < list->m_nPlayers; i++) {
+        CList__AddTail(&list->m_IdleList, &list->m_Players[i]);
     }
     options = &flags->defaultSlot;
     if (flags->multiplayer) {
-        for (i = 0; i < list->count; i++) {
-            p = &list->players[i];
+        for (i = 0; i < list->m_nPlayers; i++) {
+            p = &list->m_Players[i];
             options = &flags->slots[i];
             initPlayer(p, i, options);
             if (options->m_bActive) {
                 CPlayer__NewGame(p, options->m_nCharacter, 1);
-                CList__Remove(list->list0, p);
-                CList__AddHead(list->list1, p);
+                CList__Remove(&list->m_IdleList, p);
+                CList__AddHead(&list->m_ActiveList, p);
             }
         }
     } else {
-        p = list->players;
+        p = list->m_Players;
         initPlayer(p, options->m_nController, options);
         CPlayer__NewGame(p, options->m_nCharacter, arg2);
-        CList__Remove(list->list0, p);
-        CList__AddHead(list->list1, p);
+        CList__Remove(&list->m_IdleList, p);
+        CList__AddHead(&list->m_ActiveList, p);
     }
     gEngineApp_m_Settings.match.tagPhase = 1;
 }
