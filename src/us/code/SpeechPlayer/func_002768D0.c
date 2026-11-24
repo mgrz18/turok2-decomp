@@ -6,7 +6,6 @@
 #include "protos/iset.h"
 
 extern void adecClearStopFlag();
-extern QueueRec D_800F55F4[];
 extern void adecGetStopFlag(void);
 extern s32 adecStreamOpen(void *, s32, s32 *);
 extern s32 alSndpGetState(char *);
@@ -47,15 +46,15 @@ void SpeechPlayer_Update(PlayerRecAt24 *player) {
             }
             break;
         case 1:
-            ((s32 *)D_800F55F4)[0] = 0;
-            ((u8 *)D_800F55F4)[4] = 2;
-            ((s32 *)D_800F55F4)[2] = 0;
+            gAudioWorld.fx.stream.head = 0;
+            gAudioWorld.fx.stream.kind = 2;
+            gAudioWorld.fx.stream.tail = 0;
             index = player->song * 2;
             header = CISet__GetBlock(player->bank->songs, index);
             player->tempoScale = header->tempo * 0.01f;
             player->volume = header->volume;
             sequence = CISet__GetBlock(player->bank->songs, index | 1);
-            ((void **)D_800F55F4)[-1] = sequence;
+            gAudioWorld.fx.stream.sequence = sequence;
             sSpeechSound.envelope->decayTime = adecStreamOpen(sequence, 0x5622, &rate);
             player->state = 3;
             alSndpSetSound(channel, player->id);
