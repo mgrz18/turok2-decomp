@@ -239,6 +239,11 @@ static __inline__ PageRegion *findRegion(u32 page) {
     return region;
 }
 
+#ifndef TARGET_PORT
+/* VM_Alloc's cache tag, defined here: its .rodata comes before VM_HandleTLBMiss's constants */
+static const char sVirtualRegionTag[] = "Virtual Region";
+#endif
+
 /* TLB miss handler: maps the faulting page if it is resident, else queues a read of it; any other fault restarts the game. */
 void VM_HandleTLBMiss(void) {
     FaultedThread *thread;
@@ -396,7 +401,7 @@ s32 VM_Alloc(s32 arg0, s32 arg1_unused, s32 arg2)
     blk.f34 = (void **) sp10;
     new_var2 = temp_s1 * 4;
     rounded = new_var + 0x18;
-    temp_v0 = CCache__Allocate(0, new_var2 + rounded, 3, "Virtual Region");
+    temp_v0 = CCache__Allocate(0, new_var2 + rounded, 3, sVirtualRegionTag);
     temp_v1 = *temp_v0;
     blk.f30 = temp_v1;
     temp_v1->model = temp_v0;
