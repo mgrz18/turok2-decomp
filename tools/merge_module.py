@@ -243,6 +243,8 @@ def type_names(code):
             names.add(m.group(1))
     elif c.lstrip().startswith("#"):
         names |= {m.group(2) for m in SIMPLE_TYPEDEF.finditer(c)}
+        if re.search(r"\btypedef\b", c):   # a conditional block's struct typedefs (#ifdef TARGET_PORT .. #else ..)
+            names |= set(re.findall(r"\}\s*(\w+)\s*;", c))
     return names
 
 
@@ -416,10 +418,15 @@ def main():
         # `inline` on the N64 build and nothing on the port's
         want = set(text_order) if a.inline == "all" else set(a.inline.split(","))
         lead = re.compile(r"((?:\s|/\*.*?\*/|//[^\n]*\n)*)", re.S)
+        # the definitions inside a conditional block (#ifdef TARGET_PORT .. #else .. #endif) too
+        DEF_IN_IF = re.compile(r"^((?!typedef\b|struct\b|union\b|enum\b|extern\b|static\b|DEFERRED\b|VM_TEXT\b)"
+                               r"[A-Za-z_][\w \t\*]*?\b\w+\s*\([^;{}]*\)\s*\{)", re.M)
         for i, its in enumerate(parsed):
             if text_order[i] in want:
                 parsed[i] = [(lead.sub(lambda m: m.group(1) + "DEFERRED ", c, count=1) if k == "func" and
-                              not re.search(r"\b(inline|__inline__|INLINE|DEFERRED|static)\b", strip_comments(c).split("(")[0]) else c, k, n)
+                              not re.search(r"\b(inline|__inline__|INLINE|DEFERRED|static)\b", strip_comments(c).split("(")[0]) else
+                              DEF_IN_IF.sub(lambda m: "DEFERRED " + m.group(1), c) if k == "cpp" and
+                              re.match(r"\s*#\s*if", strip_comments(c)) else c, k, n)
                              for c, k, n in its]
     renames, hdr, hoisted = {}, {}, []
     if not a.no_fix:
@@ -448,6 +455,21 @@ def main():
                 defined.setdefault(n, signature(it))
     func_order = [n for its in parsed for it, kind, n in its if kind == "func"]
     deferred = {n for its in parsed for it, kind, n in its if kind == "func" and re.match(r"\s*DEFERRED\b", strip_comments(it))}
+    if a.inline:
+        # a deferred function defined inside a conditional block (#ifdef TARGET_PORT .. #else ..) takes its place in the
+        # output order too (its first definition's signature for the early prototype)
+        CPP_DEF = re.compile(r"^DEFERRED\s+([A-Za-z_][\w \t\*]*?\b(\w+)\s*\([^;{}]*\))\s*\{", re.M)
+        func_order = []
+        for its in parsed:
+            for it, kind, n in its:
+                if kind == "func":
+                    func_order.append(n)
+                elif kind == "cpp" and re.match(r"\s*#\s*if", strip_comments(it)):
+                    for m in CPP_DEF.finditer(strip_comments(it)):
+                        if m.group(2) not in func_order:
+                            func_order.append(m.group(2))
+                            deferred.add(m.group(2))
+                            defined.setdefault(m.group(2), re.sub(r"\s+", " ", m.group(1)) + ";\n")
     local_types, type_item = set(), {}
     is_inc = lambda it: re.match(r"#\s*include\b", strip_comments(it).strip())
     for i, its in enumerate(parsed):
@@ -460,6 +482,7 @@ def main():
                     local_types.add(t)
                     type_item.setdefault(t, it)
     out, seen, done, last, have, pending = [], set(), set(), None, set(hdr), []
+    moved = set()   # type declarations move_types wrote early
     if flags and list(flags)[0]:
         out.append(list(flags)[0][0])
     for it in hoisted:
@@ -492,12 +515,15 @@ def main():
             if t in have:
                 continue
             ti = type_item[t]
-            have.add(t)
+            key = re.sub(r"\s+", " ", strip_comments(ti)).strip()
+            if key in moved:
+                continue
+            moved.add(key)
+            have |= include_types(ti, d) if is_inc(ti) else type_names(ti) | {t}
             if not is_inc(ti):
                 move_types(strip_comments(ti))
             out.append(ti)
-            seen.add(re.sub(r"\s+", " ", strip_comments(ti)).strip())
-            have |= include_types(ti, d) if is_inc(ti) else type_names(ti)
+            seen.add(key)
 
     def needs(sig):
         return {w for w in re.findall(r"\b\w+\b", sig) if w in local_types and w not in have}
@@ -543,7 +569,7 @@ def main():
                 last = "func"
                 continue
             key = re.sub(r"\s+", " ", strip_comments(it)).strip()
-            if key in seen and ("{" not in key or re.match(r"(typedef|struct|union|enum)\b", key)):
+            if key in seen and ("{" not in key or re.match(r"(typedef|struct|union|enum)\b", key) or key in moved):
                 continue
             m = SIMPLE_TYPEDEF.fullmatch(key) if hdr else None
             if m and hdr.get(m.group(2)) == canon_type(m.group(1)):

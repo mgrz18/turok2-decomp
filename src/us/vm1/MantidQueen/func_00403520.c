@@ -27,7 +27,8 @@ typedef struct {
  * N64 views' step, stepIndex, total (toSpawn), timer and enabled (waveActive), and the step's
  * active word (partPicks, a pointer), sit elsewhere once they hold 8-byte pointers), the actor's
  * CAI by member. */
-void MantidQueen_NextStep(WaveBossState *s) {
+void MantidQueen_NextStep(void *s_) {
+    WaveBossState *s = s_;
     WaveBossStep *step;
     s32 value;
 
@@ -51,7 +52,8 @@ void MantidQueen_NextStep(WaveBossState *s) {
 #else
 /* Moves the encounter to its next step: accumulates the step's value, sets
  * whether it is enabled, and fires the actor's events for steps 7 and 8. */
-void MantidQueen_NextStep(State00403520 *s) {
+void MantidQueen_NextStep(void *s_) {
+    State00403520 *s = s_;
     Step00403520 *step;
     s32 value;
 
