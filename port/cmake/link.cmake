@@ -84,32 +84,32 @@ set(T2_LINK_REPLACED
     # (CAudioWorld__PickVariant: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
     # (CAudioWorld__GetVariantLayers: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
     # (CAudioWorld__IsSoundBusy: under #ifndef TARGET_PORT in the merged CAudioWorld.c)
-    func_00271E20.c   # Sound_CalcPan
-    func_00271F6C.c   # SndVoice_InitPitch
-    func_00272278.c   # SndVoice_InitVolume
-    func_00272B54.c   # SndVoice_UpdatePan
-    func_0027314C.c   # SndVoice_Update
-    func_00273370.c   # SndVoicePool_FindSlot
-    func_00273504.c   # SndVoicePool_AllocVoice
-    func_00273B90.c   # SndVoicePool_GetVoiceState
-    func_00273BF8.c   # SndVoicePool_PlayVoice
-    func_00273C5C.c   # SndVoicePool_StopGroupVoice
-    func_00273D88.c   # SndVoicePool_IsSoundPlaying
-    func_00273DD8.c   # SndVoicePool_StopVoice
-    func_00273E98.c   # SndVoice_SetPosition
-    func_00273EB8.c   # SndVoice_SetSoundId
-    func_00273EC0.c   # SndVoice_Setup
-    func_0027403C.c   # SndVoicePool_Update
-    func_002740E8.c   # SndVoicePool_FindSoundWithOwner
-    func_002746AC.c   # SndVoice_SetVolume
-    func_00274728.c   # SndVoice_SetPitch
-    func_00274798.c   # SndVoice_SetPan
-    func_002747EC.c   # SndVoice_GetState
-    func_00274830.c   # SndVoice_Play
-    func_00274850.c   # SndVoice_Stop
-    func_002748D0.c   # SndVoice_Release
-    func_00274948.c   # SndVoice_InitPan
-    func_00274A98.c   # SndVoicePool_ReleaseVoice
+    # (Sound_CalcPan: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_InitPitch: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_InitVolume: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_UpdatePan: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_Update: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoicePool_FindSlot: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoicePool_AllocVoice: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoicePool_GetVoiceState: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoicePool_PlayVoice: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoicePool_StopGroupVoice: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoicePool_IsSoundPlaying: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoicePool_StopVoice: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_SetPosition: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_SetSoundId: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_Setup: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoicePool_Update: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoicePool_FindSoundWithOwner: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_SetVolume: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_SetPitch: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_SetPan: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_GetState: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_Play: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_Stop: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_Release: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoice_InitPan: under #ifndef TARGET_PORT in the merged SndVoice.c)
+    # (SndVoicePool_ReleaseVoice: under #ifndef TARGET_PORT in the merged SndVoice.c)
     # (SndSeq_Update: under #ifndef TARGET_PORT in the merged SndSeq.c)
     # (SndSeq_UpdateFade: under #ifndef TARGET_PORT in the merged SndSeq.c)
     # (SndSeq_SelectSong: under #ifndef TARGET_PORT in the merged SndSeq.c)
