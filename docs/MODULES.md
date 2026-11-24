@@ -242,7 +242,7 @@ nothing from it.
 | Directory | Files | First conflicts (`tools/merge_check.py`) |
 |---|---:|---|
 | `vm2/BlindOne` | 70 | `rw/abu_protos.h` against `protos/*.h` (`CCache__*`, `CList__*`), `AI_UpdateTargets`, local struct names |
-| `vm2/Demo` | 28 | `CList__AddHead` .. (`rw/abu_protos.h` vs `protos/list.h`), `CEngineApp__SetupFadeTo`, `Triple` vs a local `Triple`, `CCache__Allocate` |
+| `vm2/Demo` | 28 | **merged** (round 26, o1: `CList__Construct` from `protos/list.h` instead of `rw/abu_protos.h`; was: declarations differ) |
 | `vm2/MpMenu` | 109 | field symbols read as arrays (`gEngineApp_m_Settings_match[]`, `_unk16[]`, `_unk18[]`, `_match_teamScore`), `Controller_ConfirmPressed` in five forms, `MenuPool_OpenChildMenu_2`, `Menu_StepValue_2`, `sprintf`, local struct names |
 | `vm2/PakMenu` | 139 | `osCreateMesgQueue` and the libultra prototypes, `CCache__*`, local struct names (87 messages on the first pass) |
 | `vm2/Primagen` | 53 | the `gLevelScript` field-symbol views (`ModeState0040457C`, `LevelScriptF950` against `LevelScriptState`), a local type used before a file defines it |
@@ -303,7 +303,7 @@ change; they need more time.
 
 | Directory | Files | Result of the dry run (round 24), or merged |
 |---|---|---|
-| `code/libultra/audio/cseq` | 12 | declarations differ (1: `__readVarLen`); local types differ (4: `DecodeResult`, `RuntimeState`, `sptr`, `uptr`). Round 25 n1: 6 conflicts: the Rage Wars files spell out their own s32/sptr typedefs and RuntimeState/DecodeResult views of structs/libaudio.h's ALCSeq/ALEvent; one rewrite onto ALCSeq |
+| `code/libultra/audio/cseq` | 12 | **merged** (round 26, o1: `__getTrackByte`/`__readVarLen`/`__alCSeqGetTrackEvent` on `ALCSeq`/`ALEvent`, the Rage Wars view of `__alCSeqGetTrackEvent` written with libaudio's field names; the port's two under `#ifndef TARGET_PORT`; was: declarations differ) |
 | `code/libultra/audio/drvrnew` | 8 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `FuncPtr`, `alFilterNew`, `alHeapDBAlloc`)) |
 | `code/libultra/audio/env` | 7 | **merged** (round 24, first batch) |
 | `code/libultra/audio/resample` | 2 | **merged** (round 24, first batch) |
@@ -355,7 +355,7 @@ change; they need more time.
 | `code/EnemySwim` | 19 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (5: `AI_ComputeFrameMotion`, `AI_UpdateTargets`, `CAI__CallHurt`, `CAI__SetMode`, ...)) |
 | `code/GameObject` | 62 | own basic typedefs (3: `s32`, `u32`, `u8`); calls typed differently (2: `GameObject_GetGroundHeight`, `GameObject_TraceMove`); declarations differ (5: `CGameRegion__GetHeight`, `CScene__GetObjectTypeID`, `CVector3__Normalize`, `GameObject_GetFrameDelta`, ...); local types differ (2: `CGameRegion`, `Triple`); parse errors (1: `}`); other (1: `structure has no member named `m_pVertices'`). Round 25 n1: 16+ conflicts: own basic typedefs (imported Rage Wars files), CVector3__Normalize, GameObject_TraceMove / GetGroundHeight called with different argument lists |
 | `code/GameObjectMove` | 6 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `Collision_MoveInstance`)) |
-| `code/Generator` | 16 | declarations differ (5: `Actor_SpawnParticle`, `CInstancePool__Spawn`, `CLevelActorPool__Spawn`, `CScene__GetIntelligence`, ...); local types differ (1: `B01Info`). Round 25 n1: 7 conflicts: CLevelActorPool__Spawn is renamed by a host macro in one file (#define .._i, the merged file would rename every call), CInstancePool__Spawn Triple vs CVector3, B01Info two views (a CAI view: wants a CGeneratorAIVars) |
+| `code/Generator` | 16 | **merged** (round 26, o1: `B01Info` in `structs/generator.h`; the spawn prototypes in the MotherBoss form; `Generator_SpawnObject`/`SpawnPickup` typed as the twins of `spawnObject`/`spawnPickup`; `CScene__GetObjectTypeID` through an `s32` type of its own on N64; was: declarations differ) |
 | `code/HostIo` | 34 | **merged** (round 25, n2: `-msplit-addresses` proven for all 34; was: cc1 flags differ) |
 | `code/Hud` | 48 | declarations differ (5: `Draw`, `ModeState`, `gEngineApp_m_OnScreen_m_FontXScale`, `gEngineApp_m_OnScreen_m_ShadowXOff`, ...); local types differ (2: `Chunk`, `FontStyle`); parse errors (12: `(Each undeclared identifier is reported `, `*`, `FrameEntry`, `byte`, ...); other (1: `for each function it appears in.)`). Round 25 n1: 21+ conflicts: gEngineApp_m_OnScreen_m_* field symbols read as arrays, `Draw`/`ModeState` names used as both type and function |
 | `code/InteractiveAnim` | 15 | **merged** (round 24, after unifying its declarations; was: declarations differ (3: `AI_PlayAnim`, `CGameObjectInstance__AdvanceAnimation`, `CGameObjectInstance__SetAnimByAction`)) |
@@ -366,8 +366,8 @@ change; they need more time.
 | `code/Rumble` | 10 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `RumbleCurve_Advance`, `__osDisableInt`, `__osRestoreInt`); local types differ (1: `Clip`)) |
 | `code/RumbleCurve` | 3 | **merged** (round 24, first batch) |
 | `code/SavedPlayers` | 8 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `gSavedPlayers`)) |
-| `code/SndQueue` | 12 | own basic typedefs (2: `s32`, `u8`); declarations differ (1: `SndVoice_Construct`); local types differ (5: `ChannelSet`, `Header`, `ListHead`, `ListLink`, ...). Round 25 n1: 13+ conflicts: imported Rage Wars files with their own s32/u8 typedefs and ListHead/ListLink/Header/ChannelSet views of structs/sound.h |
-| `code/SndSeq` | 12 | declarations differ (8: `BinarySearch`, `HalfToFloat`, `alCSPSetBank`, `alCSPSetChlFXMix`, ...); local types differ (2: `ContextRecAt2BB8`, `IntPair`). Round 25 n1: 11+ conflicts: the alCSP* prototypes (s8/s16 arguments that change the caller's code, s32 vs void returns), IntPair/ContextRecAt2BB8 views |
+| `code/SndQueue` | 12 | **merged** (round 26, o1: `SndQueue_InitNode` typed on `SndNode`, the N64 `SndQueue_Construct` view from `rw/abu_types.h`, `SndVoice_Construct` as defined; the port's four under `#ifndef TARGET_PORT`; was: declarations differ) |
+| `code/SndSeq` | 12 | **merged** (round 26, o1: the libaudio calls through `protos/libaudio.h` with ultralib's prototypes, which compile the ROM's callers; the port's ten under `#ifndef TARGET_PORT`; was: declarations differ) |
 | `code/Sort` | 2 | **merged** (round 24, first batch) |
 | `code/Sound` | 31 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (2: `CAudioWorld__SetForce2D`, `gEngineApp_m_Settings_unk1C8`)) |
 | `code/SpeechPlayer` | 7 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (5: `CAudioWorld__GetSndPlayer`, `CAudioWorld__Lock`, `CAudioWorld__Unlock`, `alSndpSetSound`, ...)) |
@@ -378,7 +378,7 @@ change; they need more time.
 | `code/VM` | 20 | .rodata not in .text order (1 inverted pairs of 2 subsegments); round 25 (n2): deferred from `func_0028E068` on (`--inline`); also declarations differ |
 | `code/WeaponMode` | 49 | declarations differ (13: `Anim`, `Bone`, `CAI__SetMode`, `CCameraPool__AddText`, ...). Round 25 n1: 21+ conflicts: Anim/Bone views, Sound__Play, CAI__SetMode, the CPlayer__ weapon family |
 | `code/__scHandleRSP` | 17 | declarations differ (2: `Sched`, `__scHandleRetrace`); local types differ (1: `Stream`); parse errors (7: `(Each undeclared identifier is reported `, `*`, `Qn`, `Stream`, ...); other (1: `for each function it appears in.)`). Round 25 n1: 19+ conflicts: Sched/ScTask/Client views of sched.h's OSSched/OSScTask/OSScClient (parse errors once they meet), __scHandleRetrace |
-| `code/adecHuffDecode` | 18 | the files do not share their cc1 flags; round 25 (n2): `func_002A0044` compiles differently under `-fforce-addr`: re-match it |
+| `code/adecHuffDecode` | 18 | **merged** (round 26, o1: `func_002A0044` re-matched under `-fforce-addr`, merged with `--cc1-flags auto`; `AdecStream` in `structs/adec.h`; was: cc1 flags differ) |
 | `code/alAdpcmPull` | 5 | **merged** (round 24, first batch) |
 | `vm1/BlindOne` | 70 | declarations differ (26: `AI_UpdateTargets`, `Animator_Update`, `CCache__Allocate`, `CCache__AllocateMemoryForDecompression`, ...); parse errors (1: `DrawInfo`). Round 25 n1: 28+ conflicts: the CCache__ family (protos/cache.h), gScene_m_LevelID, DrawInfo |
 | `vm1/CEngineApp` | 4 | **merged** (round 24, first batch) |
@@ -546,8 +546,7 @@ the merge 1). **44 module directories still hold one function per file**, by wha
 | linker padding inside the `.rodata` run: the directory is two or more objects, `versions/modules.us.txt` needs the boundary first (part n2) | `code/AI`, `code/CAudioWorld`, `code/CParticle`, `code/LevelEvent`, `vm1/MissionMenu`, `vm1/MpMenu`, `vm1/PakMenu`, `vm1/Primagen` (8) |
 | data the C reads as externs, or strings of `.data` tables in asm (they must become literals or C tables first) | `code/Anim`, `code/CEngineApp` (also `--name`), `code/CGameObjectInstance`, `code/CInstancePool`, `code/CMtxF`, `code/Crash`, `vm1/NameEntryMenu` (7) |
 | deferred functions (`--inline`) plus header work | `code/CLevelActor`, `code/VM`, `vm1/TotemDefense`, `vm1/Pak` (4; `vm1/Pak` also needs a source-order option) |
-| cc1 flags (`func_002A0044` must be re-matched under `-fforce-addr`) | `code/adecHuffDecode` (1) |
-| header work only (one declaration per name; no `.rodata` question) | `code/{CCache, CGameRegion, EnemyAI, GameObject, Generator, Hud, SndQueue, SndSeq, WeaponMode, __scHandleRSP, libultra/audio/cseq}`, `vm1/BlindOne`, `vm2/{BlindOne, Demo, MpMenu, PakMenu, Primagen, SceneLoad}` (18) |
+| header work only (one declaration per name; no `.rodata` question) | `code/{CCache, CGameRegion, EnemyAI, GameObject, Hud, WeaponMode, __scHandleRSP}`, `vm1/BlindOne`, `vm2/{BlindOne, MpMenu, PakMenu, Primagen, SceneLoad}` (13 after round 26 o1, which merged `code/{Generator, SndQueue, SndSeq, libultra/audio/cseq}`, `vm2/Demo` and, from the cc1-flags row, `code/adecHuffDecode`) |
 
 The rows above the last need header work too: `merge_check.py --rodata-free` stops at the compiler
 for every directory it gets that far with except `vm1/NameEntryMenu`; the 8 it refuses before
@@ -557,6 +556,53 @@ the C first), `code/libultra/audio/cseq` (the Rage Wars `sptr`/`uptr` typedefs a
 `RuntimeState`/`DecodeResult` views), `code/Generator` (`B01Info` twice, the CScene/actor-pool
 prototypes) and `vm2/Demo` (the CList family through `rw/abu_protos.h` in one file, `IntPair`,
 `Triple`, `CCache__Allocate`/`Deallocate`). None needs a ROM change.
+
+
+## Round 26, part o1: header work, `adecHuffDecode`, the vm1/vm2 twin structs
+
+**Merged (6 directories, 98 files):** `code/libultra/audio/cseq`, `code/Generator`, `code/SndSeq`,
+`code/SndQueue`, `vm2/Demo` (header work only) and `code/adecHuffDecode` (cc1 flags). `make verify`
+after each batch and `asm_diff --base 3ffda1bb` 0 over the tree. How the declarations were made one:
+
+- *One prototype, the definition's.* Where the files only spelled a callee differently (pointer vs
+  `sptr` arguments, `void` vs `s32` results nobody reads), every file now takes the definition's
+  prototype; the Rage Wars views (`RuntimeState`, `DecodeResult`, `ChannelSet`) are cast at the call.
+  `__alCSeqGetTrackEvent` itself is written on `ALCSeq`/`ALEvent` (the Rage Wars `DecodeResult` is
+  `ALEvent`'s `msg.midi`/`msg.tempo`).
+- *ultralib's prototypes.* The `alCSP*`/`alCSeqNew` callers in `SndSeq` compile the same with
+  libaudio.h's prototypes (`u8` channel and FX mix, `s16` volume): new `include/protos/libaudio.h`.
+- *A result the ROM's caller reads narrower or wider than the definition returns*
+  (`CScene__GetObjectTypeID` u16 read as `s32` in `Generator`; `adecReadBits` s32 read as `u16` in
+  `adecHuffDecode`; `adecDecodeFrame` s32 read as `s16` in `adecDecodeFrameOk`): on N64 the call goes
+  through a function type of its own (as round 25 did for `CAI__CallHurt`), the port calls directly.
+- *Out-of-line twins.* `Generator_SpawnObject` and `Generator_SpawnPickup` are the out-of-line
+  copies of `spawnObject`/`spawnPickup` and are now written the same way, on `CGameObjectInstance`/`CAI`.
+- *`adecHuffDecode` under `-fforce-addr`:* the phrase address is an integer sum with `dictOffset`
+  first, `(DecodePhrase *)(dictOffset + (sptr)table->phrases)`, instead of the `(phrases + 1) - 1`
+  form the default flags needed; the module is then one file with `--cc1-flags auto`.
+- *The port's replacements* in merged files go under `#ifndef TARGET_PORT` and their `link.cmake`
+  lines become comments (`tools/portwrap.py MERGED.c STEM,..`: cseq 2, SndSeq 10, SndQueue 4).
+
+**The vm1/vm2 twin structs:** `tools/hoist_twins.py` puts every local typedef that a vm1 module and
+its vm2 copy (and no other module) define with one layout into `include/structs/twin_<module>.h`
+(30 names in 7 modules: BlindOne, Demo, MotherBoss, PakMenu, Primagen, SceneLoad, TotemDefense;
+`IntPair` skipped, `rw/abu_types.h` has it); the headers include only `common.h`/`structs/`
+headers so no prototype comes along. Census: 142 of 653 -> 113 of 624 (with `B01Info`/`AdecStream`
+from the header work).
+
+**Left of the 18 header-only directories (13)**, with the first conflicts `merge_check.py
+--rodata-free` reports: `code/CCache` (59: `osSendMesg`, `CHeap__Alloc/Free`,
+`CDecompressor__DecompressAsync`), `code/CGameRegion` (74: `CISet__GetBlock`, the `CScene__*`
+family), `code/EnemyAI` (136), `code/GameObject` (24: `CVector3__Normalize`, own basic typedefs,
+`GameObject_TraceMove`/`GetGroundHeight` argument lists, `Placed`, a local `CGameRegion`),
+`code/Hud` (27: `gEngineApp_m_OnScreen_m_ShadowXOff` array view, `Draw`, `ModeState`),
+`code/WeaponMode` (42: the CPlayer weapon family, `Sound__Play`), `code/__scHandleRSP` (22: three
+local `Sched`/`Client`/`Qn` views of `OSSched` per file: one rewrite onto `structs/sched.h`),
+`vm1/BlindOne`, `vm2/BlindOne` (55/61: `gScene_m_LevelID` array view, the CCache family),
+`vm2/MpMenu` (51), `vm2/PakMenu` (185: the libultra os prototypes), `vm2/Primagen` (136:
+`LevelScript` views), `vm2/SceneLoad` (133: the CList family). The 4 deferred directories
+(`code/CLevelActor`, `code/VM`, `vm1/TotemDefense`, `vm1/Pak`) were not reached: each needs the same
+header work before `--inline`. None needs a ROM change.
 
 ## Evidence
 
