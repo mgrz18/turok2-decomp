@@ -1,7 +1,8 @@
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 
-void Angle_Wrap(f32 *);                          /* extern */
 
 /* Turns the object by arg1 and wraps its angle. */
 void Actor_TurnBy(CGameObjectInstance *arg0, f32 arg1) {

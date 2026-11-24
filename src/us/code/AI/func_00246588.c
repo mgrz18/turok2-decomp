@@ -1,4 +1,6 @@
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 
 /* Two words set to the same value (a current and an initial value). */
 typedef struct {

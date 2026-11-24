@@ -1,4 +1,6 @@
 #include "structs/vector.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002174E4.c, func_002174E4.

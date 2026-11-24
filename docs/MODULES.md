@@ -999,6 +999,63 @@ the compiler, 3 refused: `code/CScene` and `vm1/SceneLoad`, whose `.rodata` inte
 
 None needs a ROM change.
 
+## Round 28, part q1: header work on the engine (`__scHandleRSP`, `GameObject`, `AI`)
+
+**Merged (2 directories, 79 files):** `code/__scHandleRSP` (17) and `code/GameObject` (62), each with
+`tools/merge_module.py DIR --rodata-free` after the header work below. After each batch:
+`asm_diff --base b9bb8125` 0 over the tree, a clean `make setup` + build + `make verify` OK, the port
+builds from a fresh gendata, and the merged files have no implicit declaration under clang
+`-Wimplicit-function-declaration`.
+
+- *`__scHandleRSP`: the scheduler on `structs/sched.h`.* The 17 files' views (`Sched`, `Client`,
+  `ScTask`, `Vid`/`Job`/`Qn`/`View`, `Panel`, `PendingOwner`/`PendingNode`, `NodeLists`/`Node`,
+  `Stream`/`StreamOwner`, Rage Wars' `Ctx_`/`Node_`/`View_`/`Scene_func_8028F*_de`) are now
+  `OSSched`, `OSScTask` and `OSScClient`; the frame a gfx task draws is a `CFrameData`. The new
+  `protos/sched.h` has one prototype per scheduler function on those types (and the libultra calls only
+  the scheduler makes: `osSetIntMask`, `osSpTaskYield(void)`, `osSpTaskYielded`). What the views
+  hid: `Sched.retraceMsg` (0x20) is `prenmiMsg` (the pre-NMI message goes to the clients), the clients
+  get `&retraceMsg` (0x0); Rage Wars' `music`/`time` are the task's `output_buff` and
+  `*output_buff_size` (`osDpSetNextBuffer`); `osSpTaskYield` takes no argument (the `$a0` the m2c
+  draft passed is only left over). `osScGetCmdQ`, `Sched_GetInterruptQ` and `Sched_SubmitTask` take an
+  `OSSched *` and return or use its queues by member.
+- *`GameObject`: `protos/game_object.h`* holds the module's functions and the calls it makes
+  (CGameRegion, PlatformCollide, GameObjectMove, SweepShapes, the CMtxF vector helpers and the gu
+  math), one prototype each. Eleven files had an N64 view and a port view (`#ifdef TARGET_PORT`) of the
+  same function; each is now one function on `CGameObjectInstance`/`CIntelligence`/`CAI`:
+  `func_00268210`, `GameObject_GetCollisionYOffset`, `GetDeadCollisionHeight`, `GetFrameDelta` and
+  `GetFrameTurn` (the whole `CAIFrameMotion` on the stack, as the port had it), `IsNearFloor`,
+  `IsOnGround`, `GetFloorHeightAt`, `GetFloorKind`, `GetRegionFloorHeight`, `GetAimRotation`.
+  The five `Model`/`ModelBlend`/`Object` getters (`func_00267D2C`.. `GameObject_IsLeashed`) read the
+  definition's `m_dwTypeFlags` (their FAKEMATCH shapes kept). `GameObject_GetFloorPointAt` traces a
+  `CVector3` (Rage Wars' `TripleRecAt8` had an `s32` y): the port's `GameObject_TraceMove_fif` wrapper
+  (`port/game/t2abi.c`) has no caller left. Kept as the ROM has them: `GameObject_GetTypeId` calls
+  `CScene__GetObjectTypeID` through an `s32` type on the N64 (the ROM does not mask the `u16`; the
+  host keeps `protos/scene.h`'s `u16`), `GameObject_IsOnGround` passes `GameObject_GetGroundHeight` a
+  second argument 0 (cast at the call), `CGameRegion__GetNormal` is declared `void` (its definition
+  returns the vector; with that type `GameObject_GetFloorTilt` keeps `$s1` for the result).
+
+**Header work without the merge: `code/AI`** (40 files; 30 of them on the new headers).
+`protos/cai.h` (new) declares the AI functions on their real types; `protos/ai.h` and
+`protos/enemy.h` keep the untyped views the enemy modules call (`CAI__SetMode`, `CAI__CallHurt`,
+`AI_TurnClamped`, `AI_ComputeFrameMotion`...), so an AI file may not include them. Done:
+`AI_InitHealth`, `AI_RideMovingPlatform`, `CAI__UpdateModeAnim` and `CAI__SetMode` on `CAI` /
+`CAIModeInfo` / `CGameObjectInstance` (their `Dest`/`Source110`/`StateEntry` N64 views and the
+port's host-offset views joined; `m_TranqHealth` is written through an `s8` conversion, as the ROM
+converts it), `AI_FindBestTarget` on `CGameObjectInstance` (the nearest player read as a `CPlayer`).
+**Left (7 files)**, with what stops them: `func_00245C5C.c` and `func_0024699C.c` call
+`AI_FindClearHeading`/`GameObject_TraceMove` with three `f32` for the position (the port's `_fif`
+wrappers); `func_0024646C.c` and `func_00246B24.c` call `GameObject_DropPickupAt` the same way and
+redefine the basic types; `func_00246310.c` (`AI_AngleToPoint`), `func_00246690.c`
+(`Actor_SpawnParticle`), `func_00246860.c` (`AI_StartSound`) and `func_00246918.c` (`AI_StopSound`)
+define their function twice (N64 view / port view) on `SpawnObj`/`SndSrc`/`Dest`;
+`func_002449E0.c` defines `AI_GetSightTargetInfo` with an `sptr` third argument and
+`func_002465F0.c` `AI_DistSqToPointAtHeight` on a `B04Obj` view. Each needs the treatment the
+eleven GameObject files got (one function on the engine types, `CVector3` by value).
+
+**Not started: `code/EnemyAI`** (119 files): out of time after AI. Its first conflicts are the same
+untyped `protos/enemy.h` views and the `EnemyAI_GetBehaviorIndex`/`GetCurrentBehavior` `s8`-vs-word
+returns (already written as `#ifdef TARGET_PORT` pairs).
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte

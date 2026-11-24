@@ -1,4 +1,6 @@
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x78];

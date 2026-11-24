@@ -1,5 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_3.CPP, func_80214DD4_de, with Turok 2's layouts. */
 #include "common.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "globals/scene.h"
@@ -18,28 +20,11 @@ s8 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, CAI *plan); /* ABI: retur
 #else
 s32 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, CAI *plan);
 #endif
-s32 AI_UpdatePathHeading(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target);
-CGameObjectInstance *AI_FindBestTarget(CGameObjectInstance *self, CAI *plan, s32 arg2, s32 arg3);
-f32 AI_FindClearHeading(CGameObjectInstance *self, CVector3 pos, CGameObjectInstance *target, f32 scale);
-f32 AI_AngleToPoint(CGameObjectInstance *a, CVector3 point);              /* angle to a point */
 Location *CPathTrack__GetCurrentPoint(s8 *location);
-f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);                           /* height */
-f32 GameObject_GetCollisionRadius(CGameObjectInstance *a);                           /* radius */
-f32 GameObject_GetSweepRadius(CGameObjectInstance *a);                           /* reach */
-f32 GameObject_GetWaterHeight(CGameObjectInstance *a);                           /* ceiling */
-void GameObject_TraceMove(CGameObjectInstance *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
-void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
-void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a + b */
-void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
-void CVector3__Normalize(CVector3 *v);                          /* normalise */
-f32 CVector3__GetYaw(CVector3 *v);                           /* heading */
-f32 func_002982F0(f32 x);                              /* sin */
-f32 func_002974C0(f32 x);                              /* cos */
-f32 func_00298470(f32 x);                              /* sqrt */
 
 /* The point beside `target`, on the side away from `from`, where `self`
  * stands touching it. */
-static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *target, CGameObjectInstance *from, CVector3 *outPos, s32 *outRegion) {
+static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *target, CGameObjectInstance *from, CVector3 *outPos, sptr *outRegion) {
     CVector3 dir;
     CVector3 to;
     f32 dist;
@@ -56,7 +41,7 @@ static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *
     dist = GameObject_GetCollisionRadius(target) + GameObject_GetCollisionRadius(self) + 51.199997f;
     CVector3__Scale(&dir, &dir, dist);
     CVector3__Add(&to, &target->header.m_vPos, &dir);
-    GameObject_TraceMove(target, to, outPos, outRegion, 0, 0);
+    GameObject_TraceMove(&target->header, to, outPos, (CGameRegion **) outRegion, 0, 0);
 }
 
 /* Picks what the plan aims at (its target, itself, a location or home
@@ -170,14 +155,14 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
             break;
         case 3:
             pos = plan->m_vLeashPos;
-            region = plan->m_pLeashRegion;
+            region = (sptr) plan->m_pLeashRegion;
             boost = 1;
             break;
         case 6:
             pos = self->header.m_vPos;
             region = ((sptr)self->header.m_pCurrentRegion);
             if (mode == 2) {
-                pos.y = GameObject_GetWaterHeight(self);
+                pos.y = GameObject_GetWaterHeight(&self->header);
             }
             break;
         }
@@ -190,10 +175,10 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
         pos.z -= gap * func_002974C0(angle);
     }
     if (mode == 2) {
-        pos.y = (pos.y < GameObject_GetWaterHeight(self)) ? pos.y : GameObject_GetWaterHeight(self);
+        pos.y = (pos.y < GameObject_GetWaterHeight(&self->header)) ? pos.y : GameObject_GetWaterHeight(&self->header);
     }
     if (boost) {
-        reach = GameObject_GetSweepRadius(self);
+        reach = GameObject_GetSweepRadius((u8 *) self);
         probe.x = self->header.m_vPos.x + reach * func_002982F0(plan->m_PathRotY);
         probe.y = plan->m_PathHeight;
         probe.z = self->header.m_vPos.z + reach * func_002974C0(plan->m_PathRotY);

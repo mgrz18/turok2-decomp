@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "protos/game_object.h"
+#include "protos/cai.h"
 #include "globals/engine.h"
-#include "protos/ai.h"
 
-extern void Actor_TurnBy(void *arg0, f32 arg1);
 void AI_TurnClamped(void *arg0, sptr arg1, f32 arg2, f32 arg3) {
     f32 f0;
     f32 f1;
