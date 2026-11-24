@@ -8,7 +8,7 @@
 #include "protos/sndp.h"
 void CAudioWorld__Lock(CAudioWorld *m);
 void CAudioWorld__Unlock(CAudioWorld *m);
-s16 SndVoicePool_FindSlot(SndVoicePool *p, s16 a, s16 b, s16 c, s32 d);
+s32 SndVoicePool_FindSlot(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c);
 s16 SoundEffectInfo_GetGroup(SoundEffectInfo *i);
 s8 SoundEffectInfo_GetPriority(SoundEffectInfo *i);
 s8 SoundEffectInfo_GetChance(SoundEffectInfo *i);
@@ -46,7 +46,7 @@ SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, int ta
   new_var = &(*((s16 *) (((u8 *) info) + 2)));
   if ((SoundEffectInfo_GetChance(info) == 0x64) || ((Random_NextB() % 100) < SoundEffectInfo_GetChance(info)))
   {
-    idx = SndVoicePool_FindSlot(p, (s16) tag, pri, (s16) flag, SoundEffectInfo_GetFlags(info));
+    idx = ((s16 (*)(SndVoicePool *, s16, s16, s16, s32))SndVoicePool_FindSlot)(p, (s16) tag, pri, (s16) flag, SoundEffectInfo_GetFlags(info));
     if (idx != (-1))
     {
       v = (SndVoice *) (&p->voices[idx]);

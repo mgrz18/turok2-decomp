@@ -7,7 +7,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0025A864.c, func_0025A864, with Turok 2's layouts. */
 
 s32 CAudioWorld__GetStereo(CAudioWorld *c);
-s32 Sound_CalcPan(f32 *pos, CCamera *t);
+s32 Sound_CalcPan(CVector3 *pos, CCamera *cam);
 
 void SndVoice_UpdatePan(SndVoice *o) {
     SndVoiceParams *vp;
@@ -53,7 +53,7 @@ slide:
         goto setpan;
     }
     if ((o->flags & 0x400) && o->reset == 0) {
-        vp->pan = Sound_CalcPan(&o->vp.pos.x, o->mgr->listener);
+        vp->pan = Sound_CalcPan(&o->vp.pos, o->mgr->listener);
 setpan:
         pan = ((u8 *)&vp->pan)[1];
         pl = &o->mgr->player;

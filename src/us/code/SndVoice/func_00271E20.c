@@ -1,29 +1,32 @@
 #include "structs/vector.h"
+#include "structs/camera.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00259B30.c, func_00259B30.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 f32 func_002982F0(f32 x);
-void CVector3__Subtract(CVector3 *out, void *src, sptr a);
-void CMtxF__InverseRotateVector(void *src, CVector3 *a, CVector3 *out);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+void CMtxF__InverseRotateVector(CMtxF *m, CVector3 *a, CVector3 *out);
 void CVector3__Normalize(CVector3 *v);
 f32 Math_AcosLookup(f32 x);
 f32 func_002982F0(f32 x);
 f32 __builtin_fabsf(f32 x);
-s32 Sound_CalcPan(sptr a0, u8 *obj) {
+/* The pan (0..0x80) of a sound at pos heard from the camera (round 29, part r2: typed as the
+ * port's copy in port/audio/t2audio_world.c). */
+s32 Sound_CalcPan(CVector3 *pos, CCamera *cam) {
     CVector3 r;
     CVector3 d;
     CVector3 w;
     f32 s;
     f32 zero;
-    if (obj == 0) {
+    if (cam == NULL) {
         return 0x40;
     }
-    CVector3__Subtract(&d, obj + 0x114, a0);
+    CVector3__Subtract(&d, &cam->m_vPos, pos);
     if (d.x * d.x + d.z * d.z < 1.0e2f) {
         return 0x40;
     }
-    CMtxF__InverseRotateVector(obj + 0x14C, &d, &w);
+    CMtxF__InverseRotateVector(&cam->m_mfViewOrient, &d, &w);
     w.y = 0.0f;
     zero = w.y;
     r.y = zero;
