@@ -8,8 +8,6 @@
 #include "protos/ultra.h"
 
 
-u32 __osDisableInt(void);
-void __osRestoreInt(u32 mask);
 
 /* Loads a four-byte probe to read a count, frees it under the resource lock, then loads count*4+15
  * rounded to eight bytes and stores its first word through arg1, returning the allocation. */
@@ -29,7 +27,7 @@ void **CCache__LoadPersistantIndex(s32 arg0, void **arg1, sptr arg2, void *arg3)
     gCache_mutex_count = counter;
     if (counter != one) {
         __osRestoreInt(token);
-        osRecvMesg(&gCache_mutex, 0, one);
+        osRecvMesg(&gCache_mutex.queue, 0, one);
     } else {
         __osRestoreInt(token);
     }
@@ -39,7 +37,7 @@ void **CCache__LoadPersistantIndex(s32 arg0, void **arg1, sptr arg2, void *arg3)
     gCache_mutex_count = counter2;
     if (counter2 != 0) {
         __osRestoreInt(token2);
-        osSendMesg(&gCache_mutex, 0, 1);
+        osSendMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(token2);
     }

@@ -4,10 +4,8 @@
 #include "globals/sysrc.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/heap.h"
 
-s32 CHeap__Free(CHeap *, sptr);
-s32 __osDisableInt(void);
-void __osRestoreInt(s32);
 
 
 void CCache__DeallocAndReplaceCompressedData(s32 arg0, CMemEntry **arg1, CMemEntry *arg2) {
@@ -23,7 +21,7 @@ void CCache__DeallocAndReplaceCompressedData(s32 arg0, CMemEntry **arg1, CMemEnt
     gCache_mutex_count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg(&gCache_mutex, 0, 1);
+        osRecvMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(temp_a0);
     }
@@ -51,7 +49,7 @@ loop_4:
     gCache_mutex_count = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0_2);
-        osSendMesg(&gCache_mutex, 0, 1);
+        osSendMesg(&gCache_mutex.queue, 0, 1);
         return;
     }
     __osRestoreInt(temp_v0_2);

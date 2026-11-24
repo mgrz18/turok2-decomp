@@ -10,13 +10,11 @@
 #include "protos/list.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
-u32 __osDisableInt(void);
-void __osRestoreInt(u32 mask);
+#include "protos/heap.h"
+#include "protos/hash.h"
 void *memset(void *s, int c, uptr n);
 void CMutex__Construct(void *lock);
 u32 GetMemSize(void);
-u8 *CHeap__Alloc(CHeap *heap, u32 size);
-void CHashTable__Construct(u32 n);
 #include "structs/cache.h"
 #ifdef TARGET_PORT
 

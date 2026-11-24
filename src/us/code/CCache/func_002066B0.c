@@ -1,29 +1,24 @@
 #include "common.h"
 #include "globals/cache.h"
 #include "protos/list.h"
+#include "protos/cache.h"
 
-/* An element of the lists at gCache_cacheUsedList - 0x14 and gCache_cacheUsedList. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ s32 unk10;
-} ListElem;
-
-
-
+/* Returns a request entry to the free list. */
 #ifdef TARGET_PORT
-/* The port: CCacheEntry.flags and gCache_cacheFreeList by name (structs/cache.h); the N64 0x10
- * and the list 0x14 bytes before the used list are not the host's. */
-#include "structs/cache.h"
+void CCache__FreeCacheEntry(s32 arg0, void *entry) {
+    CCacheEntry *e = entry;
 
-void CCache__FreeCacheEntry(s32 arg0, CCacheEntry *arg1) {
-    CList__Remove(&gCache_cacheUsedList, arg1);
-    arg1->flags = 0;
-    CList__AddHead(&gCache_cacheFreeList, arg1);
+    CList__Remove(&gCache_cacheUsedList, e);
+    e->flags = 0;
+    CList__AddHead(&gCache_cacheFreeList, e);
 }
 #else
-void CCache__FreeCacheEntry(s32 arg0, ListElem *arg1) {
-    CList__Remove(&gCache_cacheUsedList, arg1);
-    arg1->unk10 = 0;
-    CList__AddHead((sptr) (((__typeof__(&gCache_cacheUsedList))((s8 *)&gCache_cacheUsedList - 0x14))), arg1);
+/* gCache_cacheFreeList is reached from gCache_cacheUsedList (the list before it): one %hi for both. */
+void CCache__FreeCacheEntry(s32 arg0, void *entry) {
+    CCacheEntry *e = entry;
+
+    CList__Remove(&gCache_cacheUsedList, e);
+    e->flags = 0;
+    CList__AddHead((CList *)((s8 *)&gCache_cacheUsedList - sizeof(CList)), e);
 }
 #endif

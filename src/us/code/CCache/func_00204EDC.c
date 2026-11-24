@@ -5,9 +5,7 @@
 #include "globals/cache.h"
 #include "protos/ultra.h"
 
-u32 __osDisableInt(void);
-void __osRestoreInt(u32 mask);
-B12Node *CCache__AllocateInternal(s32 a, s32 b, u32 c, s32 d);
+#include "protos/cache.h"
 B12Node *CCache__Allocate(s32 unused, s32 a1, u32 a2, sptr a3) {
     u32 mask;
     u32 m2;
@@ -15,15 +13,15 @@ B12Node *CCache__Allocate(s32 unused, s32 a1, u32 a2, sptr a3) {
     mask = __osDisableInt();
     if (++gCache_mutex_count != 1) {
         __osRestoreInt(mask);
-        osRecvMesg(&gCache_mutex, 0, 1);
+        osRecvMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(mask);
     }
-    r = CCache__AllocateInternal(0, a1, a2, a3);
+    r = ((B12Node *(*)(s32, s32, u32, s32))CCache__AllocateInternal)(0, a1, a2, a3);   /* the ROM passes a fourth argument */
     m2 = __osDisableInt();
     if (--gCache_mutex_count != 0) {
         __osRestoreInt(m2);
-        osSendMesg(&gCache_mutex, 0, 1);
+        osSendMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(m2);
     }

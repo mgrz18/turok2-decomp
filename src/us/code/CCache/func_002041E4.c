@@ -8,12 +8,9 @@
 #include "protos/cache.h"
 #include "protos/ultra.h"
 
-u32 __osDisableInt(void);
-void __osRestoreInt(u32 mask);
-s32 CDecompressor__DecompressAsync(CDecompressor *port, B12Msg *n, void *q);
-void CHeap__Free(CHeap *heap, sptr key);
 #include "structs/cache.h"
 #include "globals/cache.h"
+#include "protos/heap.h"
 /* The port: typed on gCache (structs/cache.h) and CMemEntry/CCacheEntry. The ROM reaches the
  * cache through a B12Mgr view of gCache (Rage Wars offsets) and B12Node/B12Msg views at N64 offsets: on the host
  * they missed the cache's own fields (the display-list locks landed in CMemEntry.lockCount, so
@@ -46,7 +43,7 @@ void CCache__Main(void) {
             msg->flags &= ~2;
             if (msg->flags & 8) {
                 msg->flags &= ~8;
-                if (CDecompressor__DecompressAsync(&gDecompressor, (B12Msg *)msg, &gCache.queue) != 0) {
+                if (CDecompressor__DecompressAsync(&gDecompressor, msg, &gCache.queue) != 0) {
                     continue;
                 }
                 mask = __osDisableInt();
@@ -68,7 +65,7 @@ void CCache__Main(void) {
                 }
                 if (!(p->flags & 0x702)) {
                     CCache__DetachCacheEntry(0, p);
-                    CHeap__Free(&gHeap, (sptr)p->data);
+                    CHeap__Free(&gHeap, p->data);
                     CCache__FreeMemEntry(0, p);
                 }
                 CCache__FreeCacheEntry(0, msg);

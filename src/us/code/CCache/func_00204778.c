@@ -11,6 +11,7 @@
 #include "gbi_t2.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "globals/cache.h"
 
 /* A tracked allocation (list at gCache_memLockedList). */
 typedef struct HeapNode HeapNode;
@@ -33,13 +34,7 @@ struct HeapSpan {
     /* 0x14 */ u32 free;
 };
 
-extern char gCache_mutex[]; /* OSMesgQueue, the heap lock */ /* local: cache.h is not included here: the FAKEMATCH CCache__DrawDebug reads the gCache fields through its own views */
-extern s32 gCache_mutex_count;    /* heap lock depth */ /* local: cache.h is not included here: the FAKEMATCH CCache__DrawDebug reads the gCache fields through its own views */
-extern u32 gCache_ageCount[];  /* frame stamp */ /* local: cache.h is not included here: the FAKEMATCH CCache__DrawDebug reads the gCache fields through its own views */
 extern HeapSpan *gHeap_usedHead[];
-extern HeapNode *gCache_memLockedList[]; /* local: cache.h is not included here: the FAKEMATCH CCache__DrawDebug reads the gCache fields through its own views */
-extern u32 __osDisableInt(void);   /* __osDisableInt */
-extern void __osRestoreInt(u32);   /* __osRestoreInt */
 extern void Render_SetCombineMode(s32);
 extern void Render_SetRenderMode(s32);
 
@@ -88,7 +83,7 @@ void CCache__DrawDebug(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
     mask = __osDisableInt();
     if (++gCache_mutex_count != 1) {
         __osRestoreInt(mask);
-        osRecvMesg(gCache_mutex, 0, 1);
+        osRecvMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(mask);
     }
@@ -106,7 +101,7 @@ void CCache__DrawDebug(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
     RECTA(gDList++, left, upper, right, bottom + 1);
 
     for (pass = 0; pass < 2; pass++) {
-        for (node = gCache_memLockedList[0]; node != 0; node = node->next) {
+        for (node = (HeapNode *)gCache_memLockedList.m_pHead; node != 0; node = node->next) {
             if (pass != 0) {
                 select = (node->flags & 0x101) == 0x100;
             } else {
@@ -129,7 +124,7 @@ void CCache__DrawDebug(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
 
                 if (!(node->flags & 0x702)) {
                     b = 0xFF;
-                    if (gCache_ageCount[0] - node->stamp >= 5) {
+                    if (gCache_ageCount - node->stamp >= 5) {
                         gDPSetPrimColor(gDList++, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF);
                         if (upper < lower) {
                             gDPFillRectangle(gDList++, left + 8, upper, right, lower);
@@ -154,7 +149,7 @@ void CCache__DrawDebug(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
     mask2 = __osDisableInt();
     if (--gCache_mutex_count != 0) {
         __osRestoreInt(mask2);
-        osSendMesg(gCache_mutex, 0, 1);
+        osSendMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(mask2);
     }

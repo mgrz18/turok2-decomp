@@ -6,8 +6,6 @@
 #include "protos/cache.h"
 #include "protos/ultra.h"
 
-u32 __osDisableInt(void);
-void __osRestoreInt(u32 mask);
 #include "structs/cache.h"
 #include "globals/cache.h"
 /* The port: typed on gCache (structs/cache.h) and CMemEntry/CCacheEntry. The ROM reaches the

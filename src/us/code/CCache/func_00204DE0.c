@@ -3,8 +3,6 @@
 #include "protos/cache.h"
 #include "protos/ultra.h"
 
-u32 __osDisableInt(void);
-void __osRestoreInt(u32 mask);
 
 /* Turok 3's CCache__Advance, once a frame: counts the frame delay down,
  * ages the cache and compacts it 10 steps under the cache lock. */

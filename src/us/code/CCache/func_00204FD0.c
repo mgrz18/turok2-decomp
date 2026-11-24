@@ -12,8 +12,6 @@
 #include "protos/ultra.h"
 
 sptr CHeap__AllocAt(CHeap *, sptr, s32);
-s32 __osDisableInt(void);
-void __osRestoreInt(s32);
 struct B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2) {
     s32 mask;
     CMemEntry *entry;
@@ -21,7 +19,7 @@ struct B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2) {
     mask = __osDisableInt();
     if (++gCache_mutex_count != 1) {
         __osRestoreInt(mask);
-        osRecvMesg((OSMesgQueue *)&gCache_mutex, 0, 1);
+        osRecvMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(mask);
     }
@@ -40,7 +38,7 @@ struct B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2) {
     mask = __osDisableInt();
     if (--gCache_mutex_count != 0) {
         __osRestoreInt(mask);
-        osSendMesg((OSMesgQueue *)&gCache_mutex, 0, 1);
+        osSendMesg(&gCache_mutex.queue, 0, 1);
         return (struct B12Node *)entry;
     }
     __osRestoreInt(mask);
@@ -54,8 +52,6 @@ struct B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2) {
 #include "protos/ultra.h"
 
 sptr CHeap__AllocAt(CHeap *, sptr, s32);
-s32 __osDisableInt(void);
-void __osRestoreInt(s32);
 B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2)
 {
   s32 temp_a0;
@@ -70,7 +66,7 @@ B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2)
   if (temp_v1 != 1)
   {
     __osRestoreInt(temp_a0);
-    osRecvMesg((&gCache_mutex), 0, 1);
+    osRecvMesg((&gCache_mutex.queue), 0, 1);
   }
   else
   {
@@ -99,7 +95,7 @@ B12Node *CCache__AllocateAt(s32 arg0, sptr arg1, s32 arg2)
   if (temp_v1_2 != 0)
   {
     __osRestoreInt(temp_v0_2);
-    osSendMesg((&gCache_mutex), 0, 1);
+    osSendMesg((&gCache_mutex.queue), 0, 1);
   }
   else
   {

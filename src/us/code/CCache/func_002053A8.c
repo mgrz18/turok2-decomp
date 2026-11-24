@@ -2,11 +2,7 @@
 #include "globals/cache.h"
 #include "protos/ultra.h"
 
-s32 CCache__WaitForDisplayLists(s32);                     /* extern */
-s32 CCache__Compact(s32, s32);            /* extern */
-s32 CCache__FreeOldestMemEntryWithFlags(s32, s32, s32);       /* extern */
-s32 __osDisableInt();                                /* extern */
-s32 __osRestoreInt(s32);                         /* extern */
+#include "protos/cache.h"
 
 void CCache__Flush(void) {
     s32 temp_a0;
@@ -19,21 +15,21 @@ void CCache__Flush(void) {
     gCache_mutex_count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg(&gCache_mutex, 0, 1);
+        osRecvMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(temp_a0);
     }
-    CCache__WaitForDisplayLists(0);
+    ((void (*)(s32))CCache__WaitForDisplayLists)(0);   /* the ROM passes an argument */
     do {
 
-    } while (CCache__FreeOldestMemEntryWithFlags(0, 0, 0) != 0);
+    } while (((s32 (*)(s32, s32, s32))CCache__FreeOldestMemEntryWithFlags)(0, 0, 0) != 0);   /* reads the v0 it leaves */
     CCache__Compact(0, 1);
     temp_v0 = __osDisableInt();
     temp_v1_2 = gCache_mutex_count - 1;
     gCache_mutex_count = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0);
-        osSendMesg(&gCache_mutex, 0, 1);
+        osSendMesg(&gCache_mutex.queue, 0, 1);
         return;
     }
     __osRestoreInt(temp_v0);

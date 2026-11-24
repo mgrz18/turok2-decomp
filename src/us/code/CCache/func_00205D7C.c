@@ -4,8 +4,6 @@
 #include "protos/cache.h"
 #include "protos/ultra.h"
 
-s32 __osDisableInt(void);
-void __osRestoreInt(s32);
 #ifndef TARGET_PORT
 sptr CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
 {
@@ -23,7 +21,7 @@ sptr CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
   if (temp_v1 != 1)
   {
     __osRestoreInt(temp_a0);
-    osRecvMesg((&gCache_mutex), 0, 1);
+    osRecvMesg((&gCache_mutex.queue), 0, 1);
   }
   else
   {
@@ -61,7 +59,7 @@ sptr CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
   if (temp_v1_2 != 0)
   {
     __osRestoreInt(temp_v0_3);
-    osSendMesg((&gCache_mutex), 0, 1);
+    osSendMesg((&gCache_mutex.queue), 0, 1);
   }
   else
   {

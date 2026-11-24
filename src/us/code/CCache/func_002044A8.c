@@ -6,10 +6,9 @@
 #include "globals/cache.h"
 #include "protos/list.h"
 #include "protos/cache.h"
+#include "protos/heap.h"
+#include "protos/hash.h"
 
-void CHashTable__Remove(u32 key);
-void CHeap__Free(CHeap *heap, sptr data);
-void CHashTable__Insert(u32 key, CCacheEntry *value);
 
 static __inline__ void find(u32 key, CCacheEntry **out) {
     HashEntry *node = gHashTable + (((key << 5) ^ (key >> 1) ^ (key >> 9) ^ (key >> 17)) & gHashMask);

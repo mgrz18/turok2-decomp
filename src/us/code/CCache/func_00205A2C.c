@@ -5,6 +5,7 @@
 #include "globals/cache.h"
 #include "protos/list.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
 #ifdef TARGET_PORT /* the bucket stride is the host entry's size (pointer-wide value/next): with the
                     * N64 0x10 the lookup probed the wrong bucket, never found a resident entry and
@@ -14,12 +15,7 @@
 #define HASH_STRIDE 0x10
 #endif
 
-extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern u32 __osDisableInt(void);
-extern void __osRestoreInt(u32 arg0);
-extern void __osRestoreInt(u32);
 void CCache__Touch(s32 arg0, s32 arg1) {
-    extern s32 osSendMesg(OSMesgQueue *, sptr, s32);
     s32 temp_v1;
     s32 temp_v1_2;
     u32 temp_a0;
@@ -32,7 +28,7 @@ void CCache__Touch(s32 arg0, s32 arg1) {
     gCache_mutex_count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg(&gCache_mutex, 0, 1);
+        osRecvMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(temp_a0);
     }
@@ -72,7 +68,7 @@ found:
     gCache_mutex_count = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0);
-        osSendMesg(&gCache_mutex, 0, 1);
+        osSendMesg(&gCache_mutex.queue, 0, 1);
         return;
     }
     __osRestoreInt(temp_v0);

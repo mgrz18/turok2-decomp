@@ -4,12 +4,9 @@
 #include "rw/abu_types.h"
 #include "globals/cache.h"
 #include "protos/cache.h"
+#include "protos/ultra.h"
 
-extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern u32 __osDisableInt(void);
-extern void __osRestoreInt(u32);
 void CCache__WaitForDisplayLists(void) {
-    extern s32 osSendMesg(void *, sptr, s32);
     s32 temp_v1;
     s32 temp_v1_2;
     s32 var_s0;
@@ -40,7 +37,7 @@ block_7:
         gCache_mutex_count = temp_v1;
         if (temp_v1 != 0) {
             __osRestoreInt(temp_v0);
-            osSendMesg(&gCache_mutex, 0, 1);
+            osSendMesg(&gCache_mutex.queue, 0, 1);
             var_s0_2 = 0;
         } else {
             __osRestoreInt(temp_v0);
@@ -57,7 +54,7 @@ block_7:
         gCache_mutex_count = temp_v1_2;
         if (temp_v1_2 != 1) {
             __osRestoreInt(temp_a0);
-            osRecvMesg(&gCache_mutex, 0, 1);
+            osRecvMesg(&gCache_mutex.queue, 0, 1);
             return;
         }
         __osRestoreInt(temp_a0);

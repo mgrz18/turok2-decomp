@@ -10,6 +10,7 @@
 #include "protos/list.h"
 #include "protos/cache.h"
 #include "protos/ultra.h"
+#include "protos/heap.h"
 
 #ifdef TARGET_PORT /* the bucket stride is the host entry's size (pointer-wide value/next): with the
                     * N64 0x10 the lookup probed the wrong bucket, never found a resident entry and
@@ -19,8 +20,6 @@
 #define HASH_STRIDE 0x10
 #endif
 
-extern void __osRestoreInt(OSIntMask mask);
-extern OSIntMask __osDisableInt(void);
 extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
 static __inline__ void addref(CMemEntry *node) {
     node->lockCount += 1;
@@ -57,7 +56,6 @@ static __inline__ void release(void) {
         __osRestoreInt(token);
     }
 }
-extern s32 CDecompressor__DecompressAsync(CDecompressor *, CCacheEntry *, OSMesgQueue *);
 static __inline__ void lock(void) {
     u32 token = __osDisableInt();
     s32 counter = gCache_mutex_count + 1;

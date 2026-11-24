@@ -7,9 +7,8 @@
 #include "globals/sysrc.h"
 #include "protos/list.h"
 #include "protos/cache.h"
+#include "protos/heap.h"
 
-extern u8 *CHeap__Alloc(CHeap *heap, s32 size);
-extern void CHeap__Free(CHeap *heap, u8 *data);
 extern void memmove(void *dst, void *src, s32 size);
 
 /* Moves unlocked blocks down the heap (free, then allocate again lower) and
