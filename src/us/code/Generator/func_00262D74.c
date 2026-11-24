@@ -10,6 +10,7 @@
 #include "globals/ai.h"
 #include "protos/player.h"
 #include "protos/game.h"
+#include "protos/scene.h"
 
 #include "structs/game.h"
 #define GAME_SETTINGS_OFF T2_OFFSETOF(CGame, m_Settings)
@@ -20,15 +21,15 @@
  * random from the weapon/ammo/item tables the definition enables. */
 
 extern f32 CGameRegion__GetHeight(sptr region, f32 x, f32 z);
-extern s32 *CScene__GetIntelligence(void *level, s32 model);
 #ifdef TARGET_PORT
-extern u16 CScene__GetObjectTypeID(void *level, s32 id); /* ABI: returns u16 (the host leaves the upper bits of the return register undefined) */
+#define getObjectTypeID CScene__GetObjectTypeID /* ABI: returns u16 (the host leaves the upper bits of the return register undefined) */
 #else
-extern s32 CScene__GetObjectTypeID(void *level, s32 id);
+/* The ROM's caller takes the u16 result as an s32 (no andi): called through a type of its own. */
+#define getObjectTypeID ((s32 (*)(struct CScene *, s32))CScene__GetObjectTypeID)
 #endif
 extern s32 Generator_IsPickupUnlocked(s32 id);
-extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, sptr region, f32 lifetime);
-extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
+void *CLevelActorPool__Spawn(CLevelActorPool *pool, void *refCount, s32 id, CVector3 vel, CVector3 pos, sptr region, f32 lifetime);
+void Actor_SpawnParticle(void *actor, s32 event, CVector3 pos, s32 arg);
 extern s32 CPlayer__HasRoomForAmmo(void *player, s32 id);
 extern s32 CPlayer__IsBelowFullHealth(void *player, s32 id);
 extern s16 WeightedTable_PickStatic(Pick *table);
@@ -89,10 +90,10 @@ void Generator_SpawnEnter(CGameObjectInstance *actor, CAI *ai) {
     }
     switch (info->m_Type) {
     case 0:
-        model = CScene__GetIntelligence(&gScene, info->m_VariationIndex);
+        model = (s32 *)CScene__GetIntelligence(&gScene, info->m_VariationIndex);
         switch (*model) {
         case 8:
-            id = CScene__GetObjectTypeID(&gScene, info->m_ObjectIndex);
+            id = getObjectTypeID(&gScene, info->m_ObjectIndex);
             if (Generator_IsPickupUnlocked(id)) {
                 spawnPickup(actor, ai, pos, region, id);
             }

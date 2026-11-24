@@ -4,15 +4,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "protos/ai.h"
-typedef struct B01Info {
-    u32 flags;
-    s32 unk4;
-    s16 unk8;
-    s16 unkA;
-    u8 padC[0x8];
-    s16 unk14;
-    s16 unk16;
-} B01Info;
+#include "structs/generator.h"
 void Generator_WaitUpdate(CGameObjectInstance *actor, CAI *state) {
     B01Info *info = ((B01Info *)((u8 *)(actor->header.m_pIntelligence) + 0x14));
     if (info->unk4 == 0) {
