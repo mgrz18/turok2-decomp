@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/scene.h"
 
-s32 CDLightSet__Free(s32 *, sptr);              /* extern */
+void CDLightSet__Free(void *, void *);
 
 void Particle_FreeSlot(s32 arg0, s32 *arg1) {
     s32 temp_a1;

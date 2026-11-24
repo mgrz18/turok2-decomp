@@ -10,7 +10,7 @@
  * light are 0x18..0x22 on the host); the ROM light is a pointer. */
 #include "structs/particle.h"
 #include "globals/scene.h"
-void *CDLightSet__Alloc(void *tbl, void *light);
+void *CDLightSet__Alloc(void *, void *);
 CVector3 *CGameObjectInstance__LocalToWorld(CVector3 *, void *, CVector3);
 void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
 f32 GameObject_GetCollisionHeight(void *);

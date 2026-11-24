@@ -21,7 +21,7 @@ typedef struct SoundEvent {
     s32 value;                 /* 0x90 (Rage Wars 0x04) */
 } SoundEvent;
 
-extern void CMtxF__RotateX(void *arg0, f32 arg1);
+void CMtxF__RotateX(void *, f32);
 
 void Actor_PlayRangedSound(void *arg0, void *arg1) {
     SoundRange *range;

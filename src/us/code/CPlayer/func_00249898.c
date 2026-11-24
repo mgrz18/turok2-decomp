@@ -10,7 +10,7 @@
 void Render_InvalidateModeCache(void);
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
-void CGameObjectInstance__Draw(void *, CCamera *);
+void CGameObjectInstance__Draw(void *, void *);
 void CEngineApp__ClearDepthRect(void *, s32, s32, s32, s32);
 
 /* Draws the weapon's HUD overlay, scissored to its screen box. */

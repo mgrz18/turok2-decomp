@@ -18,7 +18,7 @@ typedef struct TravelTarget {
 } TravelTarget;
 
 extern void CPlayer__TurnAndLook(void *, void *, void *);
-extern void Angle_Wrap(f32 *value);
+void Angle_Wrap(f32 *);
 
 void PlayerJumpPad_Update(CPlayer *player, void *body) {
     f32 yaw, targetYaw, alternate, duration, t;

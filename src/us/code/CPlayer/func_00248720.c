@@ -9,7 +9,7 @@
 #include "protos/game.h"
 
 CQuaternion CGameObjectInstance__GetRotation(void *);
-AmmoInfo *CPlayer__GetFiringAmmo(CPlayer *p, s32 weapon);
+struct AmmoInfo *CPlayer__GetFiringAmmo(struct CPlayer *, s32);
 
 /* A debug print compiled out of the release build. Its empty loop notes stop
  * loop.c (find_and_verify_loops) from moving the found block out of the

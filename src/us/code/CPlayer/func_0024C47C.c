@@ -95,7 +95,7 @@ s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 s32 CPlayer__GetCurrentAmmoInfo(CPlayer *player);
 s32 Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
 void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32, s32 rightAlign, s32 minDigits);
-void CPlayer__DrawSightIcon(CPlayer *player, CCamera *view);
+void CPlayer__DrawSightIcon(void *, void *);
 
 /* The next display list command. Through this helper, as in the ROM, the
  * head is loaded and stored by symbol; a post-increment written in place
@@ -596,9 +596,9 @@ void AI_UpdateRegionFlags(Player *, u32 *ai);
 void CGameObjectInstance__UpdateAnimation(void *);
 void AI_RideMovingPlatform(Player *, u32 *ai);
 void *GameObject_GetRegionInfo(void *);
-void CPlayer__UpdateSpeedScale(Player *, Player *, Surface *);
-f32 CGameRegion__GetCeilingHeight(Model *, f32 x, f32 z);
-f32 CGameRegion__GetHeight(Model *, f32 x, f32 z);
+void CPlayer__UpdateSpeedScale(void *, void *, void *);
+f32 CGameRegion__GetCeilingHeight(void *, f32, f32);
+f32 CGameRegion__GetHeight(sptr, f32, f32);
 void Sound__SetReverb(f32);
 void CPlayer__EaseEyeOffset(Player *, Player *);
 f32 func_00298470(f32);
@@ -619,7 +619,7 @@ void CPlayer__Hurt(Player *, Player *, s32, s32, s32);
 void CPlayer__UpdateWaterRegion(Player *, Player *, Surface *);
 void CPlayer__UpdateFlashlight(Player *, Player *);
 s32 Collision_MoveInstance(void *, CVector3, void *);
-void CGameRegion__FireTriggers(Model *, s32, Player *);
+void CGameRegion__FireTriggers(void *, s32, void *);
 void CPlayer__RamWithMount(Player *, Player *, u32 *);
 s32 CPlayer__TryMount(Player *, Player *, u32 *);
 void CPlayer__TouchPickup(Player *, u8 *);
@@ -629,7 +629,7 @@ s32 CGameObjectInstance__SetAnimByAction(Player *, s32, s32);
 sptr CGameObjectInstance__PickRandomAnim(Player *, sptr, sptr);
 void CGameObjectInstance__SetAnim(Player *, sptr, s32);
 void CGameObjectInstance__AlignToGround(Player *);
-s16 *CPlayer__GetFiringAmmo(Player *, s32);
+struct AmmoInfo *CPlayer__GetFiringAmmo(struct CPlayer *, s32);
 void CBarrel__Update(s32 *, Player *, u8 *);
 void Player_UpdateAim(Player *);
 
@@ -1077,7 +1077,7 @@ void CPlayer__Update(Player *p) {
     }
     if (gEngineApp_m_Settings.cheatFlags & 4) {
         if (gEngineApp_m_Settings.multiplayer == 0 && p->owned[21] == 0) {
-            *(p->ammo + *CPlayer__GetFiringAmmo(p, 21)) = 1;
+            *(p->ammo + CPlayer__GetFiringAmmo((CPlayer *) p, 21)->type) = 1;
         }
         for (i = 0; i < 35; i++) {
             if ((i >= 24) ^ !gEngineApp_m_Settings.multiplayer) {

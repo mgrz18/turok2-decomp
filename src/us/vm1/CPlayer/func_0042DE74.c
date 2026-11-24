@@ -15,10 +15,10 @@ extern void COverlay__Construct(COverlay *item, s32 x, s32 y);
 extern void COverlay__StartScript(COverlay *item, s32 *script);
 extern void CPlayer__Reset(CPlayer *p);
 extern s32 Cinema_IsActive(void);
-extern s16 *CPlayer__GetFiringAmmo(CPlayer *p, s32);
+struct AmmoInfo *CPlayer__GetFiringAmmo(struct CPlayer *, s32);
 extern void Cinema_Disable(void);
 extern void Cinema_Enable(void);
-extern void CGameRegion__FireTriggers(sptr, s32, CPlayer *p);
+void CGameRegion__FireTriggers(void *, s32, void *);
 
 /* ABI (docs/port/ABI.md, abicheck missing_args): on MIPS CPlayer__PickSpawnPoint receives CPlayer__LevelStart's own argument
  * registers (pass-through); the host passes them. */
@@ -84,7 +84,7 @@ void CPlayer__LevelStart(CPlayer *p) {
     }
     if (!flags->multiplayer && p->m_Data.m_WeaponList[21]) {
         /* the ROM adds the scaled index first: written index + array */
-        *(*CPlayer__GetFiringAmmo(p, 21) + p->m_Data.m_AmmoList) = 1;
+        *(CPlayer__GetFiringAmmo(p, 21)->type + p->m_Data.m_AmmoList) = 1;
     }
     Cinema_Disable();
     if (p->m_CharacterActor.header.m_pCurrentRegion) {

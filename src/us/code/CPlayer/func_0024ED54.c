@@ -19,7 +19,7 @@ s32 Sound__Play(s16, CVector3, sptr, sptr);
  * The single `return 1` after the if/else (not one per branch) is what gives
  * the ROMs plain bne at the 0x2E test: with two returns, reorgs liveness at
  * the fall-through keeps $v0 and annuls the slot (bnel). */
-s32 CPlayer__RamWithMount(CPlayer *player, CGameObjectInstance *body) {
+s32 CPlayer__RamWithMount(CPlayer *player, CGameObjectInstance *body, u32 *stateFlags) {
     CGameObjectInstance *aim = gCollisionResults.m_pInstance;
     CGameObjectInstance *target;
     CGameObjectInstance *mount;

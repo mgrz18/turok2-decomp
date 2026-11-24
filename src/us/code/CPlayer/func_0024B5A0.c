@@ -10,12 +10,12 @@ s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 s32 CPlayer__IsInMatchEndState(CPlayer *player);
 s32 CBarrel__HasUnlistedWeapon(CBarrel *menu, CPlayer *player);
 void CBarrel__OpenWheel(CBarrel *menu, CPlayer *player);
-void Angle_Wrap(f32 *angle);
+void Angle_Wrap(f32 *);
 
 /* Runs the weapon menu: marks the weapons the player can use, steps the
  * cursor with the next/previous weapon buttons and turns the wheel towards
  * the selected slot. */
-void CBarrel__RunButtons(CBarrel *menu, CPlayer *player) {
+void CBarrel__RunButtons(CBarrel *menu, CPlayer *player, u32 *input) {
     s32 step;
     s32 i;
     s32 dir;

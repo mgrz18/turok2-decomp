@@ -28,7 +28,7 @@ static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
 /* Mounts the creature of type 0x136 in front, if within 45 degrees of the
  * heading and the player is not holding 0x8000: the player takes its seat
  * and heading, and the movement state is reset. */
-s32 CPlayer__TryMount(CPlayer *p, CGameObjectInstance *body) {
+s32 CPlayer__TryMount(CPlayer *p, CGameObjectInstance *body, u32 *stateFlags) {
     CGameObjectInstance *mount;
 
     if (p->m_pOnEnemy == NULL && !(p->m_ModeBeforeFlags & 0x8000)) {

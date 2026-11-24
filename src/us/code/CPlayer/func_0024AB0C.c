@@ -41,9 +41,9 @@ typedef struct B05P14 {
 typedef struct B05Fx { u8 pad0[8]; void *unk8; f32 unkC; s16 unk10; s16 unk12; s16 unk14; s16 unk16; } B05Fx;
 #endif
 #include "globals/scene.h"
-void CDLightSet__Free(u8 *, void *);
+void CDLightSet__Free(void *, void *);
 s32 Random_Next();
-B05Fx *CDLightSet__Alloc(u8 *, u8 *);
+void *CDLightSet__Alloc(void *, void *);
 CVector3 *CGameObjectInstance__LocalToWorld(CVector3 *, void *, CVector3);
 void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
 f32 GameObject_GetCollisionHeight(void *);
@@ -71,7 +71,7 @@ static inline void fxupd(B05P14 *p, void **slot, u8 *tab, f32 offz, f32 k1, f32 
     fx->unk14 = v.z;
     fx->unkC = k2;
 }
-void CPlayer__UpdateFlashlight(B05P14 *p) {
+void CPlayer__UpdateFlashlight(B05P14 *p, void *body) {
     s32 vis;
     if (gEngineApp_m_Settings.cheatFlags & 0x4000) {
         p->timer = 0.0f;

@@ -20,7 +20,7 @@ void Render_FlushBatches(void);
 void CEngineApp__ClearDepthRect(void *vp, s32 left, s32 right, s32 top, s32 bottom);
 void CMtxF__SetScale(f32 *mtx, f32 x, f32 y, f32 z);
 void CMtxF__RotateY(f32 *mtx, f32 angle);
-void CMtxF__RotateX(f32 *mtx, f32 angle);
+void CMtxF__RotateX(void *, f32);
 void CMtxF__Translate(f32 *mtx, f32 x, f32 y, f32 z);
 void CMtxF__SwapYZRows(f32 *mtx);
 void CMtxF__Copy(f32 *dst, f32 *src);

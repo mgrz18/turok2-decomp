@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 #include "globals/engine.h"
 
-f32 Angle_Wrap(sptr);
+void Angle_Wrap(f32 *);
 
 
 f32 Angle_StepToward(f32 arg0, f32 arg1, s32 arg2, f32 arg3) {

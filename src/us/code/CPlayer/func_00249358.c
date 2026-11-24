@@ -20,7 +20,7 @@ extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: global
 s32 Cinema_IsActive(void);
 s32 CPlayer__IsInMatchEndState(CPlayer *p);
 void CPlayer__Kill(CPlayer *p, HitSource *src, s32 arg3, s32 type);
-void CCameraPool__AddText(CGameFromCameraPool *game, void *camera, char *text);
+struct CCameraText *CCameraPool__AddText(void *, void *, u8 *);
 void Sound__PlaySpeech(s32);
 void CCamera__SetHitFlash(void *camera, s32 alpha, s32 time);
 s32 Sound__Play2D(s32);

@@ -8,7 +8,7 @@
 
 f32 Math_Approach(f32 value, f32 target, f32 rate);
 void CMtxF__Identity(f32 *m);
-void CMtxF__RotateX(f32 *m, f32 angle);
+void CMtxF__RotateX(void *, f32);
 void CMtxF__TransformPoint(CMtxF, CVector3 *, CVector3 *);
 void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, sptr arg3);
 
