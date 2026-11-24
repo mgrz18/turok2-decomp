@@ -1405,18 +1405,18 @@ extern void WeightedTable_Clear(WeightedTable *);
 extern void WeightedTable_Add(WeightedTable *, s32, s32);
 extern s16 WeightedTable_Pick(WeightedTable *);
 
-s32 AI_PickAnimFromTable(CGameObjectInstance *owner, sptr unused, struct IntPair *table, s32 flags) {
+s32 AI_PickAnimFromTable(CGameObjectInstance *owner, sptr unused, CEnemyAnimPick *table, s32 flags) {
     WeightedTable picker;
     s32 first;
     s16 pick;
     WeightedTable_Clear(&picker);
-    first = table->field_4;
-    while (table->field_0 != -1) {
-        if (table->field_0 == 0 && picker.count != 0) {
+    first = table->m_Anim;
+    while (table->m_Flags != -1) {
+        if (table->m_Flags == 0 && picker.count != 0) {
             goto choose;
         }
-        if ((flags & table->field_0) && CGameObjectInstance__PickRandomAnim(owner, table->field_4, -1) != -1) {
-            WeightedTable_Add(&picker, (s16) table->field_4, 10);
+        if ((flags & table->m_Flags) && CGameObjectInstance__PickRandomAnim(owner, table->m_Anim, -1) != -1) {
+            WeightedTable_Add(&picker, (s16) table->m_Anim, 10);
         }
         table++;
     }

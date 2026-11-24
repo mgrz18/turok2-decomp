@@ -7,44 +7,38 @@
  * location's primary flags and one from its secondary flags, each from the
  * table for the current mode; with both, a coin toss decides. */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x16];
-    /* 0x16 */ u16 flagsA;
-    /* 0x18 */ u16 flagsB;
-} Location;
-
 
 extern s32 Random_Next(void);
 
-s32 EnemyAnim_InteractiveIdle(void *actor, CAI *ai) {
-    Location *loc = CPathTrack__GetCurrentPoint(&ai->m_PathTrack.m_Mode);
+s32 EnemyAnim_InteractiveIdle(CGameObjectInstance *actor, CAI *ai) {
+    CPathPoint *loc = CPathTrack__GetCurrentPoint(&ai->m_PathTrack);
     s32 animA = -1;
     s32 mode = ai->m_Enemy.m_BehaviorIndex;
     s32 animB = -1;
 
-    if (loc->flagsA != 0) {
+    if (loc->m_AnimFlagsA != 0) {
         switch (mode) {
         case 0:
-            animA = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF6F0, loc->flagsA);
+            animA = AI_PickAnimFromTable(actor, (sptr) ai, sEnemyAnimIdle_AF6F0, loc->m_AnimFlagsA);
             break;
         case 1:
-            animA = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF720, loc->flagsA);
+            animA = AI_PickAnimFromTable(actor, (sptr) ai, sEnemyAnimIdle_AF720, loc->m_AnimFlagsA);
             break;
         case 2:
-            animA = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF750, loc->flagsA);
+            animA = AI_PickAnimFromTable(actor, (sptr) ai, sEnemyAnimIdle_AF750, loc->m_AnimFlagsA);
             break;
         }
     }
-    if (loc->flagsB != 0) {
+    if (loc->m_AnimFlagsB != 0) {
         switch (mode) {
         case 0:
-            animB = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF780, loc->flagsB);
+            animB = AI_PickAnimFromTable(actor, (sptr) ai, sEnemyAnimIdle_AF780, loc->m_AnimFlagsB);
             break;
         case 1:
-            animB = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF7B0, loc->flagsB);
+            animB = AI_PickAnimFromTable(actor, (sptr) ai, sEnemyAnimIdle_AF7B0, loc->m_AnimFlagsB);
             break;
         case 2:
-            animB = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF7E0, loc->flagsB);
+            animB = AI_PickAnimFromTable(actor, (sptr) ai, sEnemyAnimIdle_AF7E0, loc->m_AnimFlagsB);
             break;
         }
     }

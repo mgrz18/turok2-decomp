@@ -10,6 +10,7 @@
 #include "structs/intelligence.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
+#include "structs/enemy_anim.h"
 
 void AI_InitHealth(CAI *ai, CIntelligence *def, CVector3 pos, CGameObjectInstance *obj);
 void AI_RideMovingPlatform(CGameObjectInstance *actor, CAI *ai);
@@ -28,6 +29,7 @@ void Actor_TurnBy(CGameObjectInstance *actor, f32 angle);
 void AI_StopSound(CGameObjectInstance *obj, CAI *ai);
 f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 point);
 f32 AI_FlatDistSqToPoint(CGameObjectInstance *obj, CVector3 point);
+s32 AI_PickAnimFromTable(CGameObjectInstance *owner, sptr unused, CEnemyAnimPick *table, s32 flags);
 void AI_TurnTowardTarget(CGameObjectInstance *o, CAI *ai, CGameObjectInstance *t, f32 lim);
 void AI_DropPickupsOnce(CInstanceHeader *o, u32 *flags, u32 bit, u32 m1, u32 m2);
 struct CDropPickup;

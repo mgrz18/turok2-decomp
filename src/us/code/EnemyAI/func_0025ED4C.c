@@ -10,7 +10,7 @@ typedef struct {
 
 
 
-void EnemyAI_DrawWithBlend(CGameObjectInstance *obj, CAI *ai, s32 arg2) {
+void EnemyAI_DrawWithBlend(CGameObjectInstance *obj, CAI *ai, CDrawArgs *arg2) {
     f32 fade = 1.0f;
     CVector3 *color;
     FillAlpha *alpha;
