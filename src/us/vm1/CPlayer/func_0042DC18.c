@@ -1,4 +1,4 @@
-/* Player code: CPlayer__NewGame, 0x0042DC18-0x0042DE74 (splat had it inside the data D_0042D50C). */
+/* Player code: CPlayer__NewGame, 0x0042DC18-0x0042DE74 (splat had it inside the data at 0x0042D50C). */
 #include "common.h"
 #include "globals/menu_desc.h"
 #include "structs/player.h"
@@ -18,11 +18,8 @@ extern void CPlayer__ResetHealth(CPlayer *p);
 /* The port: the three window descs are data (MenuDesc), not functions: declared as such so
  * tools/port/gendata.py lays them out (as func_* they were zero .bss placeholders). */
 #include "structs/menu.h"
-extern MenuDesc D_004388E0;
-extern MenuDesc D_0043916C;
+#include "globals/menu_desc.h"
 #define func_00438808 (&gCharacterMenuDesc)
-#define func_004388E0 (&D_004388E0)
-#define func_0043916C (&D_0043916C)
 
 void CPlayer__NewGame(CPlayer *p, s32 character, s32 arg2) {
     GameSettings *flags;
@@ -98,12 +95,12 @@ void CPlayer__NewGame(CPlayer *p, s32 character, s32 arg2) {
             p->m_Data.m_nDeathmatchCharacter = 0;
             p->m_bEnteringDeathmatch = 1;
             if (flags->match.teams) {
-                MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, func_004388E0, p, (sptr) p->m_ContState.m_pContState, p->m_nController);
+                MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, &gTeamMenuDesc, p, (sptr) p->m_ContState.m_pContState, p->m_nController);
             } else {
                 MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, func_00438808, p, (sptr) p->m_ContState.m_pContState, p->m_nController);
             }
         } else {
-            MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, func_0043916C, p, (sptr) p->m_ContState.m_pContState, p->m_nController);
+            MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, &gSingleMenuDesc, p, (sptr) p->m_ContState.m_pContState, p->m_nController);
         }
     }
 }

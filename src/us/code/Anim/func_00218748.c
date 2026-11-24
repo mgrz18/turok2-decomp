@@ -6,7 +6,6 @@
 #include "protos/iset.h"
 
 s32 Anim_DecodeTracks(void *a, void *b, s32 c, s32 d, s32 e, s32 f);
-extern f32 D_800E6790;
 s32 Anim_DecodeAnimation(void *a, void *b) {
     s32 r;
     B14Hdr *h = CISet__GetBlock(a, 0);
@@ -18,13 +17,13 @@ s32 Anim_DecodeAnimation(void *a, void *b) {
     sAnimDecodeRotation = 0;
     sAnimRemapMin = -2.0e3f;
     sAnimRemapMax = 2.0e3f;
-    D_800E6790 = h->fC;
+    sAnimDecodeUnkC = h->fC;
     if (Anim_DecodeTracks(a1, b1, h->f14, 3, h->f0, h->f8) != 0) {
         sAnimRawRange = 0;
         sAnimDecodeRotation = 1;
         sAnimRemapMin = -1.0f;
         sAnimRemapMax = 1.0f;
-        D_800E6790 = h->fC;
+        sAnimDecodeUnkC = h->fC;
         r = Anim_DecodeTracks(a2, b2, h->f10, 4, h->f0, h->f8) != 0;
     } else {
         r = 0;

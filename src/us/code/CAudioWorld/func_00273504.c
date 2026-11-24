@@ -4,8 +4,7 @@
 #include "structs/sound.h"
 #include "rw/junk_types.h" /* M04Bank2 */
 
-extern s32 D_800B2A34[];
-extern s32 D_800B2A44[];
+#include "globals/audio.h"
 s16 alSndpAllocate(void *p, s32 a, void *owner);
 void alSndpSetPriority(void *p, s16 id, s32 pri);
 void CAudioWorld__Lock(CAudioWorld *m);
@@ -96,9 +95,9 @@ SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, int ta
       v->soundId = p->owner->cueId;
       v->reset = p->owner->unk2BAC;
       v->hasTrack = 0;
-      for (i = 0; i < 4; i++) { if (v->soundId == D_800B2A34[i]) { v->hasTrack = 1; break; } }
+      for (i = 0; i < 4; i++) { if (v->soundId == sVoiceTrackSounds[i]) { v->hasTrack = 1; break; } }
       v->unkC4 = 1;
-      for (i = 0; i < 6; i++) { if (v->soundId == D_800B2A44[i]) { v->unkC4 = 0; break; } }
+      for (i = 0; i < 6; i++) { if (v->soundId == sVoiceNoUnkC4Sounds[i]) { v->unkC4 = 0; break; } }
       v->unkB4 = p->owner->cueArg;
       v->stopping = 0;
       vp = &v->vp;

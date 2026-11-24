@@ -5,7 +5,6 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern char D_800C140C[];
 
 s32 PakMenu_UpdateSubtitle(MenuItem *item, s16 *id) {
     s32 n = *id;
@@ -23,7 +22,7 @@ s32 PakMenu_UpdateSubtitle(MenuItem *item, s16 *id) {
             return 0;
         }
         if (n == 21) {
-            item->text = D_800C140C;
+            item->text = sPakMenuText_Space;
         } else if (gPakMenuIsProfile != 0) {
             item->text = sPakMenuText_SaveNote_B487C;
         } else {

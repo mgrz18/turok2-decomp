@@ -26,11 +26,7 @@ SwooshInfo *CScene__GetSwoosh(void *tbl, s32 arg);
  * point records (Morph points: x, y, z and two more f32, 0x14 bytes each) are reached only
  * through sTrailTextures, so they came out as N64 bytes: every point read as a denormal, about 0,
  * and every textured trail was drawn with no width. This reference makes them host f32s. */
-extern f32 D_800ACE70[10];
-extern f32 D_800ACE98[10];
-extern f32 D_800ACEC0[30];
-extern f32 D_800ACF38[30];
-f32 *const gTrailPoints_port[4] = { D_800ACE70, D_800ACE98, D_800ACEC0, D_800ACF38 };
+f32 *const gTrailPoints_port[4] = { sTrailTexture0Points, sTrailTexture1Points, sTrailTexture2Points, sTrailTexture3Points };
 #endif
 void Material_GetTextureSet(s32 *p, s32 v);
 TrailNode *Swoosh_NewNode(void *o, Trail *s, void *m);

@@ -4,6 +4,7 @@
 /* The boss fights' states (structs/boss.h). */
 
 #include "structs/boss.h"
+#include "structs/pick.h"
 
 extern WaveBossState gMantidQueen;          /* the Mantid Queen */
 extern MotherBossState gMotherBoss;         /* the Mother */
@@ -56,6 +57,10 @@ extern BossStep3 sPrimagenSoundScript2[];        /* script C */
 extern BossStep3 sPrimagenSoundScript1[];
 extern BossStep3 sPrimagenSoundScript3[];
 extern BossStep3 sPrimagenSoundScript4[];
+extern struct Pick sPrimagenSoundScript1Picks[]; /* the type-2 steps' sound picks (structs/pick.h) */
+extern struct Pick sPrimagenSoundScript2Picks[];
+extern struct Pick sPrimagenSoundScript3Picks[];
+extern struct Pick sPrimagenSoundScript4Picks[];
 extern f32 sPrimagenPartHitScript[];             /* ScriptAnimator scripts */
 extern f32 sPrimagenPartDestroyScript[];
 extern f32 sPrimagenMode7PartScript[];

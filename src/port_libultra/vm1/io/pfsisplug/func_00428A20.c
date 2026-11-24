@@ -38,19 +38,19 @@ s32 osPfsIsPlug(void *queue, u8 *pattern)
 
         __osPfsGetInitData(&bitpattern, contData);
 
-        for (channel = 0; channel < __osContNumControllers; channel++) {
+        for (channel = 0; channel < __osContNumControllers[0]; channel++) {
             if ((contData[channel].team & 4) == 0) {
                 crcErrorCount--;
                 break;
             }
         }
 
-        if (channel == __osContNumControllers) {
+        if (channel == __osContNumControllers[0]) {
             crcErrorCount = 0;
         }
     } while (crcErrorCount > 0);
 
-    for (channel = 0; channel < __osContNumControllers; channel++) {
+    for (channel = 0; channel < __osContNumControllers[0]; channel++) {
         if ((contData[channel].slot == 0) && ((contData[channel].team & 1) != 0)) {
             bits |= (1 << channel);
         }

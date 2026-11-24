@@ -34,7 +34,7 @@ set(T2_LINK_REPLACED
     func_0029B410.c   # osPiRawReadIo
     func_002A2FB0.c   # osPiStartDma
     # SI: controllers, rumble
-    func_00298A40.c   # osContInit
+    # (osContInit: under #ifndef TARGET_PORT in the merged controller.c)
     func_0029A080.c   # __osSiRawStartDma
     # system, TLB, 64DD
     func_0029B1F0.c   # osInitialize
@@ -48,7 +48,7 @@ set(T2_LINK_REPLACED
     # audio (docs/port/AUDIO.md): Sound__Initialize in t2boot.c (only with --audio); the SDK
     # audio manager in port/audio/t2audio_mgr.c (frames through the ABI1 interpreter, resident
     # wave data instead of the loader's DMA windows)
-    func_00275520.c   # Sound__Initialize
+    # (Sound__Initialize: under #ifndef TARGET_PORT in the merged Sound.c)
     func_0026F760.c   # amCreateAudioMgr
     func_0026FB70.c   # __amMain
     func_0026FD4C.c   # __amDmaNew
@@ -120,27 +120,19 @@ set(T2_LINK_REPLACED
     func_00275324.c   # SndSeq_SetVolume
     func_00275378.c   # SndSeq_UpdateVolume
     func_00275450.c   # SndSeq_Load
-    func_002757E4.c   # Sound__IsPlaying
+    # (Sound__IsPlaying: under #ifndef TARGET_PORT in the merged Sound.c)
     # (LoopSounds_Construct .. LoopSounds_StopAll: under #ifndef TARGET_PORT in the merged LoopSounds.c)
     func_00275FA0.c   # SndQueue_Add
     func_00276180.c   # SndQueue_Update
     func_002763AC.c   # SndQueue_InitNode
     func_002764C4.c   # SndQueue_RequeueVoice
-    func_002768D0.c   # SpeechPlayer_Update
-    func_00276B10.c   # SpeechPlayer_Play
-    func_00276D98.c   # SpeechPlayer_Construct
-    func_00276DFC.c   # SpeechPlayer_Stop
-    func_00276E78.c   # SpeechPlayer_PickEntry
-    func_00277024.c   # SpeechPlayer_StopUnlocked
+    # (SpeechPlayer_Update .. SpeechPlayer_StopUnlocked, all but SpeechPlayer_ReadHeader: under #ifndef TARGET_PORT in the merged SpeechPlayer.c)
     # libaudio's synthesizer driver, voice calls and event helpers (views at N64 offsets):
     # port/audio/t2audio_lib.c
-    func_00294C70.c   # __nextSampleTime
-    func_00294D18.c   # _timeToSamples
-    func_00294C30.c   # _timeToSamplesNoRound
-    func_00294BDC.c   # _collectPVoices
-    func_00294B9C.c   # _freePVoice
+    # (_freePVoice, _collectPVoices, _timeToSamples, __nextSampleTime, _timeToSamplesNoRound: under
+    # #ifndef TARGET_PORT in the merged synthesizer.c)
     func_00294200.c   # alSynSetFXMix
-    func_002954F8.c   # alSaveNew
+    # (alSaveNew: under #ifndef TARGET_PORT in the merged drvrnew.c)
     func_0026FFA0.c   # AudioDMA_CacheBlock
     # libultra's compressed sequence player, cseq.c and the shared seqplayer.c helpers (Rage Wars
     # views at N64 offsets, s32 pointers): port/audio/t2audio_csp.c (docs/port/AUDIO.md §9)

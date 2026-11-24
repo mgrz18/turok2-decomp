@@ -6,13 +6,12 @@
 s32 MenuItem_TextLength(void *item);
 s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 
-extern char D_800C140C[];
 
 s32 PakMenu_UpdateTitle(MenuItem *item, Menu *event) {
     s32 port;
 
     if (gPakMenuAnyPak != 0) {
-        item->text = D_800C140C;
+        item->text = sPakMenuText_Space;
     } else {
         port = event->controller->port;
         item->text = sPakMenuText_ControllerPakX_B45E0;

@@ -1,0 +1,80 @@
+/* The second VM module's copy of src/us/vm1/Primagen/func_0040688C.c (byte for byte, at the same link address or 0xE0 below
+ * it, docs/VMASM.md), with the second module's names. */
+#include "common.h"
+#include "structs/boss.h"
+#include "structs/game_object.h"
+#include "globals/engine.h"
+#include "protos/ai.h"
+#include "globals/collision.h"
+
+/* Boss module state from 0x8012F9E4. */
+#ifdef TARGET_PORT
+typedef struct BossTimers {
+/* the view at the host offsets of LevelScriptState (tools/port/hostview.py): each field in its own
+ * member of one union, placed by __builtin_offsetof of the member it reads */
+#define T2_HOFF_BossTimers(m) __builtin_offsetof(LevelScriptState, m)
+    union {
+        struct { u8 _hp_timer[T2_HOFF_BossTimers(timer) - T2_HOFF_BossTimers(timer)]; f32 timer; }; /* N64 0x0 */
+        struct { u8 _hp_pushTimer[T2_HOFF_BossTimers(swayTimer) - T2_HOFF_BossTimers(timer)]; f32 pushTimer; }; /* N64 0x4 */
+        struct { u8 _hp_index[T2_HOFF_BossTimers(script.current) - T2_HOFF_BossTimers(timer)]; s32 index; }; /* N64 0x20 */
+    };
+} BossTimers;
+#else
+typedef struct {
+    /* 0x00 */ f32 timer;           /* 0x8012F9E4 */
+    /* 0x04 */ f32 pushTimer;       /* 0x8012F9E8 */
+    /* 0x08 */ u8 pad08[0x18];
+    /* 0x20 */ s32 index;           /* 0x8012FA04 */
+} BossTimers;
+#endif
+
+extern LevelScriptState gLevelScript; /* local: globals/boss.h is not included here (its gLevelScript_timer clashes with this file's view) */
+extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a - b */
+extern f32 CVector3__GetYaw(CVector3 *v);                                    /* heading */
+extern s32 GameObject_IsOnGround(CGameObjectInstance *obj);
+extern f32 func_002982F0(f32 angle);                                      /* sin */
+extern f32 func_002974C0(f32 angle);                                      /* cos */
+
+extern BossTimers gLevelScript_timer; /* local type: the field's real type (or the member path) changes the ROM's code here */
+
+/* Pushes the target away from the boss while the push timer has run out. */
+void Primagen_UpdateMode20_2(CGameObjectInstance *obj, CAI *ai) {
+    CAITargets t;
+    CVector3 pos;
+    CVector3 d;
+    CGameObjectInstance *target;
+    f32 heading;
+    f32 push;
+
+    gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
+    AI_UpdateTargets(obj, ai, &t, 0, 1);
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
+    if (t.m_Sight.m_pTarget != NULL) {
+        AI_TurnClamped(obj, ai, 0.261799425f, t.m_Sight.m_Angle);
+        gLevelScript.targetAngle = t.m_Sight.m_Angle;
+    } else {
+        AI_TurnClamped(obj, ai, 0.261799425f, gLevelScript.targetAngle);
+    }
+    target = t.m_Sight.m_pTarget;
+    if (target != NULL && gLevelScript_timer.pushTimer <= 0.0f) {
+        pos = target->header.m_vPos;
+        CVector3__Subtract(&d, &obj->header.m_vPos, &pos);
+        heading = CVector3__GetYaw(&d);
+        if (GameObject_IsOnGround(target)) {
+            push = 716.8f;
+        } else {
+            push = 179.2f;
+        }
+        target->m_vVelocity.x += push * func_002982F0(heading);
+        target->m_vVelocity.z += push * func_002974C0(heading);
+        if (gLevelScript_timer.timer > 0.0f) {
+            gLevelScript_timer.timer -= gFrameIncrement;
+        }
+    }
+    if (ai->m_AnimRepeatedCount != 0 && gLevelScript_timer.timer <= 0.0f && gLevelScript_timer.pushTimer <= 0.0f) {
+        gLevelScript_timer.index = -1;
+        obj->m_AI.m_AnimSpeed = 1.0f;
+        CAI__SetMode(obj, ai, 7);
+    }
+}

@@ -98,7 +98,7 @@ def signature(item):
     """`T name(params);` from a definition (its text up to the body's brace), comments dropped."""
     c = strip_comments(item)
     head = c[:c.index("{")].strip()
-    head = re.sub(r"^\s*(INLINE\s+)?", "", head)
+    head = re.sub(r"^\s*(INLINE\s+|inline\s+|DEFERRED\s+)?", "", head)
     return re.sub(r"\s+", " ", head) + ";\n"
 
 
@@ -160,6 +160,22 @@ def static_name(code, kind, name):
     return None
 
 
+def first_function(path, rel_dir, stem):
+    """The first function a file's object holds: cc1's own output in the build tree when there is one
+    (a static inline helper is written where it is first needed, or not at all), else the first
+    definition in the C that is not inline."""
+    s_c = ROOT / "build" / "src" / "us" / rel_dir / f"{stem}.s_c"
+    if s_c.exists():
+        m = re.search(r"^\s*\.ent\s+(\S+)", s_c.read_text(errors="replace"), re.M)
+        if m:
+            return m.group(1)
+    body = strip_comments(path.read_text())
+    for m in re.finditer(r"^([A-Za-z_][^;{}()]*?)\b([A-Za-z_]\w*)\s*\([^;{}]*\)\s*\{", body, re.M):
+        if not re.search(r"\b(__inline__|inline|INLINE|DEFERRED)\b", m.group(1)):
+            return m.group(2)
+    sys.exit(f"{path}: no function found for its .rodata part")
+
+
 def rename_statics(parsed, stems):
     """A static defined by more than one file is a separate object in each original object file: keep
     them all, under the first file's name and `<name>_<vram>` in the others (the name the readable files
@@ -217,6 +233,36 @@ def type_names(code):
     return names
 
 
+GAME_CC1 = "-quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64"
+
+
+def proven_flags(paths, src_dir, want=None):
+    """The `/* cc1-flags: */` line (or "" for the Makefile's own flags) under which every file compiles to the
+    assembly its own flags give: `want`, else the first of the files' own flag sets that does. None if none."""
+    tmp = tempfile.mkdtemp()
+    own, cands = [], []
+    for k, p in enumerate(paths):
+        m = FLAGS.search(p.read_text())
+        fl = m.group(0).split("cc1-flags:")[1].rsplit("*/", 1)[0].strip() if m else GAME_CC1
+        i = os.path.join(tmp, f"{k}.i")
+        subprocess.run(CPP + ["-Wall", f"-I{src_dir}", "-o", i, str(p)], cwd=ROOT, check=True, capture_output=True)
+        own.append((i, fl))
+        if fl not in cands:
+            cands.append(fl)
+
+    def asm(i, fl):
+        o = i + ".s"
+        if os.path.exists(o):
+            os.unlink(o)
+        subprocess.run([str(ROOT / "tools/sn64/cc1")] + fl.split() + ["-o", o, i], cwd=ROOT, capture_output=True)
+        return re.sub(r"^\s*\.(file|ident).*\n", "", Path(o).read_text(), flags=re.M) if os.path.exists(o) else None
+    ref = [asm(i, fl) for i, fl in own]
+    for c in ([want] if want else cands):
+        if all(asm(i, c) == r for (i, _), r in zip(own, ref)):
+            return "" if c == GAME_CC1 else f"/* cc1-flags: {c} */\n"
+    return None
+
+
 def yaml_entries(stems):
     """(line index, kind, path) of the yaml subsegments that name these files."""
     lines = YAML.read_text().splitlines(keepends=True)
@@ -232,6 +278,12 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("dir")
     ap.add_argument("--name")
+    ap.add_argument("--cc1-flags", help="`auto` or a flag set: the merged file's flags when the files' differ, "
+                    "if every file compiles the same under them")
+    ap.add_argument("--inline", help="stems (comma-separated) or `all`: their functions are written DEFERRED "
+                    "(`inline`: output after the others, string literals at the definition)")
+    ap.add_argument("--rodata-free", action="store_true", help="no .rodata order check: the slices and the unnamed "
+                    "data between them become the merged file's one .rodata (make verify decides)")
     ap.add_argument("--dry-run", action="store_true", help="print the merged file, change nothing")
     ap.add_argument("--no-fix", action="store_true", help="round 23's merge: no static renames, no include hoisting, "
                     "no typedef dedupe against the headers, no deferred prototypes")
@@ -277,21 +329,49 @@ def main():
     if not adjacent(cs):
         sys.exit(f"{a.dir}: its .text subsegments are not adjacent")
     ro_order = [e[2].rsplit("/", 1)[-1] for e in ro]
-    if not adjacent(ro, allow_pads=True) or ro_order != [s for s in text_order if s in ro_order]:
+    if a.rodata_free and ro:
+        # the merged object's .rodata is one block: whatever lies between its first and last slice must be data its
+        # files will now emit themselves (literals given back, DEFERRED order); another file's slice cannot be
+        idx = [pos[e[0]] for e in ro]
+        between = [k for k in range(idx[0], idx[-1] + 1) if k not in idx]
+        other = [lines[entry_lines[k]].strip() for k in between if ANY_ENTRY.match(lines[entry_lines[k]]).group(3)]
+        if other:
+            sys.exit(f"{a.dir}: another file's .rodata lies inside the module's: {other[0]}")
+        pads.update(entry_lines[k] for k in between)
+    elif not adjacent(ro, allow_pads=True) or ro_order != [s for s in text_order if s in ro_order]:
         sys.exit(f"{a.dir}: its .rodata is not one block in .text order ({ro_order})")
     # a second-VM-module file whose .rodata is placed over the first module's pool (tools/shared_rodata.py) owns
-    # that placement by its file name: one such file per module can hand it to the merged file, two cannot
-    # (one object has one .rodata section, placed at one address)
+    # that placement by its file name: one such file hands it to the merged file; two or more become parts of
+    # it, each named by the first function its file emitted (`<merged>:<function> <address>`), and the
+    # assembler input puts each part's .rodata in a section of its own (shared_rodata.py --split)
     shared = [l.split()[0] for l in SHARED.read_text().splitlines() if l.split("#")[0].strip()
               and l.split()[0] in files]
-    if len(shared) > 1 or (shared and ro):
-        sys.exit(f"{a.dir}: {len(shared)} files place their .rodata over the first VM module's pool one by one "
-                 f"(versions/shared_rodata.us.txt){' and the yaml places others' if ro else ''}")
+    if shared and ro:
+        sys.exit(f"{a.dir}: {len(shared)} files place their .rodata over the first VM module's pool "
+                 f"(versions/shared_rodata.us.txt) and the yaml places others")
     texts = [files[s].read_text() for s in text_order]
     flags = {tuple(FLAGS.findall(t)) for t in texts}
+    if len(flags) > 1 and a.cc1_flags:
+        # one translation unit has one set of flags: proven equal when every file compiles to the same assembly
+        # under it as under its own (docs/MODULES.md, "cc1 flags")
+        line = proven_flags([files[s] for s in text_order], d, None if a.cc1_flags == "auto" else a.cc1_flags)
+        if line is None:
+            sys.exit(f"{a.dir}: the files do not share their cc1 flags, and no one set compiles them all the same")
+        flags = {(line,) if line else ()}
     if len(flags) > 1:
         sys.exit(f"{a.dir}: the files do not share their cc1 flags")
     parsed = [items(FLAGS.sub("", t)) for t in texts]
+    if a.inline:
+        # deferred functions (docs/MODULES.md, ".rodata order"): GCC 2.8 outputs an `inline` function at the end of
+        # the file, after every other one, but its string literals at its definition. DEFERRED (common.h) is
+        # `inline` on the N64 build and nothing on the port's
+        want = set(text_order) if a.inline == "all" else set(a.inline.split(","))
+        lead = re.compile(r"((?:\s|/\*.*?\*/|//[^\n]*\n)*)", re.S)
+        for i, its in enumerate(parsed):
+            if text_order[i] in want:
+                parsed[i] = [(lead.sub(lambda m: m.group(1) + "DEFERRED ", c, count=1) if k == "func" and
+                              not re.search(r"\b(inline|__inline__|INLINE|DEFERRED|static)\b", strip_comments(c).split("(")[0]) else c, k, n)
+                             for c, k, n in its]
     renames, hdr, hoisted = {}, {}, []
     if not a.no_fix:
         parsed, renames = rename_statics(parsed, text_order)
@@ -314,6 +394,8 @@ def main():
         for it, kind, n in its:
             if kind == "func":
                 defined.setdefault(n, signature(it))
+    func_order = [n for its in parsed for it, kind, n in its if kind == "func"]
+    deferred = {n for its in parsed for it, kind, n in its if kind == "func" and re.match(r"\s*DEFERRED\b", strip_comments(it))}
     local_types, type_item = set(), {}
     is_inc = lambda it: re.match(r"#\s*include\b", strip_comments(it).strip())
     for i, its in enumerate(parsed):
@@ -339,6 +421,16 @@ def main():
                 have |= include_types(it, d)
     dropped = []
 
+    def earlier_first(n):
+        """Deferred functions are output in the order of their first declaration: before an early prototype
+        of one, the deferred functions before it in .text are declared."""
+        if not a.inline or n not in deferred:
+            return
+        for f in func_order[:func_order.index(n)]:
+            if f not in seen and f not in done and f in deferred:
+                seen.add(f)
+                out.append(defined[f])
+
     def needs(sig):
         return {w for w in re.findall(r"\b\w+\b", sig) if w in local_types and w not in have}
 
@@ -357,6 +449,7 @@ def main():
             if force or not needs(defined[p]):
                 pending.remove(p)
                 if p not in done:
+                    earlier_first(p)
                     out.append(defined[p])
                     last = "proto"
     for its in parsed:
@@ -370,6 +463,7 @@ def main():
                 if not a.no_fix and needs(defined[n]):
                     pending.append(n)   # its signature names a type a later file declares: wait for it
                     continue
+                earlier_first(n)
                 out.append(defined[n])
                 last = "proto"
                 continue
@@ -418,8 +512,15 @@ def main():
         if e:
             lines[e[0]] = lines[e[0]].replace(e[2], f"{rel_dir}/{name}")
     YAML.write_text("".join(l for n, l in enumerate(lines) if n not in drop))
-    if shared:
+    if len(shared) == 1:
         SHARED.write_text(re.sub(rf"^{shared[0]}\b", name, SHARED.read_text(), flags=re.M))
+    elif shared:
+        st = SHARED.read_text()
+        for s in shared:
+            head = first_function(files[s], rel_dir, s)
+            head = renames.get(text_order.index(s), {}).get(head, head)
+            st = re.sub(rf"^{s}\b", f"{name}:{head}", st, flags=re.M)
+        SHARED.write_text(st)
     subprocess.run(["git", "rm", "-q", *[str(files[s].relative_to(ROOT)) for s in text_order]], check=True, cwd=ROOT)
     subprocess.run(["git", "add", str(target.relative_to(ROOT))], check=True, cwd=ROOT)
     print(f"{target.relative_to(ROOT)}: {len(files)} files, {len(ro)} .rodata subsegments")

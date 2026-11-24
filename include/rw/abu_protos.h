@@ -273,11 +273,7 @@ s32 Controller_Lock(s32 arg0);
 void Controller_Unlock(void);
 s32 Controller_PakChanged(s32);
 int Controller_PakInserted(int arg0);
-#ifdef TARGET_PORT
-u8 Controller_IsPakWatched(int arg0); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
-#else
-int Controller_IsPakWatched(int arg0);
-#endif
+s32 Controller_IsPakWatched(s32 arg0);
 void Controller_WatchPak(s32 arg);
 void Controller_UnwatchPak(sptr arg);
 void CEngineApp__UpdateControllers(void *arg0);

@@ -74,7 +74,7 @@ typedef struct CLevelActor {
     /* 0x174 */ f32 m_AnimSpeed;            /* type 12 (morpher): the frame rate times its m_AnimSpeed (CLevelActor__UpdateAnimSpeed) */
     /* 0x178 */ CLights1 m_Lights;           /* the lighting at its position (CScene__GetLightsAt, CScene__ComputeLights; gSceneLights when placed) */
     /* 0x190 */ s32 m_ViewMask;             /* the views it shows in: the placement record's, then its region's m_VisBits (CLevelActor__Update) */
-    /* 0x194 */ u8 m_DrawnFrame;            /* the frame (D_800B6D1B) its matrix was last built for */
+    /* 0x194 */ u8 m_DrawnFrame;            /* the frame (the low byte of gFrameCount, 0x800B6D1B) its matrix was last built for */
     /* 0x195 */ u8 m_UpdatedFrame;          /* the frame its once-per-frame update (CLevelActor__Update) last ran */
     /* 0x196 */ u8 pad196[0x198 - 0x196];
 } CLevelActor; /* size 0x198 */

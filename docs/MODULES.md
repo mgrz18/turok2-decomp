@@ -174,7 +174,7 @@ its functions are replaced, they are under `#ifndef TARGET_PORT` in the merged f
 reports a missed one (a duplicate definition), because the merged object is pulled in for
 its other functions.
 
-**Left: 75 directories** (`python3 tools/merge_check.py`, `COMPILE 30 REFUSED 45`):
+**Left: 75 directories** (`python3 tools/merge_check.py`, `COMPILE 30 REFUSED 45`) (round 25: part n2 merged 5 of them and found the real cause of the `.rodata`, flags and name-clash rows: next section):
 
 | Blocker | Directories | What it takes |
 |---|---:|---|
@@ -185,129 +185,378 @@ its other functions.
 | the files' `cc1-flags` differ | 4 | two files per module, or the flags proven equal |
 | a merged file of the same name exists (`code/CEngineApp` / `vm1/CEngineApp`, `vm1/Demo` / `code/Demo`) | 2 | `--name`; both are refused for `.rodata` order anyway |
 
+## Round 25, part n3: the second VM module (vm2)
+
+The 14 vm2 directories the round-24 table stopped at asm or at the shared pool.
+
+**No vm2 function is asm any more.** The 57 asm subsegments between vm2's C files held
+100 functions (`TotemDefense_DrawTotem_2`, `CScene__DecompressCollision_2`, `Primagen_*_2`,
+`MotherBoss_*_2`, `BlindOne_*_2`, the `func_` copies in `Demo` and `PakMenu` ...). Every one is
+byte for byte its first-module twin (`progress.py` counts such copies once, which is why
+nobody wrote them): at the same link address, or 0xE0 below it in `Demo` and `PakMenu`, whose
+`j`-free bodies do not care. Each is now its twin's C file with the second module's names
+(functions by position in the module, data with a `_2` symbol such as `gMotherSpawnPoints_2`)
+and a header line saying whose copy it is; 44 read the first module's pool and have their
+twin's `.rodata` address in `versions/shared_rodata.us.txt`. `MotherBoss_AnimEvent_2` went into
+`func_00442A64.c` with `MotherBoss_TeleportTarget_2`, as vm1's `func_00409A64.c` holds both. The
+generator was a one-off (twin pairs from `versions/modules.us.txt`, `.rodata` addresses from the
+link map); `make verify` is what checked it.
+
+**A merged vm2 file places its `.rodata` per original file.** A vm2 module's files read the
+first module's pool at different, not adjacent addresses (`CPlayer`: 0x800A6A98, 0x800A6AC4,
+0x800A6AC8, 0x800A70D8 ...), so one placement per merged object cannot work. The merged file
+keeps one placement per part instead: `versions/shared_rodata.us.txt` names a part by the
+merged file and the first function its original file emitted,
+
+    CPlayer_2:CPlayer__LoseLife_2 0x800A6AC8
+
+and the assembler input does the rest (`tools/sn_as.sh`, only for a file with such lines):
+`tools/sn_li.py` writes its `li.s` literal pool out before each part's first function (as it did
+at the end of each file: without it the pools of all parts landed in the last one), and
+`tools/shared_rodata.py --split` moves each `.rodata` chunk into `.rodata.<function>` of its
+part: a string written before a function goes with that function, a jump table with the
+function it is in, an `sn_li` pool with the function it was flushed after. `make setup` gives
+each part its output section (NOLOAD) and `make verify` checks each part against the ROM as it
+did each file. `tools/merge_module.py` writes the part lines itself (one file still hands its
+line over whole). Strings a TU shares between parts are emitted once, in the first part that
+uses them; that holds wherever the parts read the same pool address (the menus' "  %02d",
+"none" at 0x800C1318 for three OptionsMenu parts), and `make verify` would catch any other case.
+`ASSEMBLER=asn64` does not split (it has no such filter): parts need the default gas route.
+
+**Merged (8 directories, 221 files -> 8):** `vm2/CPlayer`, `vm2/NameEntryMenu`, `vm2/TotemDefense`,
+`vm2/OptionsMenu`, `vm2/MissionMenu`, `vm2/CheatMenu`, `vm2/MotherBoss`, `vm2/Pak`. The last six first got one
+declaration per name, without touching shared headers: a field symbol the ROM's code reads as
+an array is reached through a pointer (`s32 *kills = &gTotemDefense.kills; *kills += 1;`,
+`u8 *value = &gEngineApp_m_Settings_unk17;` keep the address-building code that `x[0]` gave,
+where the plain member does not), a local struct of a name another file or `rw/abu_types.h` also
+defines is that header's or renamed, the CheatMenu files take vm1 `CheatMenu.c`'s declarations,
+MotherBoss's local prototypes take `void *` arguments, and the two callers whose arguments
+disagree with the module's prototype (`CAI__CallHurt` with three, `ImpactEvent_Send` with
+another 8-byte params type) call through a function type of their own (still a direct `jal`;
+`asm_diff` 0); in Pak, `Pak_RefreshNotes_2` returns its last `osPfsFreeBlocks_2` as vm1's
+`Pak_RefreshNotes` does (its caller tests it) and `rw/abu_protos.h` left the two files that needed
+nothing from it.
+
+**Left (6 directories), all header work now, no asm and no pool question:**
+
+| Directory | Files | First conflicts (`tools/merge_check.py`) |
+|---|---:|---|
+| `vm2/BlindOne` | 70 | `rw/abu_protos.h` against `protos/*.h` (`CCache__*`, `CList__*`), `AI_UpdateTargets`, local struct names |
+| `vm2/Demo` | 28 | `CList__AddHead` .. (`rw/abu_protos.h` vs `protos/list.h`), `CEngineApp__SetupFadeTo`, `Triple` vs a local `Triple`, `CCache__Allocate` |
+| `vm2/MpMenu` | 109 | field symbols read as arrays (`gEngineApp_m_Settings_match[]`, `_unk16[]`, `_unk18[]`, `_match_teamScore`), `Controller_ConfirmPressed` in five forms, `MenuPool_OpenChildMenu_2`, `Menu_StepValue_2`, `sprintf`, local struct names |
+| `vm2/PakMenu` | 139 | `osCreateMesgQueue` and the libultra prototypes, `CCache__*`, local struct names (87 messages on the first pass) |
+| `vm2/Primagen` | 53 | the `gLevelScript` field-symbol views (`ModeState0040457C`, `LevelScriptF950` against `LevelScriptState`), a local type used before a file defines it |
+| `vm2/SceneLoad` | 23 | the `CList`/`CCache`/`CScene` prototype families (`rw/abu_protos.h` vs `protos/*.h`), `ProPackDecompress` in four forms, local struct names (72 messages) |
+
+These are the families part n1 works on in vm1 (`CList`/`CISet`/`CCache`, the field-symbol views,
+`gLevelScript`); the vm2 copies can follow once vm1's declarations are one. None needs a ROM change.
+
+## Round 25, part n1: the header-work directories
+
+Of the 30 directories `merge_check.py` stopped at the compiler ("declarations differ, local types
+differ"), 17 are merged (one C file each; `make verify` OK, `asm_diff` 0): `code/{CEmitter,
+CISet,Cinema,Controller,Destructible,EnemyHover,EnemySwim,Render,Rumble,Sound,SpeechPlayer,
+Texture,Throwable}`, `code/libultra/{io/controller,audio/drvrnew}`, `vm1/StatsMenu`,
+`vm2/StatsMenu`. **75 modules are one C file; 58 directories left.** What it took, by kind:
+
+- *Field symbols read as arrays.* Where every user's code is the same with the array view, the
+  header now declares the array and the scalar users read `[0]`: `__osContNumControllers[]`
+  (globals/libultra.h), `gEngineApp_m_Settings_match_tag[]` / `_unk1C8[]` (globals/game.h),
+  `gThrowableCollisionInfo_m_InstanceBehavior[]` (globals/collision.h). Where it is not (the
+  array view changes `SavedPlayers_Arm`: GCC 2 then keeps the address in a register for two
+  reads), the header keeps both views behind a switch: `gScene_m_LevelID` / `gScene_m_nLevel`
+  are arrays under `SCENE_LEVEL_ARRAYS` (globals/scene.h), which the Cinema module's own header
+  `cinema_scene.h` defines. A struct member read (`gScene.m_LevelID`) or `(&x)[0]` does not give
+  Cinema_Start's code (tried: GCC bases the loads on gScene, or reloads after the stores).
+- *Host-dependent return types.* `Controller_IsPakWatched` now returns s32 (the u8 flag,
+  zero-extended by its `lbu`): one prototype for both targets, N64 code unchanged (a u8
+  prototype adds an `andi` at each N64 caller; before this, the merged Controller.c had it
+  implicitly declared). `EnemyAI_GetBehaviorIndex` cannot: its definition's s8 makes GCC
+  sign-extend at the callers, so `include/protos/enemy.h` keeps `#ifdef TARGET_PORT` s8 / s32
+  in the one header.
+- *Triple vs CVector3 by value*: the callers pass the CVector3 member of their unions
+  (`pos.v`), the same 12 bytes (Destructible).
+- *Prototype families.* New headers: `protos/enemy.h` (AI_UpdateTargets,
+  AI_ComputeFrameMotion, AI_LerpByAggression, AI_IsAimedAt, EnemyAI_GetBehaviorIndex: void *
+  for the actor/AI/output so every caller's view fits), `protos/mtxf.h` (CMtxF__SetRotateY,
+  CMtxF__TransformPoint); fixed: `protos/ai.h` CAI__CallHurt takes its three arguments,
+  `protos/iset.h` CUSet__GetTotalSize / CUSet__Transpose on struct tags, `rw/abu_protos.h`
+  Controller_IsPakWatched. Pointer-only differences are free on the N64; an s16 parameter, a
+  narrower return or a float argument are not, and were kept as the definition has them.
+- *An extra argument*: `Model_BlendMorphFrames` takes the third argument its one caller passes
+  (unused).
+- *The port*: a merged file goes through clang too, which rejects what GCC 2.8 lets pass
+  (a later declaration that disagrees with the definition in pointer types: Throwable.c,
+  Rumble's block-scope externs); `merge_check.py` does not see those. The functions the port
+  replaces are under `#ifndef TARGET_PORT` (osContInit, Sound__Initialize, Sound__IsPlaying,
+  six SpeechPlayer functions, alSaveNew) and left `port/cmake/link.cmake`.
+
+Left of the 30: 13, each in the table with what stops it. The pattern is the same everywhere
+(one prototype per function, in a header where the family is shared), but the remaining ones
+are the big imported Rage Wars files with their own basic typedefs and struct views
+(`code/{EnemyAI,GameObject,SndQueue,libultra/audio/cseq}`), the CCache / CScene prototype
+families (`code/{CCache,CGameRegion}`, `vm1/BlindOne`), and two that need a structural change
+first (`Generator`'s host rename macro, `__scHandleRSP`'s sched.h views). None needs a ROM
+change; they need more time.
+
 ### The dry-run table (round 24; merged rows updated after the merges)
 
 | Directory | Files | Result of the dry run (round 24), or merged |
 |---|---|---|
-| `code/libultra/audio/cseq` | 12 | declarations differ (1: `__readVarLen`); local types differ (4: `DecodeResult`, `RuntimeState`, `sptr`, `uptr`) |
-| `code/libultra/audio/drvrnew` | 8 | declarations differ (3: `FuncPtr`, `alFilterNew`, `alHeapDBAlloc`) |
+| `code/libultra/audio/cseq` | 12 | declarations differ (1: `__readVarLen`); local types differ (4: `DecodeResult`, `RuntimeState`, `sptr`, `uptr`). Round 25 n1: 6 conflicts: the Rage Wars files spell out their own s32/sptr typedefs and RuntimeState/DecodeResult views of structs/libaudio.h's ALCSeq/ALEvent; one rewrite onto ALCSeq |
+| `code/libultra/audio/drvrnew` | 8 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `FuncPtr`, `alFilterNew`, `alHeapDBAlloc`)) |
 | `code/libultra/audio/env` | 7 | **merged** (round 24, first batch) |
 | `code/libultra/audio/resample` | 2 | **merged** (round 24, first batch) |
 | `code/libultra/audio/reverb` | 8 | **merged** (round 24, first batch) |
 | `code/libultra/audio/save` | 2 | **merged** (round 24, first batch) |
 | `code/libultra/audio/seq` | 12 | **merged** (round 24, first batch) |
 | `code/libultra/audio/sndplayer` | 5 | **merged** (round 24, first batch) |
-| `code/libultra/audio/synthesizer` | 9 | .rodata not in .text order (1 inverted pairs of 3 subsegments) |
-| `code/libultra/gu/lookat` | 2 | the files do not share their cc1 flags |
-| `code/libultra/gu/perspective` | 2 | the files do not share their cc1 flags |
-| `code/libultra/io/controller` | 3 | declarations differ (2: `__osContBuffer`, `__osContNumControllers`) |
+| `code/libultra/audio/synthesizer` | 9 | **merged** (round 25, n2: flags proven, three functions `DEFERRED`; was: .rodata not in .text order) |
+| `code/libultra/gu/lookat` | 2 | **merged** (round 25, n2: `-fforce-addr` proven; was: cc1 flags differ) |
+| `code/libultra/gu/perspective` | 2 | **merged** (round 25, n2: `-fforce-addr` proven; was: cc1 flags differ) |
+| `code/libultra/io/controller` | 3 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (2: `__osContBuffer`, `__osContNumControllers`)) |
 | `code/libultra/io/piacs` | 3 | **merged** (round 24, first batch) |
 | `code/libultra/io/siacs` | 3 | **merged** (round 24, first batch) |
 | `code/libultra/io/sptask` | 3 | **merged** (round 24, after unifying its declarations; was: declarations differ (2: `__osSpSetStatus`, `osSpTaskStartGo`)) |
 | `code/libultra/io/vimgr` | 2 | **merged** (round 24, first batch) |
 | `code/libultra/libc/xprintf` | 2 | **merged** (round 24, first batch) |
 | `code/libultra/os/timerintr` | 4 | **merged** (round 24, first batch) |
-| `code/AI` | 48 | .rodata interrupted by data no C file owns (1: `unnamed@0xA7478`) |
+| `code/AI` | 48 | .rodata interrupted by data no C file owns (1: `unnamed@0xA7478`); round 25 (n2): linker padding before `func_00241E30` or `func_002427E0`: two objects; also declarations differ |
 | `code/Action` | 17 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `Action_Draw`)) |
-| `code/Anim` | 49 | .rodata interrupted by data no C file owns (1: `unnamed@0xA64F4`) |
+| `code/Anim` | 49 | .rodata interrupted by data no C file owns (1: `unnamed@0xA64F4`); round 25 (n2): `D_800A58F4` (a float the C reads as an extern); also declarations differ |
 | `code/BinaryRange` | 13 | **merged** (round 24, first batch) |
 | `code/Boot` | 4 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `gSavedPlayers`)) |
-| `code/CAudioWorld` | 101 | .rodata interrupted by data no C file owns (3: `unnamed@0xA8C94`) |
-| `code/CCache` | 56 | calls typed differently (2: `CCache__AllocateInternal`, `CCache__WaitForDisplayLists`); declarations differ (18: `CCache__DeallocateInternal`, `CCache__DetachCacheEntry`, `CCache__FreeCacheEntry`, `CCache__FreeMemEntry`, ...); local types differ (3: `B12Bucket`, `B12Mgr`, `B12Node`); other (1: `request for member `m_pHead' in something not a structure or`) |
-| `code/CCamera` | 66 | .rodata interleaved with another directory's (2 subsegments between, e.g. `func_0042F9B0`) |
+| `code/CAudioWorld` | 101 | .rodata interrupted by data no C file owns (3: `unnamed@0xA8C94`); round 25 (n2): linker padding three times: four objects; also declarations differ |
+| `code/CCache` | 56 | calls typed differently (2: `CCache__AllocateInternal`, `CCache__WaitForDisplayLists`); declarations differ (18: `CCache__DeallocateInternal`, `CCache__DetachCacheEntry`, `CCache__FreeCacheEntry`, `CCache__FreeMemEntry`, ...); local types differ (3: `B12Bucket`, `B12Mgr`, `B12Node`); other (1: `request for member `m_pHead' in something not a structure or`). Round 25 n1: 35+ conflicts: its own B12Node/B12Bucket/B12Mgr views against structs/cache.h, osSendMesg, CHeap__Alloc/Free; the cache manager's real struct first (part n4's D_800D7BE0 work) |
+| `code/CCamera` | 66 | .rodata interleaved with another directory's (2 subsegments between, e.g. `func_0042F9B0`); round 25 (n2): interleaved with `vm1/Demo`: one object over the engine and the VM; also declarations differ |
 | `code/CCollisionSetup` | 3 | **merged** (round 24, first batch) |
-| `code/CEmitter` | 10 | declarations differ (4: `CList__AddHead`, `CList__Remove`, `Emitter_CompareHeightAsc`, `Sortable`) |
-| `code/CEngineApp` | 90 | .rodata interrupted by data no C file owns (1: `unnamed@0xAA9FC`) |
-| `code/CGameObjectInstance` | 64 | .rodata interrupted by data no C file owns (2: `unnamed@0xA66C4`) |
-| `code/CGameRegion` | 53 | calls typed differently (1: `incompatible types in initialization`); declarations differ (24: `CGameRegion__FloodClearFlag4`, `CGameRegion__FloodSetFlag4`, `CGameRegion__FloodSetHeight`, `CGameRegion__GetCeilingHeight`, ...); local types differ (2: `CollisionBuildVertex`, `Node75`); parse errors (6: `&`, `.`, `if`, `return`, ...); other (4: `initializer element is not constant`, `request for member `x' in something not a structure or union`, `request for member `y' in something not a structure or union`, `request for member `z' in something not a structure or union`) |
-| `code/CISet` | 14 | declarations differ (3: `CUSet__GetTotalSize`, `CUSet__Transpose`, `osCreateMesgQueue`); local types differ (2: `CMutex`, `OffsetTable`) |
-| `code/CInstancePool` | 18 | .rodata interrupted by data no C file owns (1: `unnamed@0xA6C6C`) |
-| `code/CLevelActor` | 9 | .rodata not in .text order (2 inverted pairs of 5 subsegments) |
-| `code/CMtxF` | 124 | .rodata interrupted by data no C file owns (3: `unnamed@0xA6004`) |
-| `code/CParticle` | 212 | .rodata interrupted by data no C file owns (8: `unnamed@0xA7004`) |
-| `code/CPlayer` | 245 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042DA60`) |
-| `code/CScene` | 96 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042AA80`) |
-| `code/Cinema` | 34 | declarations differ (5: `Sound__StopAllExcept`, `gScene`, `gScene_m_LevelID`, `gScene_m_WarpSpawn`, ...) |
+| `code/CEmitter` | 10 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (4: `CList__AddHead`, `CList__Remove`, `Emitter_CompareHeightAsc`, `Sortable`)) |
+| `code/CEngineApp` | 90 | .rodata interrupted by data no C file owns (1: `unnamed@0xAA9FC`); round 25 (n2): `60.0f` no file owns (not padding); also `--name` |
+| `code/CGameObjectInstance` | 64 | .rodata interrupted by data no C file owns (2: `unnamed@0xA66C4`); round 25 (n2): `sCGameObjectInstanceCacheDesc_AnimObjectInfo` and a `1.0f` read as externs; also declarations differ |
+| `code/CGameRegion` | 53 | calls typed differently (1: `incompatible types in initialization`); declarations differ (24: `CGameRegion__FloodClearFlag4`, `CGameRegion__FloodSetFlag4`, `CGameRegion__FloodSetHeight`, `CGameRegion__GetCeilingHeight`, ...); local types differ (2: `CollisionBuildVertex`, `Node75`); parse errors (6: `&`, `.`, `if`, `return`, ...); other (4: `initializer element is not constant`, `request for member `x' in something not a structure or union`, `request for member `y' in something not a structure or union`, `request for member `z' in something not a structure or union`). Round 25 n1: 47+ conflicts: CISet__GetBlock and the CScene__ prototype family against protos/scene.h (pointer types and host returns) |
+| `code/CISet` | 14 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `CUSet__GetTotalSize`, `CUSet__Transpose`, `osCreateMesgQueue`); local types differ (2: `CMutex`, `OffsetTable`)) |
+| `code/CInstancePool` | 18 | .rodata interrupted by data no C file owns (1: `unnamed@0xA6C6C`); round 25 (n2): `sCInstancePoolCacheDesc_*` strings read as externs; also declarations differ |
+| `code/CLevelActor` | 9 | .rodata not in .text order (2 inverted pairs of 5 subsegments); round 25 (n2): deferred `func_00215944` (`--inline`); also declarations differ |
+| `code/CMtxF` | 124 | .rodata interrupted by data no C file owns (3: `unnamed@0xA6004`); round 25 (n2): `sCStaticObjectCacheDesc_*` strings and `0, 1.0, 0` read as externs; also declarations differ |
+| `code/CParticle` | 212 | .rodata interrupted by data no C file owns (8: `unnamed@0xA7004`); round 25 (n2): linker padding six times; `D_800A652C` and a float table read as externs; also declarations differ |
+| `code/CPlayer` | 245 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042DA60`); round 25 (n2): interleaved with `vm1/CPlayer`: one object over the engine and the VM; also declarations differ |
+| `code/CScene` | 96 | .rodata interleaved with another directory's (7 subsegments between, e.g. `func_0042AA80`); round 25 (n2): interleaved with `vm1/SceneLoad`: one object over the engine and the VM; also declarations differ |
+| `code/Cinema` | 34 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (5: `Sound__StopAllExcept`, `gScene`, `gScene_m_LevelID`, `gScene_m_WarpSpawn`, ...)) |
 | `code/Color` | 3 | **merged** (round 24, first batch) |
-| `code/Controller` | 37 | declarations differ (3: `Controller_IsPakWatched`, `RumblePool_Init`, `osMotorStop`) |
-| `code/Crash` | 16 | .rodata interrupted by data no C file owns (1: `unnamed@0xAACEC`) |
+| `code/Controller` | 37 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `Controller_IsPakWatched`, `RumblePool_Init`, `osMotorStop`)) |
+| `code/Crash` | 16 | .rodata interrupted by data no C file owns (1: `unnamed@0xAACEC`); round 25 (n2): its object's `.rodata` starts with the strings of its `.data` register tables: those tables in C first; also declarations differ |
 | `code/DLights` | 6 | **merged** (round 24, after unifying its declarations; was: local types differ (1: `ListNode`)) |
 | `code/Demo` | 3 | **merged** (round 24, first batch) |
-| `code/Destructible` | 15 | declarations differ (3: `AI_DropPickupsOnce`, `Actor_SpawnParticle`, `Sound__Play`) |
+| `code/Destructible` | 15 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `AI_DropPickupsOnce`, `Actor_SpawnParticle`, `Sound__Play`)) |
 | `code/Door` | 16 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `ImpactEvent_Call`); local types differ (1: `ResourceManagerState`)) |
-| `code/EnemyAI` | 119 | own basic typedefs (3: `s32`, `s8`, `u16`); calls typed differently (1: `EnemyAI_CheckOffscreen`); declarations differ (50: `AI_AngleToPoint`, `AI_IsAimedAt`, `AI_StopSound`, `AI_TurnClamped`, ...); local types differ (1: `Motion`); parse errors (1: `*`) |
+| `code/EnemyAI` | 119 | own basic typedefs (3: `s32`, `s8`, `u16`); calls typed differently (1: `EnemyAI_CheckOffscreen`); declarations differ (50: `AI_AngleToPoint`, `AI_IsAimedAt`, `AI_StopSound`, `AI_TurnClamped`, ...); local types differ (1: `Motion`); parse errors (1: `*`). Round 25 n1: 69+ conflicts: own basic typedefs, the AI helper family (now protos/enemy.h: the callers here still declare their own), CGameObjectInstance__PickRandomAnim, gEngineApp_m_Settings_multiplayer, EnemyAI_GetBehaviorIndex's definition (s8) against its N64 callers (s32) |
 | `code/EnemyAnim` | 76 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `WeightedTable_Clear`)) |
-| `code/EnemyHover` | 9 | declarations differ (6: `AI_IsAimedAt`, `AI_LerpByAggression`, `AI_UpdateTargets`, `CMtxF__SetRotateY`, ...) |
-| `code/EnemySwim` | 19 | declarations differ (5: `AI_ComputeFrameMotion`, `AI_UpdateTargets`, `CAI__CallHurt`, `CAI__SetMode`, ...) |
-| `code/GameObject` | 62 | own basic typedefs (3: `s32`, `u32`, `u8`); calls typed differently (2: `GameObject_GetGroundHeight`, `GameObject_TraceMove`); declarations differ (5: `CGameRegion__GetHeight`, `CScene__GetObjectTypeID`, `CVector3__Normalize`, `GameObject_GetFrameDelta`, ...); local types differ (2: `CGameRegion`, `Triple`); parse errors (1: `}`); other (1: `structure has no member named `m_pVertices'`) |
+| `code/EnemyHover` | 9 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (6: `AI_IsAimedAt`, `AI_LerpByAggression`, `AI_UpdateTargets`, `CMtxF__SetRotateY`, ...)) |
+| `code/EnemySwim` | 19 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (5: `AI_ComputeFrameMotion`, `AI_UpdateTargets`, `CAI__CallHurt`, `CAI__SetMode`, ...)) |
+| `code/GameObject` | 62 | own basic typedefs (3: `s32`, `u32`, `u8`); calls typed differently (2: `GameObject_GetGroundHeight`, `GameObject_TraceMove`); declarations differ (5: `CGameRegion__GetHeight`, `CScene__GetObjectTypeID`, `CVector3__Normalize`, `GameObject_GetFrameDelta`, ...); local types differ (2: `CGameRegion`, `Triple`); parse errors (1: `}`); other (1: `structure has no member named `m_pVertices'`). Round 25 n1: 16+ conflicts: own basic typedefs (imported Rage Wars files), CVector3__Normalize, GameObject_TraceMove / GetGroundHeight called with different argument lists |
 | `code/GameObjectMove` | 6 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `Collision_MoveInstance`)) |
-| `code/Generator` | 16 | declarations differ (5: `Actor_SpawnParticle`, `CInstancePool__Spawn`, `CLevelActorPool__Spawn`, `CScene__GetIntelligence`, ...); local types differ (1: `B01Info`) |
-| `code/HostIo` | 34 | the files do not share their cc1 flags |
-| `code/Hud` | 48 | declarations differ (5: `Draw`, `ModeState`, `gEngineApp_m_OnScreen_m_FontXScale`, `gEngineApp_m_OnScreen_m_ShadowXOff`, ...); local types differ (2: `Chunk`, `FontStyle`); parse errors (12: `(Each undeclared identifier is reported `, `*`, `FrameEntry`, `byte`, ...); other (1: `for each function it appears in.)`) |
+| `code/Generator` | 16 | declarations differ (5: `Actor_SpawnParticle`, `CInstancePool__Spawn`, `CLevelActorPool__Spawn`, `CScene__GetIntelligence`, ...); local types differ (1: `B01Info`). Round 25 n1: 7 conflicts: CLevelActorPool__Spawn is renamed by a host macro in one file (#define .._i, the merged file would rename every call), CInstancePool__Spawn Triple vs CVector3, B01Info two views (a CAI view: wants a CGeneratorAIVars) |
+| `code/HostIo` | 34 | **merged** (round 25, n2: `-msplit-addresses` proven for all 34; was: cc1 flags differ) |
+| `code/Hud` | 48 | declarations differ (5: `Draw`, `ModeState`, `gEngineApp_m_OnScreen_m_FontXScale`, `gEngineApp_m_OnScreen_m_ShadowXOff`, ...); local types differ (2: `Chunk`, `FontStyle`); parse errors (12: `(Each undeclared identifier is reported `, `*`, `FrameEntry`, `byte`, ...); other (1: `for each function it appears in.)`). Round 25 n1: 21+ conflicts: gEngineApp_m_OnScreen_m_* field symbols read as arrays, `Draw`/`ModeState` names used as both type and function |
 | `code/InteractiveAnim` | 15 | **merged** (round 24, after unifying its declarations; was: declarations differ (3: `AI_PlayAnim`, `CGameObjectInstance__AdvanceAnimation`, `CGameObjectInstance__SetAnimByAction`)) |
-| `code/LevelEvent` | 31 | .rodata interrupted by data no C file owns (1: `unnamed@0xA8C3C`) |
+| `code/LevelEvent` | 31 | .rodata interrupted by data no C file owns (1: `unnamed@0xA8C3C`); round 25 (n2): linker padding before `func_0026DFB0`: two objects; also declarations differ |
 | `code/LoopSounds` | 10 | **merged** (round 24, after unifying its declarations; was: declarations differ (3: `CList__AddTail`, `CList__Remove`, `Sound__Stop`)) |
 | `code/Platform` | 27 | **merged** (round 24, after unifying its declarations; was: declarations differ (2: `Platform_Step`, `StateInfo`)) |
-| `code/Render` | 28 | calls typed differently (1: `Model_BlendMorphFrames`); declarations differ (2: `CCache__LockForDisplayList`, `CCache__Unlock`); local types differ (2: `Material`, `Vtx`) |
-| `code/Rumble` | 10 | declarations differ (3: `RumbleCurve_Advance`, `__osDisableInt`, `__osRestoreInt`); local types differ (1: `Clip`) |
+| `code/Render` | 28 | **merged** (round 25 n1, after unifying its declarations; was: calls typed differently (1: `Model_BlendMorphFrames`); declarations differ (2: `CCache__LockForDisplayList`, `CCache__Unlock`); local types differ (2: `Material`, `Vtx`)) |
+| `code/Rumble` | 10 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `RumbleCurve_Advance`, `__osDisableInt`, `__osRestoreInt`); local types differ (1: `Clip`)) |
 | `code/RumbleCurve` | 3 | **merged** (round 24, first batch) |
 | `code/SavedPlayers` | 8 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `gSavedPlayers`)) |
-| `code/SndQueue` | 12 | own basic typedefs (2: `s32`, `u8`); declarations differ (1: `SndVoice_Construct`); local types differ (5: `ChannelSet`, `Header`, `ListHead`, `ListLink`, ...) |
-| `code/SndSeq` | 12 | declarations differ (8: `BinarySearch`, `HalfToFloat`, `alCSPSetBank`, `alCSPSetChlFXMix`, ...); local types differ (2: `ContextRecAt2BB8`, `IntPair`) |
+| `code/SndQueue` | 12 | own basic typedefs (2: `s32`, `u8`); declarations differ (1: `SndVoice_Construct`); local types differ (5: `ChannelSet`, `Header`, `ListHead`, `ListLink`, ...). Round 25 n1: 13+ conflicts: imported Rage Wars files with their own s32/u8 typedefs and ListHead/ListLink/Header/ChannelSet views of structs/sound.h |
+| `code/SndSeq` | 12 | declarations differ (8: `BinarySearch`, `HalfToFloat`, `alCSPSetBank`, `alCSPSetChlFXMix`, ...); local types differ (2: `ContextRecAt2BB8`, `IntPair`). Round 25 n1: 11+ conflicts: the alCSP* prototypes (s8/s16 arguments that change the caller's code, s32 vs void returns), IntPair/ContextRecAt2BB8 views |
 | `code/Sort` | 2 | **merged** (round 24, first batch) |
-| `code/Sound` | 31 | declarations differ (2: `CAudioWorld__SetForce2D`, `gEngineApp_m_Settings_unk1C8`) |
-| `code/SpeechPlayer` | 7 | declarations differ (5: `CAudioWorld__GetSndPlayer`, `CAudioWorld__Lock`, `CAudioWorld__Unlock`, `alSndpSetSound`, ...) |
+| `code/Sound` | 31 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (2: `CAudioWorld__SetForce2D`, `gEngineApp_m_Settings_unk1C8`)) |
+| `code/SpeechPlayer` | 7 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (5: `CAudioWorld__GetSndPlayer`, `CAudioWorld__Lock`, `CAudioWorld__Unlock`, `alSndpSetSound`, ...)) |
 | `code/Sweep` | 6 | **merged** (round 24, after unifying its declarations; was: local types differ (1: `HitInst`)) |
-| `code/Texture` | 8 | declarations differ (3: `CISet__GetBlock`, `CISet__GetBlockAndSize`, `Pair`) |
-| `code/Throwable` | 13 | declarations differ (3: `CAI__CallHurt`, `OwnedState`, `gThrowableCollisionInfo_m_InstanceBehavior`) |
+| `code/Texture` | 8 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `CISet__GetBlock`, `CISet__GetBlockAndSize`, `Pair`)) |
+| `code/Throwable` | 13 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (3: `CAI__CallHurt`, `OwnedState`, `gThrowableCollisionInfo_m_InstanceBehavior`)) |
 | `code/Turret` | 15 | **merged** (round 24, after unifying its declarations; was: calls typed differently (1: `Turret_EventShow`); declarations differ (1: `Turret_Effects`)) |
-| `code/VM` | 20 | .rodata not in .text order (1 inverted pairs of 2 subsegments) |
-| `code/WeaponMode` | 49 | declarations differ (13: `Anim`, `Bone`, `CAI__SetMode`, `CCameraPool__AddText`, ...) |
-| `code/__scHandleRSP` | 17 | declarations differ (2: `Sched`, `__scHandleRetrace`); local types differ (1: `Stream`); parse errors (7: `(Each undeclared identifier is reported `, `*`, `Qn`, `Stream`, ...); other (1: `for each function it appears in.)`) |
-| `code/adecHuffDecode` | 18 | the files do not share their cc1 flags |
+| `code/VM` | 20 | .rodata not in .text order (1 inverted pairs of 2 subsegments); round 25 (n2): deferred from `func_0028E068` on (`--inline`); also declarations differ |
+| `code/WeaponMode` | 49 | declarations differ (13: `Anim`, `Bone`, `CAI__SetMode`, `CCameraPool__AddText`, ...). Round 25 n1: 21+ conflicts: Anim/Bone views, Sound__Play, CAI__SetMode, the CPlayer__ weapon family |
+| `code/__scHandleRSP` | 17 | declarations differ (2: `Sched`, `__scHandleRetrace`); local types differ (1: `Stream`); parse errors (7: `(Each undeclared identifier is reported `, `*`, `Qn`, `Stream`, ...); other (1: `for each function it appears in.)`). Round 25 n1: 19+ conflicts: Sched/ScTask/Client views of sched.h's OSSched/OSScTask/OSScClient (parse errors once they meet), __scHandleRetrace |
+| `code/adecHuffDecode` | 18 | the files do not share their cc1 flags; round 25 (n2): `func_002A0044` compiles differently under `-fforce-addr`: re-match it |
 | `code/alAdpcmPull` | 5 | **merged** (round 24, first batch) |
-| `vm1/BlindOne` | 70 | declarations differ (26: `AI_UpdateTargets`, `Animator_Update`, `CCache__Allocate`, `CCache__AllocateMemoryForDecompression`, ...); parse errors (1: `DrawInfo`) |
+| `vm1/BlindOne` | 70 | declarations differ (26: `AI_UpdateTargets`, `Animator_Update`, `CCache__Allocate`, `CCache__AllocateMemoryForDecompression`, ...); parse errors (1: `DrawInfo`). Round 25 n1: 28+ conflicts: the CCache__ family (protos/cache.h), gScene_m_LevelID, DrawInfo |
 | `vm1/CEngineApp` | 4 | **merged** (round 24, first batch) |
 | `vm1/COnScreen` | 3 | **merged** (round 24, first batch) |
-| `vm1/CPlayer` | 13 | .rodata interleaved with another directory's (39 subsegments between, e.g. `func_00248340`) |
+| `vm1/CPlayer` | 13 | .rodata interleaved with another directory's (39 subsegments between, e.g. `func_00248340`); round 25 (n2): interleaved with `code/CPlayer` (compiles merged otherwise) |
 | `vm1/CheatMenu` | 48 | **merged** (round 24, after unifying its declarations; was: declarations differ (2: `Controller_MenuLeft`, `Controller_MenuRight`)) |
 | `vm1/Cont` | 2 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `RumblePool_Init`)) |
 | `vm1/ContinueMenu` | 2 | **merged** (round 24, first batch) |
-| `vm1/Demo` | 28 | .rodata interleaved with another directory's (6 subsegments between, e.g. `func_0027C074`) |
+| `vm1/Demo` | 28 | .rodata interleaved with another directory's (6 subsegments between, e.g. `func_0027C074`); round 25 (n2): interleaved with `code/CCamera`; also `--name` |
 | `vm1/GameOverMenu` | 3 | **merged** (round 24, first batch) |
-| `vm1/MissionMenu` | 14 | .rodata interrupted by data no C file owns (1: `unnamed@0xC2368`) |
-| `vm1/MotherBoss` | 65 | declarations differ (6: `AI_UpdateTargets`, `Actor_SpawnParticle`, `CAI__CallHurt`, `CLevelActorPool__Spawn`, ...) |
-| `vm1/MpMenu` | 110 | .rodata interrupted by data no C file owns (3: `unnamed@0xC1A78`) |
-| `vm1/NameEntryMenu` | 8 | .rodata interrupted by data no C file owns (1: `unnamed@0xC1F4C`) |
-| `vm1/OptionsMenu` | 31 | .rodata not in .text order (2 inverted pairs of 4 subsegments) |
-| `vm1/Pak` | 42 | .rodata not in .text order (1 inverted pairs of 3 subsegments) |
-| `vm1/PakMenu` | 140 | .rodata interrupted by data no C file owns (2: `unnamed@0xC2008`) |
-| `vm1/Primagen` | 115 | .rodata interrupted by data no C file owns (2: `unnamed@0xC0F14`) |
+| `vm1/MissionMenu` | 14 | .rodata interrupted by data no C file owns (1: `unnamed@0xC2368`); round 25 (n2): linker padding before `func_00424B90`; also declarations differ |
+| `vm1/MotherBoss` | 65 | **merged** (round 25 merge, after unifying its declarations as its vm2 twin's; was: declarations differ (6: `AI_UpdateTargets`, `Actor_SpawnParticle`, `CAI__CallHurt`, `CLevelActorPool__Spawn`, ...)) |
+| `vm1/MpMenu` | 110 | .rodata interrupted by data no C file owns (3: `unnamed@0xC1A78`); round 25 (n2): linker padding before one of ten starts; `sMpMenuFmt_3d` read as an extern; also declarations differ |
+| `vm1/NameEntryMenu` | 8 | .rodata interrupted by data no C file owns (1: `unnamed@0xC1F4C`); round 25 (n2): the strings of its key table in `.data` (asm): the table in C first (compiles merged otherwise; round 25 merge: merged with `--rodata-free`, `make verify` fails, the strings are not in the C) |
+| `vm1/OptionsMenu` | 31 | **merged** (round 25, n2: every function `DEFERRED`; was: .rodata not in .text order) |
+| `vm1/Pak` | 42 | .rodata not in .text order (1 inverted pairs of 3 subsegments); round 25 (n2): deferred from index 2..6 on, index 7 defined before 6; also declarations differ |
+| `vm1/PakMenu` | 140 | .rodata interrupted by data no C file owns (2: `unnamed@0xC2008`); round 25 (n2): linker padding (two places); `sPakMenuText_Spaces3` read as an extern; also declarations differ |
+| `vm1/Primagen` | 115 | .rodata interrupted by data no C file owns (2: `unnamed@0xC0F14`); round 25 (n2): linker padding twice; also declarations differ |
 | `vm1/SceneActorPool` | 2 | **merged** (round 24, first batch) |
-| `vm1/SceneLoad` | 24 | .rodata interleaved with another directory's (15 subsegments between, e.g. `func_00220530`) |
-| `vm1/StatsMenu` | 15 | declarations differ (1: `gEngineApp_m_Settings_match_tag`) |
-| `vm1/TotemDefense` | 18 | .rodata not in .text order (8 inverted pairs of 9 subsegments) |
-| `vm2/BlindOne` | 60 | its .text subsegments are not adjacent |
+| `vm1/SceneLoad` | 24 | .rodata interleaved with another directory's (15 subsegments between, e.g. `func_00220530`); round 25 (n2): interleaved with `code/CScene`; also declarations differ |
+| `vm1/StatsMenu` | 15 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (1: `gEngineApp_m_Settings_match_tag`)) |
+| `vm1/TotemDefense` | 18 | .rodata not in .text order (8 inverted pairs of 9 subsegments); round 25 (n2): every function deferred (`--inline all`); also declarations differ |
+| `vm2/BlindOne` | 60 | its .text subsegments are not adjacent; round 25: no asm left (70 files), declarations differ (n3 table above) |
 | `vm2/CEngineApp` | 4 | **merged** (round 24, first batch) |
 | `vm2/COnScreen` | 2 | **merged** (round 24, first batch) |
-| `vm2/CPlayer` | 13 | vm2 files placing .rodata over vm1's pool one by one (6 files, versions/shared_rodata.us.txt) |
-| `vm2/CheatMenu` | 48 | vm2 files placing .rodata over vm1's pool one by one (7 files, versions/shared_rodata.us.txt) |
+| `vm2/CPlayer` | 13 | **merged** (round 25, n3: its 6 pool placements are parts of `CPlayer_2.c`) |
+| `vm2/CheatMenu` | 48 | **merged** (round 25, n3: declarations as vm1's `CheatMenu.c`, 7 parts) |
 | `vm2/Cont` | 2 | **merged** (round 24, after unifying its declarations; was: declarations differ (1: `RumblePool_Init`)) |
 | `vm2/ContinueMenu` | 2 | **merged** (round 24, first batch) |
-| `vm2/Demo` | 21 | its .text subsegments are not adjacent |
+| `vm2/Demo` | 21 | its .text subsegments are not adjacent; round 25: no asm left (28 files), declarations differ (n3 table above) |
 | `vm2/GameOverMenu` | 3 | **merged** (round 24, first batch) |
-| `vm2/MissionMenu` | 14 | vm2 files placing .rodata over vm1's pool one by one (7 files, versions/shared_rodata.us.txt) |
-| `vm2/MotherBoss` | 30 | its .text subsegments are not adjacent |
-| `vm2/MpMenu` | 106 | its .text subsegments are not adjacent |
-| `vm2/NameEntryMenu` | 8 | vm2 files placing .rodata over vm1's pool one by one (2 files, versions/shared_rodata.us.txt) |
-| `vm2/OptionsMenu` | 31 | vm2 files placing .rodata over vm1's pool one by one (6 files, versions/shared_rodata.us.txt) |
-| `vm2/Pak` | 41 | its .text subsegments are not adjacent |
-| `vm2/PakMenu` | 133 | its .text subsegments are not adjacent |
-| `vm2/Primagen` | 35 | its .text subsegments are not adjacent |
+| `vm2/MissionMenu` | 14 | **merged** (round 25, n3: one declaration per name, 7 parts) |
+| `vm2/MotherBoss` | 30 | **merged** (round 25, n3: its asm in C, one declaration per name, 19 parts) |
+| `vm2/MpMenu` | 106 | its .text subsegments are not adjacent; round 25: no asm left (109 files), declarations differ (n3 table above) |
+| `vm2/NameEntryMenu` | 8 | **merged** (round 25, n3: 2 parts) |
+| `vm2/OptionsMenu` | 31 | **merged** (round 25, n3: one declaration per name, 6 parts) |
+| `vm2/Pak` | 41 | **merged** (round 25, n3: its asm in C, one declaration per name, 3 parts) |
+| `vm2/PakMenu` | 133 | its .text subsegments are not adjacent; round 25: no asm left (139 files), declarations differ (n3 table above) |
+| `vm2/Primagen` | 35 | its .text subsegments are not adjacent; round 25: no asm left (53 files), declarations differ (n3 table above) |
 | `vm2/SceneActorPool` | 2 | **merged** (round 24, first batch) |
-| `vm2/SceneLoad` | 19 | its .text subsegments are not adjacent |
-| `vm2/StatsMenu` | 15 | declarations differ (2: `CPlayerPool__GetIndex`, `gEngineApp_m_Settings_match_tag`); local types differ (1: `FieldRecAt14`) |
-| `vm2/TotemDefense` | 7 | its .text subsegments are not adjacent |
+| `vm2/SceneLoad` | 19 | its .text subsegments are not adjacent; round 25: no asm left (23 files), declarations differ (n3 table above) |
+| `vm2/StatsMenu` | 15 | **merged** (round 25 n1, after unifying its declarations; was: declarations differ (2: `CPlayerPool__GetIndex`, `gEngineApp_m_Settings_match_tag`); local types differ (1: `FieldRecAt14`)) |
+| `vm2/TotemDefense` | 7 | **merged** (round 25, n3: its asm in C, 4 parts) |
+
+## Round 25, part n2: `.rodata` order, unowned data, cc1 flags
+
+**How SN's toolchain fills an object's `.rodata`** (small test files through `tools/sn64/cc1`, the
+original `cc1n64.exe` and `asn64.exe` under wine; same results from both compilers):
+
+- cc1 writes a string literal into `.rodata` when it expands the function that first uses it in the
+  file (once per file: a second use shares it), i.e. at the function's definition, before its code. A
+  file-scope initializer's strings go out where the variable is output.
+- asn64 puts each `li.s`/`li.d` constant into `.rodata` at the instruction, in code order, never
+  pooled (two `0.5f` in two functions are two words); cc1 writes a jump table at its `switch`.
+  `tools/sn_li.py` flushes its pool at cc1's next section directive, which gives the same order.
+- A function is output (code, literals, jump tables) at its definition, **except an `inline` one**:
+  GCC 2.8.1 at `-O2` keeps every `inline` function, public ones too, until the end of the file and
+  outputs them after all the others, in the order of their first declaration; their strings are
+  already out, at the definition. At `-O3` (`-finline-functions`) the same happens to `static`
+  functions defined after their callers. The original sources are C++ (`MATCHING.md`): a member
+  function defined in its class body is `inline`.
+
+So a module whose `.rodata` has a later function's strings before an earlier function's float
+literals is one object with deferred functions, not a wrong boundary. ultralib's `synthesizer.c`
+proves it: in its own order (`_timeToSamplesNoRound` static, `_timeToSamples`, `__nextSampleTime`
+static) at `-O3` cc1 gives exactly the ROM's `.text` order (`_timeToSamples`, `__nextSampleTime`,
+`_timeToSamplesNoRound`) and `.rodata` order (`"EX"`, `"audio/synthesizer.c"`, then the two
+functions' literals).
+
+**`merge_module.py` does it:** `--inline all|stem,..` writes those files' functions `DEFERRED`
+(`include/common.h`: `inline` on the N64 build, nothing on the port's, where C99 `inline` would emit
+no definition) and declares the deferred functions before them in `.text` order wherever one is
+declared early (output order is first-declaration order); `--rodata-free` takes the slices and the
+unnamed data between them as the merged object's one `.rodata` (another file's slice in between still
+refuses); `make verify` decides. `--cc1-flags auto` (or a given set) picks one flag set under which
+every file of the module compiles to the same assembly as under its own, else refuses.
+
+**Merged here (5 directories, 74 files -> 5), `make verify` OK:**
+
+| Directory | What it took |
+|---|---|
+| `vm1/OptionsMenu` (31) | every function `DEFERRED` (`--inline all`): the ROM has the strings of `OptionsMenu_ControlSideText`/`OptionsMenu_StickHorzText` before `GameSettings_SetDefaults`' `1.0f` |
+| `code/libultra/audio/synthesizer` (9) | `--cc1-flags auto` (the game's flags compile all nine the same, also the one with `-msplit-addresses`); `_timeToSamples`, `__nextSampleTime`, `_timeToSamplesNoRound` `DEFERRED`; one `RateSource`; the port's five functions under `#ifndef TARGET_PORT` |
+| `code/HostIo` (34) | `-msplit-addresses` compiles all 34 the same; one `HostIo_GetSR`/`SetSR`; `HostIo_ReadByte`'s `u32` read as a cast (`srlv`); `HostIo_Call` under `#ifndef TARGET_PORT` (was `T2_GAME_EXCLUDE`) |
+| `code/libultra/gu/lookat`, `gu/perspective` (2 + 2) | `-fforce-addr` compiles both files the same; ultralib's float matrix renamed `GuMatrix` (not `rw/abu_types.h`'s `struct Matrix`) |
+
+```
+python3 tools/merge_module.py src/us/vm1/OptionsMenu --rodata-free --inline all
+python3 tools/merge_module.py src/us/code/libultra/audio/synthesizer --cc1-flags auto --rodata-free \
+    --inline func_00294C30,func_00294C70,func_00294D18
+python3 tools/merge_module.py src/us/code/HostIo --cc1-flags auto        # also gu/lookat, gu/perspective
+```
+
+**The rest of the 31 directories, by real cause.** `merge_check.py --rodata-free` shows that 21 of
+them also have the "declarations differ" problems of part n1 behind the `.rodata` refusal (only
+`vm1/CPlayer` and `vm1/NameEntryMenu` compile merged), so every row below needs that header work too.
+
+*Out of order: deferred functions* (model above; each needs its header work, then `--inline`):
+
+| Directory | `DEFERRED` set the ROM implies |
+|---|---|
+| `code/CLevelActor` | `func_00215944` (`CLevelActor__LoadGeometry`/`TouchGeometry`): its strings lie between `func_002154DC`'s and `func_002156FC`'s literals. Compile: `CScene__GetObjectTypeID` `u16`/`s32`, `GameObject_GetGroundRotation` by value/out pointer, `CMtxF__*` `f32 *`/`CMtxF *` |
+| `code/VM` | `func_0028E068` (index 4) and everything after it: `func_0028E60C`'s `"Virtual Region"` precedes `func_0028E068`'s literals. Compile: the `gPager_*` views, `B09SlotA`, `func_0028EE40` |
+| `vm1/TotemDefense` | all (strings of indices 4 and 7 before the literals of 0..3) |
+| `vm1/Pak` | the functions from index 2..6 on; `func_00426164`'s strings come after `func_004263DC`'s, so index 7 is defined before index 6 (declared in `.text` order): needs a source-order option in `merge_module.py` |
+
+*Unowned data between the slices* (`unnamed@...` in the yaml; `python3 tools/rodata_gaps.py <dir>` classifies them) is of two kinds:
+
+- **Linker padding** (stale buffer words, often instructions, before a slice on a 16-byte boundary):
+  the next slice is the first of *another object*; `.text` cannot show it because the object before
+  ended on 16. The module directory is two objects there, and `versions/modules.us.txt` needs the
+  boundary (a new evidence kind for `tools/modules.py`, then the files moved): `code/LevelEvent`
+  before `func_0026DFB0` (`LevelEvent_Fire`; the only 16-aligned start in range), `code/CParticle`
+  before `func_002333C0`, `func_00239F00`, `func_0023D050` (unique), and ranges in `code/AI`
+  (`func_00241E30` or `func_002427E0`), `code/CAudioWorld` (three), `code/CParticle` (three more),
+  `vm1/MissionMenu` (`func_00424B90`), `vm1/MpMenu`, `vm1/PakMenu`, `vm1/Primagen` (two). A VM split
+  must be made in `vm2` too (`modules.py` pairs the two copies; part n3's directories).
+- **The module's own data that its C reads as externs**: named strings (`sCrashText_Spaces3`,
+  `sCGameObjectInstanceCacheDesc_AnimObjectInfo`, `sCInstancePoolCacheDesc_*`,
+  `sCStaticObjectCacheDesc_*` in `code/CMtxF`, `sMpMenuFmt_3d`, `sPakMenuText_Spaces3`), float words
+  (`D_800A58F4` in `code/Anim`, `D_800A652C` in `code/CParticle`, `42700000` in `code/CEngineApp`,
+  `0, 1.0, 0` in `code/CMtxF`: no 16-aligned start in range, so not padding) and the strings of
+  tables in `.data` (`vm1/NameEntryMenu`: 37 one-character strings, the key table of its menu in
+  `virtual_rodata_0.data.s`). A merged file must write them as literals (one copy per object: a
+  string two files share can only be given back in the merged file), or define the `.data` table in
+  C at its place in the source. `code/Crash` shows the size of it: its object starts at
+  `0x800AA070` with the flag-name strings of its register tables (`"IP7"`, `"BD"`, `": "`), so its
+  `.data` tables must become C first.
+
+*Interleaved with another directory's* (`code/CPlayer` + `vm1/CPlayer`, `code/CScene` +
+`vm1/SceneLoad`, `code/CCamera` + `vm1/Demo`): the VM functions' literals sit between the engine
+functions' in one `.rodata` run, in `.text` order of each part. One original object per pair, its
+functions linked partly into the engine and partly into the paged VM module: one merged file would
+need its VM functions in their own text section (`__attribute__((section(...)))`, linked into the VM
+segment) while their `.rodata` stays in the object's. Build work in the linker-script generation,
+not attempted.
+
+*cc1 flags:* `code/adecHuffDecode` is the one left: under `-fforce-addr` (the flags of 3 of its 18
+files) every file compiles the same except `func_002A0044` (`adecHuffDecode`, a register
+allocation difference); its C must be re-matched under `-fforce-addr` first.
+
+*Name clash:* `code/CEngineApp` and `vm1/Demo` merge with `--name`, but `code/CEngineApp` has
+unattributed data (`60.0f`) inside its `.rodata` and `vm1/Demo` is interleaved with `code/CCamera`.
+
+None of this needs a ROM change.
+
+## Round 25 merge: the state after parts n1-n4
+
+The four parts merged in the order n3, n2, n1, n4 (`make verify` and `asm_diff --base f3e72718` 0
+after each, the port compiled with clang after each). Then `tools/merge_check.py --rodata-free` over
+the 45 directories left: one compiled and compared equal (`vm1/NameEntryMenu`, but `make verify`
+fails after the merge: its key table's strings are `.data`'s, see its row), 36 stop at the compiler,
+8 are refused. `vm1/MotherBoss` was merged after its declarations took the forms its vm2 twin's
+merged file has (`AI_UpdateTargets`, `Actor_SpawnParticle`, `WeightedTable_PickStatic`,
+`CLevelActorPool__Spawn` on `void *` arguments; `CAI__CallHurt` and `ImpactEvent_Send` through a
+function type of their own in the one file each that passes other arguments; `asm_diff` 0 before
+the merge, `make verify` after; clang needed the port-only `MotherBoss_Hurt` prototype gone).
+
+**89 modules are one C file** (14 in round 23, 44 in round 24, 31 in round 25: n1 17, n2 5, n3 8,
+the merge 1). **44 module directories still hold one function per file**, by what stops them:
+
+| Reason | Directories |
+|---|---|
+| one original object over the engine and the VM (its VM functions would need a text section of their own in the merged file: linker-script work) | `code/CPlayer` + `vm1/CPlayer`, `code/CScene` + `vm1/SceneLoad`, `code/CCamera` + `vm1/Demo` (6; `vm1/Demo` also needs `--name`) |
+| linker padding inside the `.rodata` run: the directory is two or more objects, `versions/modules.us.txt` needs the boundary first (part n2) | `code/AI`, `code/CAudioWorld`, `code/CParticle`, `code/LevelEvent`, `vm1/MissionMenu`, `vm1/MpMenu`, `vm1/PakMenu`, `vm1/Primagen` (8) |
+| data the C reads as externs, or strings of `.data` tables in asm (they must become literals or C tables first) | `code/Anim`, `code/CEngineApp` (also `--name`), `code/CGameObjectInstance`, `code/CInstancePool`, `code/CMtxF`, `code/Crash`, `vm1/NameEntryMenu` (7) |
+| deferred functions (`--inline`) plus header work | `code/CLevelActor`, `code/VM`, `vm1/TotemDefense`, `vm1/Pak` (4; `vm1/Pak` also needs a source-order option) |
+| cc1 flags (`func_002A0044` must be re-matched under `-fforce-addr`) | `code/adecHuffDecode` (1) |
+| header work only (one declaration per name; no `.rodata` question) | `code/{CCache, CGameRegion, EnemyAI, GameObject, Generator, Hud, SndQueue, SndSeq, WeaponMode, __scHandleRSP, libultra/audio/cseq}`, `vm1/BlindOne`, `vm2/{BlindOne, Demo, MpMenu, PakMenu, Primagen, SceneLoad}` (18) |
+
+The rows above the last need header work too: `merge_check.py --rodata-free` stops at the compiler
+for every directory it gets that far with except `vm1/NameEntryMenu`; the 8 it refuses before
+compiling are the six interleaved ones, `code/CEngineApp` (its name) and `code/adecHuffDecode`. The fewest
+compiler messages are in `code/CInstancePool` and `code/Crash` (5 each, both with data to give to
+the C first), `code/libultra/audio/cseq` (the Rage Wars `sptr`/`uptr` typedefs and
+`RuntimeState`/`DecodeResult` views), `code/Generator` (`B01Info` twice, the CScene/actor-pool
+prototypes) and `vm2/Demo` (the CList family through `rw/abu_protos.h` in one file, `IntPair`,
+`Triple`, `CCache__Allocate`/`Deallocate`). None needs a ROM change.
 
 ## Evidence
 

@@ -1026,8 +1026,6 @@ s16 SndVoicePool_FindSlot(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c) {
 
 /* func_00273504 (M04Bank2: the sfx instrument; core + 0x80 = the u16 at 0xFC; sample at info+2,
  * the FX mix byte at info+0xE) */
-extern s32 D_800B2A34[];
-extern s32 D_800B2A44[];
 SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, s32 tag, s32 handle) {
     CAudioWorld *m = p->owner;
     s16 pri = SoundEffectInfo_GetGroup(info);
@@ -1077,15 +1075,22 @@ SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, s32 ta
     v->soundId = m->cueId;
     v->reset = m->unk2BAC;
     v->hasTrack = 0;
+    /* Until round 25 the two id tables reached the host as raw N64 bytes (D_800B2A34/D_800B2A44
+     * had no type), so every id read byte-swapped (0x78 as 0x78000000) and no voice matched.
+     * Round 25 n4 typed them (globals/audio.h): the host then does what the N64 does (the track
+     * voices stop with the music), which changes the random stream of every run (default run
+     * af8bd840 instead of cd2d68ce, first difference at frame 117323). Kept as before, swapped
+     * back, until a port round re-baselines the reference runs (docs/port/STATUS.md, round 25). */
+#define T2_VOICE_ID(x) ((s32) __builtin_bswap32((u32) (x)))
     for (i = 0; i < 4; i++) {
-        if (v->soundId == D_800B2A34[i]) {
+        if (v->soundId == T2_VOICE_ID(sVoiceTrackSounds[i])) {
             v->hasTrack = 1;
             break;
         }
     }
     v->unkC4 = 1;
     for (i = 0; i < 6; i++) {
-        if (v->soundId == D_800B2A44[i]) {
+        if (v->soundId == T2_VOICE_ID(sVoiceNoUnkC4Sounds[i])) {
             v->unkC4 = 0;
             break;
         }
@@ -1678,7 +1683,7 @@ s32 SpeechPlayer_PickEntry(T2SpeechPlayer *sp, s16 id, s16 avoid) {
     return entry;
 }
 
-/* func_002768D0 (PlayerRecAt24 view; D_800F55F4 = the speech wave table's len/type/waveInfo).
+/* func_002768D0 (PlayerRecAt24 view; gAudioWorld.fx.stream = the speech wave table's len/type/waveInfo).
  * State 1 opens the song's adec stream (t2audio_adec.c) and plays sSpeechSound with it: the
  * song header's first word / 100 scales the volume, its u16 at 4 is the FX mix; the stream's
  * length becomes the sound's decay time and its rate the pitch (rate / 22050). State 3 is

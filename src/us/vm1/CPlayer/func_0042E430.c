@@ -1,4 +1,4 @@
-/* CPlayer code: CPlayer__SetCharacter, 0x0042E430-0x0042E5AC (splat had it inside the data D_0042D50C). */
+/* CPlayer code: CPlayer__SetCharacter, 0x0042E430-0x0042E5AC (splat had it inside the data at 0x0042D50C). */
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
@@ -43,7 +43,7 @@ void CPlayer__SetCharacter(CPlayer *p, s32 character) {
     CPlayer__GiveStartingWeapons(p);
     modelId = 0x66;
     if (gEngineApp_m_Settings.multiplayer) {
-        if (gEngineApp_m_Settings_match_tag != 0 && p->m_pOptions->m_TagMode != 0) {
+        if (gEngineApp_m_Settings_match_tag[0] != 0 && p->m_pOptions->m_TagMode != 0) {
             modelId = gTagModeModel;
         } else {
             modelId = gCharacterModels[p->m_CharacterActor.header.m_pIntelligence->m_Id];

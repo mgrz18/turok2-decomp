@@ -23,14 +23,14 @@ func_00452060 0x800C0FA8  # jtbl (menu)
 func_004521C0 0x800C0FE0  # jtbl (menu)
 func_00452C14 0x800C1030  # strings (menu)
 func_00452D64 0x800C1030  # strings (menu)
-func_00455324 0x800C1310  # string (menu)
-func_00455484 0x800C1318  # strings (menu)
-func_004555B0 0x800C1318  # strings (menu)
-func_0045582C 0x800C1318  # string (menu)
+OptionsMenu_2:OptionsMenu_OpacityText_2 0x800C1310  # string (menu)
+OptionsMenu_2:OptionsMenu_StickHorzText_2 0x800C1318  # strings (menu)
+OptionsMenu_2:OptionsMenu_StickVertText_2 0x800C1318  # strings (menu)
+OptionsMenu_2:OptionsMenu_BrightnessText_2 0x800C1318  # string (menu)
 func_00450D78 0x800C0EE8  # floats
 func_00452EA8 0x800C1030  # "  %2d", " %3d" (menu)
-func_00453430 0x800C11B0  # jtbl of func_0041A4D0
-func_00453FC4 0x800C12B0  # jtbl of func_0041B05C
+CheatMenu_2:CheatsMenu_Init_2 0x800C11B0  # jtbl of func_0041A4D0
+CheatMenu_2:CheatMenu_WarpText_2 0x800C12B0  # jtbl of func_0041B05C
 func_00459B50 0x800C1438  # jtbl
 func_0045AEA8 0x800C1468  # jtbl
 func_0045B784 0x800C14B0  # jtbl
@@ -48,14 +48,14 @@ func_0045CBDC 0x800C16D0  # jtbl
 func_0045CCC4 0x800C1700  # jtbl
 SceneActorPool_2 0x800A6050  # copy of func_0042CF90: its literal, in the engine .rodata
 func_00466040 0x800A60B8  # copy of func_0042D120: its literal, in the engine .rodata
-func_004540B0 0x800C12E0  # jtbl of func_0041B148
+CheatMenu_2:CheatMenu_GetWarpLevel_2 0x800C12E0  # jtbl of func_0041B148
 func_0045CC58 0x800C16E8  # jtbl
 func_00448240 0x800C0950  # copy of the cinema file (func_0040F240 to func_004131B0)
 func_0043CCF8 0x800C038C  # W batch
 func_0043DC44 0x800C03E8  # W batch, jtbl
 func_0043FAA8 0x800C04E8  # W batch
-func_0044519C 0x800C08A8  # W batch
-func_004456F4 0x800C08C4  # W batch
+MotherBoss_2:MotherBoss_RandomSpawnPoint_2 0x800C08A8  # W batch
+MotherBoss_2:MotherBoss_OnPhase1CinemaDone_2 0x800C08C4  # W batch
 func_00445CC0 0x800C08D4  # W batch: copy of func_0040CCC0, "Blind"
 func_00445FC4 0x800C08DC  # W batch: copy of func_0040CFC4
 func_004460F0 0x800C08E0  # W batch
@@ -66,39 +66,39 @@ func_0044772C 0x800C0934  # W batch
 func_004478BC 0x800C0938  # W batch
 func_00450490 0x800C0E94  # W batch: copy of func_00417490
 func_0045078C 0x800C0EA8  # W batch: copy of func_0041778C
-func_0045386C 0x800C126C  # W batch: copy of func_0041A904
+CheatMenu_2:EnterCheatMenu_DrawTextField_2 0x800C126C  # W batch: copy of func_0041A904
 func_00459E54 0x800C1450  # W batch, jtbl
 func_0045B234 0x800C1488  # W batch, jtbl
-func_0045D980 0x800C1750  # W batch, jtbl
-func_0045DAB0 0x800C1770  # W batch, jtbl
-func_0045DC74 0x800C1790  # W batch, jtbl
-func_0045DEDC 0x800C17B0  # W batch, jtbl
-func_0045DF7C 0x800C17D0  # W batch, jtbl
-func_0045E01C 0x800C17F0  # W batch, jtbl
-func_0045646C 0x800C13E0  # copy of func_0041D51C (W): its pool is the original's
+MissionMenu_2:Mission_LevelObjectivesDone_2 0x800C1750  # W batch, jtbl
+MissionMenu_2:MissionMenu_UpdateObjective1Count_2 0x800C1770  # W batch, jtbl
+MissionMenu_2:MissionMenu_UpdateObjective2Count_2 0x800C1790  # W batch, jtbl
+MissionMenu_2:MissionMenu_UpdateLevelName_2 0x800C17B0  # W batch, jtbl
+MissionMenu_2:MissionMenu_UpdateObjective1_2 0x800C17D0  # W batch, jtbl
+MissionMenu_2:MissionMenu_UpdateObjective2_2 0x800C17F0  # W batch, jtbl
+NameEntryMenu_2:NameEntryMenu_DrawName_2 0x800C13E0  # copy of func_0041D51C (W): its pool is the original's
 func_004688D0 0x800A97F0  # copy of func_0042F9B0 (W), in the engine .rodata
 func_0044C230 0x800C0AF0  # copy of the file from func_00413230 (to 0x417484)
 func_00452314 0x800C1008  # X batch: jtbl of func_004193B4
-func_00453E58 0x800C1280  # X batch: jtbl of func_0041AEF0
-func_0045E808 0x800C1870  # X batch: jtbl of func_004258E8
+CheatMenu_2:Cheat_FindWarpLevel_2 0x800C1280  # X batch: jtbl of func_0041AEF0
+Pak_2:Pak_Mount_2 0x800C1870  # X batch: jtbl of func_004258E8
 func_00468AC4 0x800A9A00  # copy of func_0042FBA4: its strings and 1.0f, in the engine .rodata
 func_0043F000 0x800C04A4  # twin of func_00406000 (X), which now owns the pool
 func_0045060C 0x800C0EA0  # copy of func_0041760C (X), which now owns the pool
 func_0045D6A0 0x800C1720  # copy of func_00424780 (X), which now owns the pool
 func_0043CF3C 0x800C0398  # X batch
-func_00442000 0x800C05C0  # X batch
-func_00443BB4 0x800C0878  # X batch, twin of func_0040ABB4
-func_0045353C 0x800C11E0  # X batch: the warp menu of func_0041A5DC
-func_004549B0 0x800C1328  # X batch: copy of func_0041BA50
+MotherBoss_2:MotherBoss_Hurt_2 0x800C05C0  # X batch
+MotherBoss_2:MotherBoss_StartPhase2Cinema_2 0x800C0878  # X batch, twin of func_0040ABB4
+CheatMenu_2:CheatsMenu_WarpSelect_2 0x800C11E0  # X batch: the warp menu of func_0041A5DC
+OptionsMenu_2:GameSettings_SetDefaults_2 0x800C1328  # X batch: copy of func_0041BA50
 func_00462EC0 0x800A5D70  # copy of func_00429FA0: its strings and 1.0f, in the engine .rodata
-func_00442500 0x800C05D4  # copy of func_00409500 (X), which now owns the pool
-func_00442784 0x800C05EC  # copy of func_00409784 (X), which now owns the pool
-func_00442A64 0x800C05F8  # twin of func_00409A64 (X), which now owns the pool
+MotherBoss_2:MotherBoss_DropPickupsAtSpawnPoints_2 0x800C05D4  # copy of func_00409500 (X), which now owns the pool
+MotherBoss_2:MotherBoss_UpdateSpotsAndPickups_2 0x800C05EC  # copy of func_00409784 (X), which now owns the pool
+MotherBoss_2:MotherBoss_TeleportTarget_2 0x800C05F8  # twin of func_00409A64 (X), which now owns the pool
 func_004465C4 0x800C08F4  # copy of func_0040D5C4 (X), which now owns the pool
 func_0043EAC8 0x800C0478  # twin of func_00405AC8 (X), which now owns the pool
 func_0043D57C 0x800C03B8  # twin of func_0040457C (FAKEMATCH, as there)
 func_0043CC14 0x800C0388  # twin of func_00403C14
-func_004436F0 0x800C0850  # twin of func_0040A6F0 (N)
+MotherBoss_2:MotherBoss_Phase1ChooseAttack_2 0x800C0850  # twin of func_0040A6F0 (N)
 func_00464960 0x800A5F54  # twin of func_0042BA40 (B)
 func_00465B04 0x800A6010  # -1.0f of func_002261A8, then 1.0f and jtbl of func_0042CBE4 (one source file)
 func_004407AC 0x800C0540  # copy of func_004077AC, which now owns the pool
@@ -113,18 +113,62 @@ func_00447B68 0x800C093C  # copy of func_0040EB68, which now owns the pool
 func_00440C20 0x800C046C  # copy of func_00407C20, which now owns the pool
 func_0044068C 0x800C0534  # copy of func_0040768C, which now owns the pool
 func_0044065C 0x800C052C  # copy of func_0040765C
-func_00453A08 0x800C1278  # copy of func_0041AAA0 (menu block), which now owns the pool
-func_00455FA0 0x800C1340  # copy of func_0041D050 (menu block), which now owns the pool
-func_0045E140 0x800C1810  # copy of func_00425220, which now owns the pool
-func_00466980 0x800A6A98  # copy of func_0042DA60, which now owns the pool
-func_0046706C 0x800A6AC4  # copy of func_0042E14C, which now owns the pool
-func_004671BC 0x800A6AC8  # copy of func_0042E29C, which now owns the pool
-func_00467920 0x800A70D8  # copy of func_0042EA00, which now owns the pool
-func_00466D94 0x800A6AA0  # copy of func_0042DE74, which now owns the pool
+CheatMenu_2:EnterCheatMenu_UpdateTextField_2 0x800C1278  # copy of func_0041AAA0 (menu block), which now owns the pool
+NameEntryMenu_2:NameEntryMenu_Init_2 0x800C1340  # copy of func_0041D050 (menu block), which now owns the pool
+MissionMenu_2:GfxPool_Alloc_2 0x800C1810  # copy of func_00425220, which now owns the pool
+CPlayer_2:CPlayer__SetupActors_2 0x800A6A98  # copy of func_0042DA60, which now owns the pool
+CPlayer_2:CPlayer__StartGame_2 0x800A6AC4  # copy of func_0042E14C, which now owns the pool
+CPlayer_2:CPlayer__LoseLife_2 0x800A6AC8  # copy of func_0042E29C, which now owns the pool
+CPlayer_2:CPlayer__ResetHealth_2 0x800A70D8  # copy of func_0042EA00, which now owns the pool
+CPlayer_2:CPlayer__LevelStart_2 0x800A6AA0  # copy of func_0042DE74, which now owns the pool
 func_00463B2C 0x800A5EB4  # copy of func_0042AC0C, which now owns the pool
 func_0045C514 0x800C1430  # copy of func_004235F4, which now owns the pool
-func_0045F084 0x800C18B0  # copy of func_00426164, which now owns the pool
-func_0045F2FC 0x800C18A0  # copy of func_004263DC, which now owns the pool
-func_004674CC 0x800A7080  # copy of func_0042E4CC, which now owns the pool
+Pak_2:Pak_SaveNoteVerified_2 0x800C18B0  # copy of func_00426164, which now owns the pool
+Pak_2:Pak_AllocDirectory_2 0x800C18A0  # copy of func_004263DC, which now owns the pool
+CPlayer_2:CPlayerPool__NewGame_2 0x800A7080  # copy of func_0042E4CC, which now owns the pool
 func_0045302C 0x800C1040  # copy of func_0041A0CC, which now owns the pool
-func_00455788 0x800C132C  # copy of func_0041C788, which now owns the pool
+OptionsMenu_2:OptionsMenu_ToggleResolution_2 0x800C132C  # copy of func_0041C788, which now owns the pool
+func_00446F70 0x800C090C  # copy of func_0040DF70 (round 25: was asm), which owns the pool
+func_00447108 0x800C0910  # copy of func_0040E108 (round 25: was asm), which owns the pool
+func_0044803C 0x800C0940  # copy of func_0040F03C (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_PartEffects_2 0x800C0668  # copy of func_0040A25C (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_Phase0ChooseAttack_2 0x800C0848  # copy of func_0040A418 (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_Phase2ChooseAttack_2 0x800C0864  # copy of func_0040A8FC (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_Mode23_Approach_2 0x800C087C  # copy of func_0040B80C (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_Mode24_GoToCenter_2 0x800C0888  # copy of func_0040B918 (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_Step_2 0x800C0890  # copy of func_0040BC64 (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_GetTargetDist_2 0x800C0894  # copy of func_0040BD60 (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_Collision_2 0x800C0898  # copy of func_0040BFF0 (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_RandomArenaPoint_2 0x800C08A0  # copy of func_0040C110 (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_SpawnPickup_2 0x800C08B4  # copy of func_0040C2C4 (round 25: was asm), which owns the pool
+MotherBoss_2:MotherBoss_SpawnRandomPickup_2 0x800C08B8  # copy of func_0040C394 (round 25: was asm), which owns the pool
+func_00450910 0x800C0EB0  # copy of func_00417910 (round 25: was asm), which owns the pool
+func_00450BB0 0x800C0EE0  # copy of func_00417BB0 (round 25: was asm), which owns the pool
+func_00450DD4 0x800C0E70  # copy of func_00417DD4 (round 25: was asm), which owns the pool
+func_0043DFE0 0x800C041C  # copy of func_00404FE0 (round 25: was asm), which owns the pool
+func_0043E0E0 0x800C0420  # copy of func_004050E0 (round 25: was asm), which owns the pool
+func_0043E288 0x800C043C  # copy of func_00405288 (round 25: was asm), which owns the pool
+func_0043E3C4 0x800C0448  # copy of func_004053C4 (round 25: was asm), which owns the pool
+func_0043E6DC 0x800C0464  # copy of func_004056DC (round 25: was asm), which owns the pool
+func_0043EE04 0x800C0494  # copy of func_00405E04 (round 25: was asm), which owns the pool
+func_0043F598 0x800C04C0  # copy of func_00406598 (round 25: was asm), which owns the pool
+func_0043F88C 0x800C04DC  # copy of func_0040688C (round 25: was asm), which owns the pool
+func_0043FC4C 0x800C04F0  # copy of func_00406C4C (round 25: was asm), which owns the pool
+func_0043FE0C 0x800C0500  # copy of func_00406E0C (round 25: was asm), which owns the pool
+func_0043FFE4 0x800C0504  # copy of func_00406FE4 (round 25: was asm), which owns the pool
+func_00440374 0x800C050C  # copy of func_00407374 (round 25: was asm), which owns the pool
+func_004404D0 0x800C0518  # copy of func_004074D0 (round 25: was asm), which owns the pool
+func_004406B0 0x800C0538  # copy of func_004076B0 (round 25: was asm), which owns the pool
+func_004408B8 0x800C0550  # copy of func_004078B8 (round 25: was asm), which owns the pool
+func_004409C4 0x800C0558  # copy of func_004079C4 (round 25: was asm), which owns the pool
+func_00440AC8 0x800C055C  # copy of func_00407AC8 (round 25: was asm), which owns the pool
+func_00464E68 0x800A5F6C  # copy of func_0042BF48 (round 25: was asm), which owns the pool
+func_004650B4 0x800A5FC4  # copy of func_0042C194 (round 25: was asm), which owns the pool
+func_00465480 0x800A600C  # copy of func_0042C560 (round 25: was asm), which owns the pool
+TotemDefense_2:TotemDefense_DrawTotem_2 0x800C0570  # copy of func_004089E0 (round 25: was asm), which owns the pool
+TotemDefense_2:TotemDefense_TryHitEnemy_2 0x800C05A8  # copy of func_00408CF4 (round 25: was asm), which owns the pool
+TotemDefense_2:TotemDefense_StopEnemies_2 0x800C05B0  # copy of func_00408DCC (round 25: was asm), which owns the pool
+TotemDefense_2:TotemDefense_TryHitEnemyAfterDelay_2 0x800C05B4  # copy of func_00408EAC (round 25: was asm), which owns the pool
+func_0045AE50 0x800C1414  # copy of func_00421F30 (round 25: was asm), which owns the pool
+func_0045AF80 0x800C1418  # copy of func_00422060 (round 25: was asm), which owns the pool
+func_0045B350 0x800C1428  # copy of func_00422430 (round 25: was asm), which owns the pool

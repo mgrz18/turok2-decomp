@@ -15,7 +15,10 @@ nops still pending at every section change, as asn64 does at a section
 directive in the source, but asn64 expands li.s without one. A `.section
 .rodata` right after an mfhi cost two nops asn64 never wrote (func_00282340,
 `rem` then `li.s`). cc1's jump tables are in .rodata too, so flushing before
-its next directive keeps the pool's order against them.
+its next directive keeps the pool's order against them. The pool's section
+line is marked `# sn_li pool` for `tools/shared_rodata.py --split`, and with
+SN_LI_FLUSH_AT (function names) the pool is also written out before those
+functions (the parts of a merged file, tools/sn_as.sh).
 
 A division (`div $3,$5,$2`, `rem`, `divu`, `remu`) is a macro too, with
 checks for a zero divisor (break 7) and, signed, for INT_MIN / -1 (break
@@ -29,6 +32,7 @@ use the destination register instead. A symbol off a base register (`lw $2,
 jtbl_X($2)`) is different: there the ROM has gas's order, so it is left alone.
 """
 
+import os
 import re
 import struct
 import sys
@@ -100,10 +104,16 @@ def main():
     noreorder = False
     out = []
     pool = []
+    flush_at = set(os.environ.get("SN_LI_FLUSH_AT", "").split())
     for line in sys.stdin.read().splitlines():
         ndiv += 1
         if pool and SECTION.match(line):
-            out += ["\t.section .rodata"] + pool
+            out += ["\t.section .rodata  # sn_li pool"] + pool
+            pool = []
+        m = re.match(r"^\s*\.ent\s+(\S+)", line)
+        if pool and m and m.group(1) in flush_at:
+            # a part of a merged file begins (tools/sn_as.sh): the pool so far is the previous part's
+            out += ["\t.section .rodata  # sn_li pool"] + pool + ["\t.text"]
             pool = []
         if re.match(r"^\s*\.set\s+noreorder", line):
             noreorder = True
@@ -134,7 +144,7 @@ def main():
             bits = struct.unpack(">I", struct.pack(">f", float(value)))[0]
             out.append(f"{ind}li ${reg},0x{bits:08X}")
     if pool:
-        out += ["\t.section .rodata"] + pool
+        out += ["\t.section .rodata  # sn_li pool"] + pool
     sys.stdout.write("\n".join(out) + "\n")
 
 

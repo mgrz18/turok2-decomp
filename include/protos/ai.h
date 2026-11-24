@@ -14,7 +14,7 @@ struct IntPair;
 s32 AI_PickAnimFromTable(sptr, sptr, struct IntPair *, s32);
 void AI_PlayAnim(sptr, void *, s32);
 void AI_TurnClamped(void *, sptr, f32, f32);
-void CAI__CallHurt(s32, void *);
+void CAI__CallHurt(void *, void *, void *);
 s32 CAI__SetMode(void *, void *, s32);
 
 #endif

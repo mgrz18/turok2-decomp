@@ -1,4 +1,4 @@
-/* WRONG CUT: splat named this D_00202128 (0x202128, 200 bytes): its first 8 bytes are junk fill
+/* WRONG CUT: splat cut a symbol at 0x202128 (200 bytes): its first 8 bytes are junk fill
  * ("Style" text), the real function starts at the 16-aligned 0x202130 (184 bytes; CEngineApp__Main calls it),
  * followed by 8 bytes of fill (a nop and a junk word) before CHeap__AllocAt.
  * Heap set-up at boot: clear everything from the end of the image (D_8014A000) to the top of RDRAM

@@ -1,4 +1,4 @@
-/* CPlayer code: CPlayer__Activate, 0x0042E9A4-0x0042EA00 (splat had it inside the data D_0042D50C). */
+/* CPlayer code: CPlayer__Activate, 0x0042E9A4-0x0042EA00 (splat had it inside the data at 0x0042D50C). */
 #include "common.h"
 #include "structs/player.h"
 #include "globals/game.h"

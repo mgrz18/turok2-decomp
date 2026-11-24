@@ -1,4 +1,4 @@
-/* CPlayer code: CPlayer__Construct, 0x0042E91C-0x0042E9A4 (splat had it inside the data D_0042D50C). */
+/* CPlayer code: CPlayer__Construct, 0x0042E91C-0x0042E9A4 (splat had it inside the data at 0x0042D50C). */
 #include "common.h"
 #include "structs/player.h"
 #include "structs/controller.h"

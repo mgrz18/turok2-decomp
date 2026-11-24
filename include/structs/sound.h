@@ -160,7 +160,13 @@ typedef struct {
     /* 0x14 */ s32 unk14;
     /* 0x18 */ s32 unk18;
     /* 0x1C */ s32 sndId;
-    /* 0x20 */ u8 pad20[0x20];
+    /* 0x20 */ u8 pad20[0x10];
+    /* 0x30 */ struct {
+        void *sequence;     /* the speech stream's data (SpeechPlayer_Update, state 1) */
+        s32 head;           /* cleared when the stream opens */
+        u8 kind;            /* 2 when the stream opens */
+        s32 tail;           /* cleared when the stream opens */
+    } stream;               /* rw_abu's QueueRec; SpeechPlayer_Update read it through a view at 0x800F55F4 (&stream.head) before round 25 */
 } SndFx; /* size 0x40 */
 
 struct CAudioWorld {

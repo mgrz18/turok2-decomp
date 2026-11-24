@@ -5,7 +5,7 @@
  * 0x1268), and the match state inside it, gEngineApp_m_Settings_match (+ 0x1D8).
  *
  * The first 0x184 bytes (GameSettingsBlock) are what the save and the demo
- * player copy (SaveGame_Build, Demo_End). Rage Wars' Shared_Game (D_801462C8, at the
+ * player copy (SaveGame_Build, Demo_End). Rage Wars' Shared_Game (0x801462C8, at the
  * same place in its game state) is the same block with 4 more bytes before
  * 0x08, so its `local` at 0x1D is `multiplayer` here at 0x19.
  *
@@ -25,7 +25,7 @@
 #include "structs/frame.h"
 
 /* The match state, gEngineApp_m_Settings_match: the play clock, then the rules of the
- * running match (Rage Wars' RenderCounters / GameRules at D_801468A0). */
+ * running match (Rage Wars' RenderCounters / GameRules at 0x801468A0). */
 typedef struct GameMatch {
     /* 0x00 */ f32 frames;             /* the play clock (CEngineApp__UpdatePlayTime) */
     /* 0x04 */ f32 seconds;
@@ -241,7 +241,7 @@ typedef struct CEngineApp {
     COnScreen unk19440[1];                           /* gEngineApp_m_OnScreen */
     union {
         CSwooshSystem m_SwooshSystem[1];             /* gEngineApp_m_SwooshSystem (structs/swoosh.h) */
-        u8 _SwooshBytes[0x22BC0 - 0x19608];          /* the N64's 0x9598 bytes and unk22BA0 (D_80119850) */
+        u8 _SwooshBytes[0x22BC0 - 0x19608];          /* the N64's 0x9598 bytes and unk22BA0 (0x80119850) */
     };
     union {
         CGame m_Game;                                /* gEngineApp_m_Game */

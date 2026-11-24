@@ -438,9 +438,71 @@ the two PakMenu files that keep `extern s32 gCharNoteMenuSaving` with a `local:`
 (they view `gPakProfileRead_character`, which `globals/pak.h` types otherwise). The 27 names of
 round 22 without a header were not revisited.
 
+## Round 25, part n4
+
+The last BSS views and the data names of round 25 (docs/NAMES.md, "Round 25, part n4"), declared
+where their users can include them; header edits are additive:
+
+- `globals/render.h` now includes `structs/gbi.h` and declares `Vtx_t gUnitQuadVtx[4]`: the three
+  local lines went (`Render_InitUnitQuad` and its module-2 copy include the header; the decals'
+  `u8 []` view in `SwooshSystem_DrawDecals` was only for `GBI_ADDR`, which takes the `Vtx_t *`).
+- `globals/cache.h`: no change; the `B12Mgr` view of `CCache__Construct` (and the four unused
+  `extern B12Mgr D_800D7BE0` lines) became `gCache`'s members.
+- `structs/sound.h`: `SndFx.stream` (0x30, over `pad20`), the speech stream record.
+- `globals/object.h`: `sAnimDecodeUnkC` (the two Anim files' local lines went).
+- `globals/boss.h` (now includes `structs/pick.h`): `sPrimagenSoundScript1Picks`..`4Picks`.
+- `globals/menu_desc.h`: `gTeamMenuDesc`, `gSingleMenuDesc`, `gFinalScoreMenuDesc`.
+- `globals/menu_text.h`: `sPakMenuText_Space`, `sMissionMenuText_Space`, `sEnterCheatKeyLabels`
+  (`unsigned char []`: the port keeps those labels in ROM byte order).
+- `globals/audio.h`: `sVoiceTrackSounds[]`, `sVoiceNoUnkC4Sounds[]`, deliberately without a size:
+  with `[4]` clang vectorized the port's `SndVoicePool_AllocVoice` scan into an aligned 16-byte
+  `pcmpeqd` load, the host object is not 16-aligned, and the demos crashed at frame 1375 (the same
+  trap as `gContStatus_errno` in round 24; `aligncheck.py` looks for `movaps`-type stores and did not
+  flag this load). `globals/particle.h`: `sTrailTexture0Points`..`3Points`; `globals/render.h`:
+  `sDecalSetupDList`, `sDeferredAlphaTexture` (`u8 []`; Render_BeginDeferredAlpha passes the array,
+  not `&` of a `char`); `globals/hud.h`: `sBossOverlayScript`, `sBoss2OverlayScript`; `globals/ai.h`:
+  `gAIBaseModeTable` (was declared as `D_800B0700`).
+- The local lines that redeclared the new names: deleted where the file includes the header;
+  `local:` comments where it cannot (`PakMenu_InitSaveGame` and its twin keep the `Chars4` view of
+  `sPakMenuText_Spaces3`, so they do not include `menu_text.h`; `vm2/CheatMenu/func_00453E18.c` takes
+  `sEnterCheatKeyLabels` as a `char`; `CheatMenu.c` includes `menu_text.h` only further down).
+
+Counts (`count_ext.py`, the round-22 method):
+
+| | at `f3e72718` | after n4 | round 25 merged (n1-n4 + vm1/MotherBoss) |
+|---|---:|---:|---:|
+| local `extern` lines of named globals | 277 | 278 | 255 |
+| ... with a `local` comment | 247 | 248 | 224 |
+| ... of names no header declares | 55 (29 names) | 52 (28 names) | 52 (28 names) |
+| ... redeclaring a header global without a `local` comment | 0 | 0 | 0 |
+
+The merged tree has fewer lines because a module merged into one C file keeps one declaration
+of each name where its files had one each (n1's 17 modules, n2's 5, n3's 8, vm1/MotherBoss).
+
+**The names still without a header**, each with its reason (the round-22 list re-checked; none of
+them can take a header declaration without changing the ROM or naming something that is not a game
+global):
+
+- Field symbols whose users need a view with another type than the field's (GCC 2 shares one
+  base register across the view's members, the field's type moves the registers or the loads):
+  `gEngineApp_m_Settings_difficulty` (6 lines: `CScene__BuildActorLists` reads `CGame` and the
+  camera pool at negative offsets from it), `gEngineApp_m_Game_m_PlayerList_m_bCinema` (4:
+  `Cinema_Update` reads `match.unk44` 0x1450 bytes on), `gEngineApp_m_Settings_match_seconds` /
+  `_minutes` / `_hours` (2 each: `GameNoteMenu_SelectYes` and its twin), `gLevelScript_swayPhase` (2:
+  its files view `gLevelScript` as `s32`), `gContStatus_errno` (the host alignment case of round 24).
+- Views local to one or two files of an object the header types otherwise: `gParticleSpriteVtx` (3),
+  `gVideoModeFlags`, `gScreenViewport` (2 each), `gPoolBuffers`, `gDLightBuffer`, `sResizedViMode`,
+  `gHeap_usedHead`, `sBootMarker`, `sBoneMatrixProfile` / `sBoneMatrixCount`.
+- Not game globals: `gT2BitStreamBase` (9, port-only), `__executable_start` / `etext` (the host
+  linker's), `gVirtualRomStart` / `gVirtualModule1Size` (absolute symbols), `CList__Construct` /
+  `Automap_RevealRegion` (code bounds in `IsCodePointer`), `ProPack__Decompress` (a function read
+  as `u8 []`), `CartRomHandle` (osCartRomInit's handle viewed as `PiHandle`),
+  `sBlindOnePhases_update_2` (a function pointer the counting script misses) and `value` (the
+  script's false hit on an anonymous struct member).
+
 ## Left
 
-- **Globals without a header (51 lines, 27 names, after round 22 k4).**
+- **Globals without a header (52 lines, 28 names, after round 25 n4; the list and reasons are in "Round 25, part n4" above).**
   - Field symbols one of whose users includes the owner's header and needs a view that
     shares a base register across fields, so the header cannot declare the field's type:
     `gEngineApp_m_Settings_difficulty` (6 lines; `CScene__BuildActorLists` reads `CGame` and

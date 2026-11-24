@@ -56,4 +56,8 @@ extern ALSound sSpeechSound;
 extern LoopSounds gLoopSounds;
 extern SndSource gLoopSoundEntries[15];
 
+/* Sound ids a new voice is checked against (round 25, data_g8) */
+extern s32 sVoiceTrackSounds[];       /* 4 ids: the voice stops with the music track (SndVoice.hasTrack); no size: a sized array lets clang vectorize the scan into an aligned 16-byte load, and the host object is not 16-aligned (the demos crashed) */
+extern s32 sVoiceNoUnkC4Sounds[];     /* 6 ids: the voice gets SndVoice.unkC4 = 0 (no size, the same reason) */
+
 #endif

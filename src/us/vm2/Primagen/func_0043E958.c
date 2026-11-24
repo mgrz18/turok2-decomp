@@ -1,0 +1,44 @@
+/* The second VM module's copy of src/us/vm1/Primagen/func_00405958.c (byte for byte, at the same link address or 0xE0 below
+ * it, docs/VMASM.md), with the second module's names. */
+#include "common.h"
+#include "structs/game_object.h"
+#include "structs/boss.h"
+#include "globals/boss.h"
+#include "globals/engine.h"
+#include "protos/ai.h"
+#include "globals/collision.h"
+
+extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void AI_StopSound(CGameObjectInstance *obj, CAI *ai);
+
+
+void Primagen_UpdateMode2_2(CGameObjectInstance *obj, CAI *ai) {
+    CAITargets t;
+    s32 limit;
+    u32 bit;
+
+    gCollisionInfoFlyingEnemy.m_dwFlags |= 0x8000;
+    AI_UpdateTargets(obj, ai, &t, 1, 1);
+    gCollisionInfoFlyingEnemy.m_dwFlags &= ~0x8000;
+
+    limit = 0x4B00;
+    if (gLevelScript.stage == 0) {
+        limit = 0x2580;
+    }
+    if (gLevelScript.damage >= limit) {
+        AI_StopSound(obj, ai);
+        ai->m_VisBits &= ~(1 << gLevelScript.part);
+        gLevelScript.partActive = 0;
+        CAI__SetMode(obj, ai, 7);
+    } else if (gLevelScript.partTimer <= 0.0f) {
+        AI_StopSound(obj, ai);
+        gLevelScript.values[0][gLevelScript.part] = gLevelScript.values[1][gLevelScript.part];
+        bit = 1 << gLevelScript.part;
+        gLevelScript.partActive = 0;
+        gLevelScript.partsDone |= bit;
+        ai->m_VisBits |= bit;
+        CAI__SetMode(obj, ai, 7);
+    } else {
+        gLevelScript.partTimer -= gFrameIncrement;
+    }
+}

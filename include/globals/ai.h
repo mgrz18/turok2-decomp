@@ -18,7 +18,7 @@ extern CVector3 gEnemyLastNoisePos;
 extern struct CAIModeInfo gEnemyGroundModeTable[33];
 /* the shared mode table every AI table above chains to through its header row (m_Mode): the
  * common modes (26 rows after the header); its address is only stored in those header words */
-extern struct CAIModeInfo D_800B0700[27];
+extern struct CAIModeInfo gAIBaseModeTable[27];
 extern CEnemyBehaviorInfo *gEnemyBehaviorInfo[8];
 extern CVector3 sProjectileMuzzleOffset;
 extern struct CAIModeInfo gEnemyStationaryGroundModeTable[4];

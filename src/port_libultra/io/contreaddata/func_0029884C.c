@@ -22,7 +22,7 @@ void __osPackReadData(void) {
     readformat.button = 0xFFFF;
     readformat.stick_x = -1;
     readformat.stick_y = -1;
-    count = &__osContNumControllers;
+    count = __osContNumControllers;
     for (i = 0; i < *count; i++) {
         *(ContReadFormat *)ptr = readformat;
         ptr += sizeof(ContReadFormat);
