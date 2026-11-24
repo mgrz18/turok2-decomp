@@ -370,11 +370,11 @@ void Pak_AllocDirectory(void);
 void *memset(void *, s32, uptr);
 
 DEFERRED void Pak_AllocDirectory(void) {
-    struct Shape_typemap_165 *temp_v0;
+    CMemEntry *temp_v0;
     sptr temp_a0;
-    temp_v0 = CCache__Allocate(0, 0x810, 0x23, "Mempak pakstate");
+    temp_v0 = (CMemEntry *)CCache__Allocate(0, 0x810, 0x23, (sptr)"Mempak pakstate");
     temp_a0 = (sptr) temp_v0->data;
-    gPakStateBuffer = (CMemEntry *)temp_v0;
+    gPakStateBuffer = temp_v0;
     gPakDirectories = (PakDirectory *)temp_a0;
     memset((void *)temp_a0, 0, 0x810);
     gPakDirectoryAllocated = 1;
