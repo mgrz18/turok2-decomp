@@ -31,25 +31,25 @@ MpMenu_2:FinalScoreMenu_Poll_2 0x800C0EE8  # floats
 TitleMenu_2:SoundMenu_SfxVolumeLabel_2 0x800C1030  # "  %2d", " %3d" (menu)
 CheatMenu_2:CheatsMenu_Init_2 0x800C11B0  # jtbl of func_0041A4D0
 CheatMenu_2:CheatMenu_WarpText_2 0x800C12B0  # jtbl of func_0041B05C
-func_00459B50 0x800C1438  # jtbl
-func_0045AEA8 0x800C1468  # jtbl
-func_0045B784 0x800C14B0  # jtbl
-func_0045B7D0 0x800C14F0  # jtbl
-func_0045B8FC 0x800C1530  # jtbl
-func_0045BA28 0x800C1570  # jtbl
-func_0045BB54 0x800C15B0  # jtbl
-func_0045BC80 0x800C15F0  # jtbl
-func_0045BDAC 0x800C1630  # jtbl
-func_0045C9EC 0x800C1670  # jtbl
-func_0045CA68 0x800C1688  # jtbl
-func_0045CAE4 0x800C16A0  # jtbl
-func_0045CB60 0x800C16B8  # jtbl
-func_0045CBDC 0x800C16D0  # jtbl
-func_0045CCC4 0x800C1700  # jtbl
+PakMenu_2:PakConfirmMenu_SelectYes_2 0x800C1438  # jtbl
+PakMenu_2:GameNoteMenu_UpdateLevel_2 0x800C1468  # jtbl
+PakMenu_2:PakMessage_UpdateHeading_2 0x800C14B0  # jtbl
+PakMenu_2:PakMessage_UpdateLine1_2 0x800C14F0  # jtbl
+PakMenu_2:PakMessage_UpdateLine2_2 0x800C1530  # jtbl
+PakMenu_2:PakMessage_UpdateLine3_2 0x800C1570  # jtbl
+PakMenu_2:PakMessage_UpdateLine4_2 0x800C15B0  # jtbl
+PakMenu_2:PakMessage_UpdateLine5_2 0x800C15F0  # jtbl
+PakMenu_2:PakMessage_UpdateOk_2 0x800C1630  # jtbl
+PakMenu_2:PakConfirmMenu_UpdateLine1_2 0x800C1670  # jtbl
+PakMenu_2:PakConfirmMenu_UpdateLine2_2 0x800C1688  # jtbl
+PakMenu_2:PakConfirmMenu_UpdateLine3_2 0x800C16A0  # jtbl
+PakMenu_2:PakConfirmMenu_UpdateLine4_2 0x800C16B8  # jtbl
+PakMenu_2:PakConfirmMenu_UpdateLine5_2 0x800C16D0  # jtbl
+PakMenu_2:PakConfirmMenu_UpdateNo_2 0x800C1700  # jtbl
 SceneActorPool_2 0x800A6050  # copy of func_0042CF90: its literal, in the engine .rodata
 func_00466040 0x800A60B8  # copy of func_0042D120: its literal, in the engine .rodata
 CheatMenu_2:CheatMenu_GetWarpLevel_2 0x800C12E0  # jtbl of func_0041B148
-func_0045CC58 0x800C16E8  # jtbl
+PakMenu_2:PakConfirmMenu_UpdateYes_2 0x800C16E8  # jtbl
 func_00448240 0x800C0950  # copy of the cinema file (func_0040F240 to func_004131B0)
 Primagen_2:Primagen_InitAI_2 0x800C038C  # W batch
 Primagen_2:Primagen_RunAttackStep_2 0x800C03E8  # W batch, jtbl
@@ -67,8 +67,8 @@ BlindOne_2:BlindOne_PhaseGroup3Init_2 0x800C0938  # W batch
 MpMenu_2:MpMenu_StartFragTag_2 0x800C0E94  # W batch: copy of func_00417490
 MpMenu_2:MpMenu_StartTeamBlood_2 0x800C0EA8  # W batch: copy of func_0041778C
 CheatMenu_2:EnterCheatMenu_DrawTextField_2 0x800C126C  # W batch: copy of func_0041A904
-func_00459E54 0x800C1450  # W batch, jtbl
-func_0045B234 0x800C1488  # W batch, jtbl
+PakMenu_2:PakConfirmMenu_SelectNo_2 0x800C1450  # W batch, jtbl
+PakMenu_2:CharNoteMenu_UpdateType_2 0x800C1488  # W batch, jtbl
 func_0045D980 0x800C1750  # W batch, jtbl
 MissionMenu_2:MissionMenu_UpdateObjective1Count_2 0x800C1770  # W batch, jtbl
 MissionMenu_2:MissionMenu_UpdateObjective2Count_2 0x800C1790  # W batch, jtbl
@@ -122,7 +122,7 @@ CPlayer_2:CPlayer__LoseLife_2 0x800A6AC8  # copy of func_0042E29C, which now own
 CPlayer_2:CPlayer__ResetHealth_2 0x800A70D8  # copy of func_0042EA00, which now owns the pool
 CPlayer_2:CPlayer__LevelStart_2 0x800A6AA0  # copy of func_0042DE74, which now owns the pool
 func_00463B2C 0x800A5EB4  # copy of func_0042AC0C, which now owns the pool
-func_0045C514 0x800C1430  # copy of func_004235F4, which now owns the pool
+PakMenu_2:DamagedPakMenu_UpdateLine3_2 0x800C1430  # copy of func_004235F4, which now owns the pool
 Pak_2:Pak_SaveNoteVerified_2 0x800C18B0  # copy of func_00426164, which now owns the pool
 Pak_2:Pak_AllocDirectory_2 0x800C18A0  # copy of func_004263DC, which now owns the pool
 CPlayer_2:CPlayerPool__NewGame_2 0x800A7080  # copy of func_0042E4CC, which now owns the pool
@@ -169,6 +169,6 @@ TotemDefense_2:TotemDefense_DrawTotem_2 0x800C0570  # copy of func_004089E0 (rou
 TotemDefense_2:TotemDefense_TryHitEnemy_2 0x800C05A8  # copy of func_00408CF4 (round 25: was asm), which owns the pool
 TotemDefense_2:TotemDefense_StopEnemies_2 0x800C05B0  # copy of func_00408DCC (round 25: was asm), which owns the pool
 TotemDefense_2:TotemDefense_TryHitEnemyAfterDelay_2 0x800C05B4  # copy of func_00408EAC (round 25: was asm), which owns the pool
-func_0045AE50 0x800C1414  # copy of func_00421F30 (round 25: was asm), which owns the pool
-func_0045AF80 0x800C1418  # copy of func_00422060 (round 25: was asm), which owns the pool
-func_0045B350 0x800C1428  # copy of func_00422430 (round 25: was asm), which owns the pool
+PakMenu_2:func_0045AE50 0x800C1414  # copy of func_00421F30 (round 25: was asm), which owns the pool
+PakMenu_2:func_0045AF80 0x800C1418  # copy of func_00422060 (round 25: was asm), which owns the pool
+PakMenu_2:func_0045B350 0x800C1428  # copy of func_00422430 (round 25: was asm), which owns the pool
