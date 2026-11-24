@@ -174,10 +174,6 @@ typedef struct {
     /* 0x0C */ f32 maxZ;
     /* 0x10 */ u32 count;
 } Area; /* 0x14 bytes */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x110];
-    /* 0x110 */ void *colorImage;
-} FrameBuffers;
 extern Vp gScreenViewport[];
 extern void CMtxF__InvertAffine(f32 *out, f32 *m);
 extern void CMtxF__ToMtxAffine(f32 *m, Mtx *out);
@@ -350,7 +346,7 @@ void Automap_Draw(MapView *view) {
     GFX_CMD(0xDE000000, GBI_ADDR(gRdpInitDL));
     GFX_CMD(0xED000000, ((((s32) ((f32) (gScreenWidth - 1) * 4.0f)) & 0xFFF) << 12) |
                         (((s32) ((f32) (gScreenHeight - 1) * 4.0f)) & 0xFFF)); /* gDPSetScissor */
-    GFX_CMD(0xFF100000 | ((gScreenWidth - 1) & 0xFFF), GBI_ADDR(((FrameBuffers *)gEngineApp.m_pCurrentFrameData)->colorImage)); /* gDPSetColorImage */
+    GFX_CMD(0xFF100000 | ((gScreenWidth - 1) & 0xFFF), GBI_ADDR(gEngineApp.m_pCurrentFrameData->m_pFrameBuffer)); /* gDPSetColorImage */
     GFX_CMD(0xDC080008, GBI_ADDR(vp));                          /* gSPViewport */
     GFX_CMD(0xE7000000, 0);                                 /* gDPPipeSync */
     GFX_CMD(0xE3000A01, 0);                                 /* gDPSetCycleType(G_CYC_1CYCLE) */
