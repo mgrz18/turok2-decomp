@@ -7989,26 +7989,9 @@ void CPlayer__DrawSightIcon(void *arg0, void *arg1)
 }
 #endif
 
-struct ScreenRectangle;
-#ifdef TARGET_PORT
-/* The camera's viewport at its host offsets (round 12 a5, tools/port/n64viewcheck.py): the N64 view
- * read 0x288.. of the host CCamera, which has pointers before m_Viewport. */
-#include "structs/camera.h"
-#define T2_HOFF_ScreenRectangle(m) __builtin_offsetof(CCamera, m)
-typedef struct ScreenRectangle {
-    union {
-        struct { u8 _hp_x[T2_HOFF_ScreenRectangle(m_Viewport.m_Width)]; f32 x; }; /* N64 0x288 */
-        struct { u8 _hp_y[T2_HOFF_ScreenRectangle(m_Viewport.m_Height)]; f32 y; }; /* N64 0x28C */
-        struct { u8 _hp_width[T2_HOFF_ScreenRectangle(m_Viewport.m_ScreenPosX)]; f32 width; }; /* N64 0x290 */
-        struct { u8 _hp_height[T2_HOFF_ScreenRectangle(m_Viewport.m_ScreenPosY)]; f32 height; }; /* N64 0x294 */
-    };
-} ScreenRectangle;
-#else
-typedef struct ScreenRectangle { char pad0[0x288]; f32 x,y,width,height; } ScreenRectangle;
-#endif
-void CPlayer__DrawCenterIcon(void *arg0, struct ScreenRectangle *arg1);
+void CPlayer__DrawCenterIcon(void *arg0, CCamera *arg1);
 
-void CPlayer__DrawCenterIcon(void *arg0, struct ScreenRectangle *arg1)
+void CPlayer__DrawCenterIcon(void *arg0, CCamera *arg1)
 {
   f32 x;
   f32 y;
@@ -8021,17 +8004,17 @@ void CPlayer__DrawCenterIcon(void *arg0, struct ScreenRectangle *arg1)
   f32 screenX;
   f32 screenY;
   Hud_SetupTextureMode(gEngineApp_m_Settings.hudAlpha);
-  x = arg1->x;
+  x = arg1->m_Viewport.m_Width;
   ax = x * 0.5f;
-  y = arg1->y;
+  y = arg1->m_Viewport.m_Height;
   ay = y * 0.5f;
   sx = x / ((f32) gScreenWidth);
   bx = sx * 16.0f;
   sy = y / ((f32) gScreenHeight);
   by = sy * 16.0f;
-  screenX = ((arg1->width) + ax) - bx;
-  screenY = ((arg1->height) + ay) - by;
-  Hud_DrawSprite(0x1FB, 0, (s16) ((s32) (((arg1->width) + ax) - bx)), (s16) ((s32) screenY), sx, sy, 1);
+  screenX = ((arg1->m_Viewport.m_ScreenPosX) + ax) - bx;
+  screenY = ((arg1->m_Viewport.m_ScreenPosY) + ay) - by;
+  Hud_DrawSprite(0x1FB, 0, (s16) ((s32) (((arg1->m_Viewport.m_ScreenPosX) + ax) - bx)), (s16) ((s32) screenY), sx, sy, 1);
 }
 
 s32 CPlayer__IsInMatchEndState(CPlayer *arg0) {
