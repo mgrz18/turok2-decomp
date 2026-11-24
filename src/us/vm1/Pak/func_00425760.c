@@ -1,0 +1,35 @@
+/* WRONG CUT: real function Pak_RefreshNotes, size 0x188: splat's func_0045E674 starts with 3 junk words (0x45E674-0x45E680, linker fill after the hand-written func_0045E630). */
+#include "common.h"
+#include "structs/pak.h"
+#include "globals/pak.h"
+
+extern s32 osPfsFileState(OSPfs *pfs, s32 file_no, OSPfsState *state); /* osPfsFileState */
+extern s32 osPfsFreeBlocks(OSPfs *pfs, s32 *bytes);                  /* osPfsFreeBlocks */
+
+/* Re-reads the directory of the pak on channel ch into the cache. */
+/* Returns the last osPfsFreeBlocks result (the callers test it), as vm1's Pak_RefreshNotes. */
+s32 Pak_RefreshNotes(s32 ch) {
+    s32 i;
+    s32 ret;
+    s32 bytes;
+
+    if (gPakDirectories != NULL) {
+        for (i = 0; i < 16; i++) {
+            ret = osPfsFileState(&gPakFileSystems[ch], i, &gPakDirectories[ch].notes[i]);
+            if (ret != 0 && ret != 5) {
+                ret = osPfsFileState(&gPakFileSystems[ch], i, &gPakDirectories[ch].notes[i]);
+            }
+            if (ret == 5) {
+                gPakDirectories[ch].notes[i].file_size = 0;
+                gPakDirectories[ch].notes[i].game_code = 0;
+                gPakDirectories[ch].notes[i].company_code = 0;
+                gPakDirectories[ch].notes[i].ext_name[0] = 0;
+                gPakDirectories[ch].notes[i].game_name[0] = 0;
+            }
+            if (osPfsFreeBlocks(&gPakFileSystems[ch], &bytes) == 0) {
+                gPakDirectories[ch].freeBytes = bytes;
+            }
+        }
+    }
+    return osPfsFreeBlocks(&gPakFileSystems[ch], &bytes);
+}
