@@ -64,9 +64,8 @@ typedef struct {
 #ifdef TARGET_PORT
 int T2Port_LegacyIntel9(void); /* port/game/t2debug.c */
 #endif
-void CScene__DecompressIntelligence(sptr unused, void ***resource) __attribute__((section(".text_vm")));
-
-void CScene__DecompressIntelligence(sptr unused, void ***resource) {
+/* VM_TEXT on the definition (the merged object drops a prototype of a function it defines) */
+VM_TEXT void CScene__DecompressIntelligence(sptr unused, void ***resource) {
     f32 scale = 1.0f;
     s32 *table;
     s32 count;

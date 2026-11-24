@@ -28,8 +28,9 @@ void LevelEvent_Fire(void *event);
  * loaded, so what they had done (a used key slot s collision off, ...) was lost on a later visit. */
 #include "structs/world.h"
 #include "globals/scene.h"
-void CScene__RestoreFiredEvent(World_func_8028787C_de *world_, Entity *entity) {
+void CScene__RestoreFiredEvent(void *world_, void *entityArg) {
     CScene *world = (CScene *) world_;
+    Entity *entity = (Entity *) entityArg;
     s32 index = entity->index;
     void *mask;
     unsigned char *bits;
@@ -48,7 +49,10 @@ void CScene__RestoreFiredEvent(World_func_8028787C_de *world_, Entity *entity) {
     }
 }
 #else
-void CScene__RestoreFiredEvent(World_func_8028787C_de *world, Entity *entity) {
+#define world ((World_func_8028787C_de *) worldArg)
+#define entity ((Entity *) entityArg)
+/* the definition takes the callers' type (one prototype for the merged object); the Rage Wars view reads it */
+void CScene__RestoreFiredEvent(void *worldArg, void *entityArg) {
     s32 index;
     s32 level;
     void *mask;
@@ -75,4 +79,6 @@ void CScene__RestoreFiredEvent(World_func_8028787C_de *world, Entity *entity) {
         LevelEvent_Fire(entity);
     }
 }
+#undef world
+#undef entity
 #endif

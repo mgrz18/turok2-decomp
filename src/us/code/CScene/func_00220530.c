@@ -22,9 +22,9 @@ void CScene__ClearListCounts(void *);
 void CScene__CollectSectorObjects(struct CScene *);
 void CScene__DrawWarpFade(struct CScene *);
 void CScene__LoadVisibleGridSections(struct CScene *);
-void CScene__ReleaseSectors(void *);
+void CScene__ReleaseSectors(struct CScene *);
 void CScene__Update(struct CScene *);
-void CScene__UpdateDelayedEvents(void *);
+void CScene__UpdateDelayedEvents(struct CScene *);
 void CScene__UpdateWarp(struct CScene *);
 
 /* The input state the controller reader fills (gEngineApp_m_Settings, 0x184 bytes). */

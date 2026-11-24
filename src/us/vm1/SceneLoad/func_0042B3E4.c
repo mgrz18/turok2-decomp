@@ -91,7 +91,9 @@ static __inline__ s32 groupHas(WorldRecAt1B40C *world, s32 n) {
     mask = 1 << (n & 7);
     return bits[n / 8] & mask;
 }
-void CScene__DecompressLinks(WorldRecAt1B40C *world, void ***handle) {
+#define world ((WorldRecAt1B40C *) worldArg)
+/* the definition takes the callers' type (one prototype for the merged object) (its view's type differs per build); the Rage Wars view reads it */
+void CScene__DecompressLinks(void *worldArg, void ***handle) {
     void *node;
     struct IntPair_0042B3E4 *l0;
     struct IntPair_0042B3E4 *l1;
@@ -143,3 +145,4 @@ void CScene__DecompressLinks(WorldRecAt1B40C *world, void ***handle) {
         }
     }
 }
+#undef world

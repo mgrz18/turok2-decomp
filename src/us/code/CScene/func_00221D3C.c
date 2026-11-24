@@ -30,14 +30,14 @@ void CScene__DrawSortedList(void *, void *);
  * CScene__DrawSortedList). The list is built in place behind a branch command that
  * jumps over it, and later views just call it (0xDE000000). */
 
-/* gEngineApp_m_Settings (structs/game.h) seen from its difficulty, gEngineApp_m_Settings_difficulty: the
+/* gEngineApp_m_Settings (structs/game.h) seen from its difficulty, gSettingsDifficultyView_00221D3C: the
  * ROM bases the CGame and camera-pool reads below on this symbol, and with
  * gEngineApp_m_Settings / gEngineApp_m_Game the code no longer matches. */
 typedef struct {
     s32 mask;               /* 0x00 */
-} ViewState;
+} ViewState_00221D3C;
 
-extern ViewState gEngineApp_m_Settings_difficulty; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern ViewState_00221D3C gSettingsDifficultyView_00221D3C __asm__("gEngineApp_m_Settings_difficulty"); /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
@@ -68,7 +68,7 @@ void CScene__BuildGeometryDisplayList(CScene *w) {
     s32 found;
     s32 c;
 
-    mask = gEngineApp_m_Settings_difficulty.mask;
+    mask = gSettingsDifficultyView_00221D3C.mask;
     vmask = gCameraVisBits;
     if (gSceneGeometryDL == NULL) {
 #ifdef TARGET_PORT
@@ -76,7 +76,7 @@ void CScene__BuildGeometryDisplayList(CScene *w) {
          * the difficulty; on the host the two are 0x1358 apart (round 18 g2, n64viewcheck gptr) */
         views = (CCamera *) gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
 #else
-        views = *(CCamera **)((u8 *)&gEngineApp_m_Settings_difficulty - 0x1210);
+        views = *(CCamera **)((u8 *)&gSettingsDifficultyView_00221D3C - 0x1210);
 #endif
         if (views == NULL) {
             return;

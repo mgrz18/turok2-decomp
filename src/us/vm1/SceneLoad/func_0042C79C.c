@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/vector.h"
+#include "structs/world.h"
 /* protos/scene.h's prototypes of what this file calls (the module defines them all; the
  * merged file declares them from the definitions). */
 struct CCamera;
@@ -26,9 +27,7 @@ void Cinema_Disable();
 #ifdef TARGET_PORT
 /* The port (round 13 b2): the record tables by member of CScene (the N64 view reads them at
  * 0x1168-0x117C, other members of the host CScene, and keeps the table pointers in s32). */
-#include "structs/world.h"
-void CScene__RestoreFiredEvents(State_func_8044D5C4_de *arg0) {
-    CScene *w = (CScene *) arg0;
+void CScene__RestoreFiredEvents(CScene *w) {
     s32 i, n;
     Cinema_Disable();
     n = w->m_nRecords;
@@ -38,7 +37,9 @@ void CScene__RestoreFiredEvents(State_func_8044D5C4_de *arg0) {
     Cinema_Enable();
 }
 #else
-void CScene__RestoreFiredEvents(State_func_8044D5C4_de *arg0) {
+#define arg0 ((State_func_8044D5C4_de *) scene)
+/* the definition takes the callers' type (one prototype for the merged object); the Rage Wars view reads it */
+void CScene__RestoreFiredEvents(CScene *scene) {
  s32 i,n;
  Cinema_Disable();
  n=arg0->unk1168;
@@ -47,4 +48,5 @@ void CScene__RestoreFiredEvents(State_func_8044D5C4_de *arg0) {
  for(i=0;i<n;i++) CScene__RestoreFiredEvent(arg0,arg0->unk117C+i*20);
  Cinema_Enable();
 }
+#undef arg0
 #endif

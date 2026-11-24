@@ -1,8 +1,8 @@
 #include "common.h"
 #include "protos/cache.h"
+#include "structs/world.h"
 
 #ifdef TARGET_PORT
-#include "structs/world.h"
 
 /* Host body on CScene (the view below has the N64 offsets and a 4-byte sector handle). */
 void CScene__ReleaseSectors(CScene *scene) {
@@ -36,7 +36,9 @@ typedef struct Cache {
 } Cache;
 
 
-void CScene__ReleaseSectors(Cache *cache) {
+#define cache ((Cache *) scene)
+/* the definition takes the callers' type (one prototype for the merged object); the view reads it */
+void CScene__ReleaseSectors(CScene *scene) {
     s32 i;
     s32 count;
     Entry8 *entries;
@@ -51,4 +53,5 @@ void CScene__ReleaseSectors(Cache *cache) {
     cache->unk1064 = 0;
     cache->count = 0;
 }
+#undef cache
 #endif

@@ -1,10 +1,10 @@
 #include "common.h"
 #include "globals/engine.h"
 #include "protos/list.h"
+#include "structs/world.h"
 
 #ifdef TARGET_PORT
 /* The port: the scene's delayed events typed (structs/world.h). */
-#include "structs/world.h"
 #include "structs/event.h"
 
 void LevelEvent_Fire(void *event);
@@ -50,7 +50,9 @@ typedef struct {
     /* 0x1194 */ TimedNode *freeHead;    /* CList at 0x1194 */
 } TimedPool;
 
-void CScene__UpdateDelayedEvents(TimedPool *arg0) {
+#define arg0 ((TimedPool *) scene)
+/* the definition takes the callers' type (one prototype for the merged object); the view reads it */
+void CScene__UpdateDelayedEvents(CScene *scene) {
     f32 temp_f1;
     s32 var_s1;
     s32 var_v1;
@@ -85,4 +87,5 @@ void CScene__UpdateDelayedEvents(TimedPool *arg0) {
         } while (var_s0 != NULL);
     }
 }
+#undef arg0
 #endif

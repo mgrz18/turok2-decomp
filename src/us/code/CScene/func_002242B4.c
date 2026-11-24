@@ -17,7 +17,7 @@ struct CScene;
 struct CSceneRecord;
 struct LevelEvent;
 void CScene__DecompressCollision(void *, void *);
-sptr CScene__GetRegion(void *, s32);
+sptr CScene__GetRegion(struct CScene *, s32);
 u32 CScene__GetRegionIndex(struct CScene *, sptr);
 void CScene__SetLevelBit(void *, s32, s32);
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;

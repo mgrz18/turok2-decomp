@@ -37,7 +37,7 @@ void CScene__DecompressPaths(void *, s32 ***);
 void CScene__GetLevelName(struct CScene *, s32, void *, s32);
 void CScene__LoadLevel(struct CScene *, s32, s32);
 void CScene__LoadLightSettings(void *);
-void CScene__ReleaseSectors(void *);
+void CScene__ReleaseSectors(struct CScene *);
 void CScene__StreamAllSections(struct CScene *);
 #include "protos/player.h"
 #include "protos/game.h"

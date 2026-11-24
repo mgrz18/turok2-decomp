@@ -18,7 +18,7 @@ s32 CScene__FindWarpDests(void *, s32, s32, void *, s32);
 void CScene__LoadLevel(struct CScene *, s32, s32);
 void CScene__UpdateWarp(struct CScene *);
 
-extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
+extern CGameFromCameraPool gCameraPoolGame_002237C4 __asm__("gEngineApp_m_Game_m_CameraPool"); /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 
 void Cinema_Reset(CWarpFadeColor *entry);
 void Cinema_StopAtEnd(void);
@@ -65,12 +65,12 @@ void CScene__UpdateWarp(CScene *scene) {
                 id = transitionId(scene);
                 CScene__LoadLevel(scene, id, scene->m_bWarpSpawn);
                 if (scene->m_bWarpSpawn != 0) {
-                    settings = &gEngineApp_m_Game_m_CameraPool.m_Settings;
+                    settings = &gCameraPoolGame_002237C4.m_Settings;
                     if (scene->m_PreviewOptions != settings->unlockedCheats && !Demo_GetPlayerCount()) {
 #ifdef TARGET_PORT
-                        CCameraPool__AddTimedText(&gEngineApp_m_Game_m_CameraPool, &gEngineApp_m_Game_m_CameraPool.m_CameraPool[0].m_MainCamera, sCheatMessageText_NewCheatEnabled, 4.0f);
+                        CCameraPool__AddTimedText(&gCameraPoolGame_002237C4, &gCameraPoolGame_002237C4.m_CameraPool[0].m_MainCamera, sCheatMessageText_NewCheatEnabled, 4.0f);
 #else
-                        CCameraPool__AddTimedText(&gEngineApp_m_Game_m_CameraPool, gEngineApp_m_Game_m_CameraPool.m_CameraPool + 0x40, sCheatMessageText_NewCheatEnabled, 4.0f);
+                        CCameraPool__AddTimedText(&gCameraPoolGame_002237C4, gCameraPoolGame_002237C4.m_CameraPool + 0x40, sCheatMessageText_NewCheatEnabled, 4.0f);
 #endif
                         scene->m_PreviewOptions = settings->unlockedCheats;
                     }

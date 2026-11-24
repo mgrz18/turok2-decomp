@@ -27,7 +27,7 @@ extern s32 CScene__FindObjectType(CScene *w, s32 id);
 extern s32 CScene__GetObject(CScene *w, s32 index);
 extern void CScene__ClearListCounts();
 extern void CScene__LoadLevel(CScene *w, s32, s32);
-extern void CScene__InitPersistentData(CScene *w, s32 file);
+void CScene__InitPersistentData(CScene *menu);
 extern void CScene__ConstructWarp(CScene *w);
 void CPlayerPool__LevelStart(void *pool);
 
@@ -111,7 +111,7 @@ void CScene__Construct(CScene *w, s32 file) {
     w->m_CinemasKey = res;
     CCache__LoadPersistantIndex(0, (sptr *)&w->m_pCinemas, res, "Cinemas index");
     w->m_pLinkGroupTypes = *CCache__LoadPersistantSubBlock_v(0, cart, 0x13, file, w, NULL, "link group types");
-    CScene__InitPersistentData(w, file);
+    ((void (*)(CScene *, s32)) CScene__InitPersistentData)(w, file); /* the definition takes one */
     gPersistentDataLoaded = 1;
     loadGeomHeader(w, &w->m_Geom[0], 0xDAC);
     loadGeomHeader(w, &w->m_Geom[1], 0xDAD);

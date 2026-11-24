@@ -23,8 +23,9 @@ void *CScene__GetSwoosh(CScene *arg0, s32 index) {
     return CISet__GetBlock(arg0->m_pSwooshes, index);
 }
 #else
+void *CISet__GetBlock(void *, s32);
 
 void CScene__GetSwoosh(CScene *arg0) {
-    CISet__GetBlock((sptr)arg0->m_pSwooshes);
+    ((void (*)(sptr)) CISet__GetBlock)((sptr)arg0->m_pSwooshes); /* the ROM passes one (a1 goes through) */
 }
 #endif

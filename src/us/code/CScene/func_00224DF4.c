@@ -44,3 +44,4 @@ sptr CScene__LoadGraphicSet(Owner *owner, s32 id, s32 flags, s32 arg3) {
     return CCache__Request(0, CISet__GetROMAddressAndSize(owner->unk48, owner->unk1C, index, &out), out, flags, 0,
                          ProPack__Decompress, "graphicset", arg3);
 }
+#undef unk1C

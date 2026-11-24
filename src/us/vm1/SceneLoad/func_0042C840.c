@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/vector.h"
+#include "structs/world.h"
 /* protos/scene.h's prototypes of what this file calls (the module defines them all; the
  * merged file declares them from the definitions). */
 struct CCamera;
@@ -32,9 +33,7 @@ extern void Cinema_Enable(void);
 #ifdef TARGET_PORT
 /* The port (round 13 b2): the record tables by member of CScene (the N64 view reads them at
  * 0x1168-0x117C, other members of the host CScene, and keeps the table pointers in s32). */
-#include "structs/world.h"
-void CScene__ReapplyFiredEvents(Level *level) {
-    CScene *w = (CScene *) level;
+void CScene__ReapplyFiredEvents(CScene *w) {
     s32 i, k, n;
     Item_func_8044D668_de *item;
     Cinema_Disable();
@@ -50,7 +49,9 @@ void CScene__ReapplyFiredEvents(Level *level) {
     Cinema_Enable();
 }
 #else
-void CScene__ReapplyFiredEvents(Level *level) {
+#define level ((Level *) scene)
+/* the definition takes the callers' type (one prototype for the merged object); the Rage Wars view reads it */
+void CScene__ReapplyFiredEvents(CScene *scene) {
     s32 i;
     s32 n;
     Item_func_8044D668_de *item;
@@ -71,4 +72,5 @@ void CScene__ReapplyFiredEvents(Level *level) {
     }
     Cinema_Enable();
 }
+#undef level
 #endif
