@@ -169,13 +169,12 @@ extern void MenuItem_DrawText(void *menu, MenuItemLayout *item, void *arg2, Menu
  * the last element's first, which is why the ROM has " ", "9" .. "0", "z" .. "a" between
  * NameEntryMenu_UpdateName's 15.0f and NameEntryMenu_DrawName's literals. The title and the
  * last three keys' texts are the engine's (globals/menu_text.h); the four name fields are
- * the edit buffers at D_800C1FBC. The port keeps the generated copy (tools/port/gendata.py:
+ * the players' name buffers (gNameEntries[].name). The port keeps the generated copy (tools/port/gendata.py:
  * the s32 `data` slot holds an N64 address, a handle there). */
 #include "globals/menu_text.h"
 #include "globals/menu_desc.h"
 
 #ifndef TARGET_PORT
-extern char D_800C1FBC[];
 void NameEntryMenu_DrawName(void *menu, MenuItemLayout *item, void *arg2, Menu *win);
 s32 NameEntryMenu_DeleteChar(s32 menu, Menu *c);
 s32 NameEntryMenu_Confirm(s32 menu, Menu *c, s32 pool);
@@ -184,10 +183,10 @@ s32 Menu_Draw();
 
 MenuItemDesc gNameEntryMenuItems[] = {
     { 0, { 0 }, 0x00000041, 0, 0, { 0x00, 0x00, 0xFF, 0x01 }, (s32)sNameEntryText_Edit, (void *)MenuItem_DrawText, 0, 0, 0, 0 },
-    { 0, { 0 }, 0x00210101, 0, 8, { 0x00, 0x00, 0xFF, 0x01 }, (s32)&D_800C1FBC[0x00], (void *)NameEntryMenu_DrawName, (void *)NameEntryMenu_UpdateName, 0, 0, 0 },
-    { 0, { 0 }, 0x00210101, 0, 8, { 0x00, 0x00, 0xFF, 0x01 }, (s32)&D_800C1FBC[0x18], (void *)NameEntryMenu_DrawName, (void *)NameEntryMenu_UpdateName, 0, 0, 0 },
-    { 0, { 0 }, 0x00210101, 0, 8, { 0x00, 0x00, 0xFF, 0x01 }, (s32)&D_800C1FBC[0x30], (void *)NameEntryMenu_DrawName, (void *)NameEntryMenu_UpdateName, 0, 0, 0 },
-    { 0, { 0 }, 0x00210101, 0, 8, { 0x00, 0x00, 0xFF, 0x01 }, (s32)&D_800C1FBC[0x48], (void *)NameEntryMenu_DrawName, (void *)NameEntryMenu_UpdateName, 0, 0, 0 },
+    { 0, { 0 }, 0x00210101, 0, 8, { 0x00, 0x00, 0xFF, 0x01 }, (s32)gNameEntries[0].name, (void *)NameEntryMenu_DrawName, (void *)NameEntryMenu_UpdateName, 0, 0, 0 },
+    { 0, { 0 }, 0x00210101, 0, 8, { 0x00, 0x00, 0xFF, 0x01 }, (s32)gNameEntries[1].name, (void *)NameEntryMenu_DrawName, (void *)NameEntryMenu_UpdateName, 0, 0, 0 },
+    { 0, { 0 }, 0x00210101, 0, 8, { 0x00, 0x00, 0xFF, 0x01 }, (s32)gNameEntries[2].name, (void *)NameEntryMenu_DrawName, (void *)NameEntryMenu_UpdateName, 0, 0, 0 },
+    { 0, { 0 }, 0x00210101, 0, 8, { 0x00, 0x00, 0xFF, 0x01 }, (s32)gNameEntries[3].name, (void *)NameEntryMenu_DrawName, (void *)NameEntryMenu_UpdateName, 0, 0, 0 },
     { 0, { 0 }, 0x00010110, 0, 10, { 0x07, 0x01, 0x20, 0x08 }, (s32)"a", (void *)MenuItem_DrawText, 0, (void *)NameEntryMenu_AddChar, 0, 0 },
     { 0, { 0 }, 0x00024110, 6, 0, { 0xFF, 0x01, 0x20, 0x08 }, (s32)"b", (void *)MenuItem_DrawText, 0, (void *)NameEntryMenu_AddChar, 0, 0 },
     { 0, { 0 }, 0x00024110, 6, 0, { 0xFF, 0x01, 0x20, 0x08 }, (s32)"c", (void *)MenuItem_DrawText, 0, (void *)NameEntryMenu_AddChar, 0, 0 },

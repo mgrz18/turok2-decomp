@@ -689,3 +689,11 @@ asm with their own register conventions, in a cut file), the STVM TLB routines
 in the engine copy (0x0028EE40-0x0028EEFC: `STVM_MapTLB` is boot.s's name for
 the boot copy, and the engine copy starts one word before its cut), and the
 watch-register helpers 0x00201074/0x00425710.
+
+## Round 26, part o2: the name entry menu
+
+`versions/names/data_o2.us.txt`: the engine pool strings the name entry menu shows,
+`sNameEntryText_Edit` ("edit", its title) and `sNameEntryText_Glyph2`/`3`/`4` (the font glyphs
+2, 3, 4 of its last three keys), declared in `globals/menu_text.h`. They became names because
+`vm1/NameEntryMenu/NameEntryMenu.c` now defines the menu itself (`gNameEntryMenuItems`, was
+`D_0043AD10`, and `gNameEntryMenuDesc`; docs/MODULES.md, round 26 part o2). The four name fields point at `gNameEntries[k].name`.
