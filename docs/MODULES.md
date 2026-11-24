@@ -969,6 +969,36 @@ is from its report.) What it took:
 (`AI_TurnClamped`: 4th argument `f32` in some callers, `s32` in others), `vm2/SceneLoad` (goes with the
 engine/VM `CScene` pair of part p4), `vm2/PakMenu`.
 
+## Round 27 merge: the state after parts p1-p4
+
+Merged in the order p3 (it moves directories: the `CInstancePool` split, `tools/ld_fill.py` in the
+`Makefile`), p4 (`VM_TEXT`, `.text_vm`), p1, p2 (`--no-ff`). The only textual conflicts were this file
+(each part's section kept) and `versions/port_layout.us.json` (regenerated with `mklayout.py` after each
+merge); `include/common.h`, the `Makefile`, `merge_module.py`, the headers and the yaml merged on their
+own, and `tools/modules.py --write` gave no change. After each merge: `asm_diff --base 88d57333` 0 over
+the tree, a clean `make setup` + build + `make verify` OK, the port compiles from a fresh gendata, the
+merged files have no implicit declaration under clang `-Wimplicit-function-declaration` (the port's
+`hostified` copies for the VM-text and `_2` files), and the nested `TARGET_PORT` scan is the same 2
+known sites (`CPlayer/func_002555CC.c`, `SndQueue.c`).
+
+**`merge_check.py --rodata-free` over the 26 directories left:** none passed as it stands (23 stop at
+the compiler, 3 refused: `code/CScene` and `vm1/SceneLoad`, whose `.rodata` interleave, and
+`code/CEngineApp`, whose name is taken by `vm1/CEngineApp`; pass `--name`). Fewest first conflicts:
+`code/Anim` 14 (`Bits_ReadFloat` argument types), `vm1/MpMenu` 16 (`Controller_ConfirmPressed`),
+`code/__scHandleRSP` 22, `code/GameObject` 24, `code/CMtxF` 25 (`Actors_GetLightVolumeFalloff`),
+`vm1/TotemDefense` 31, `vm1/MantidQueen` 34.
+
+**State: 124 modules are one C file; 26 directories hold one function per file.**
+
+| Reason | Directories |
+|---|---|
+| header work only (first conflicts in parts p1, p2 and above) | `code/{AI, CAudioWorld, CCache, CGameRegion, EnemyAI, GameObject, SndVoice, __scHandleRSP}`, `vm1/{MantidQueen, Primagen}`, `vm2/{PakMenu, Primagen}` (12) |
+| data the C reads as externs, or `.data` tables in asm (`tools/ld_fill.py` and Crash show the way) | `code/{Anim, CEngineApp, CGameObjectInstance, CMtxF, CParticle, Trail}`, `vm1/{MpMenu, PakMenu}` (8) |
+| one object over the engine and the VM (the `.text_vm` route of part p4; the engine part is likely two objects) | `code/CScene`, `vm1/SceneLoad`, `vm2/SceneLoad` (3) |
+| deferred functions plus header work | `code/VM`, `vm1/{TotemDefense, Pak}` (3) |
+
+None needs a ROM change.
+
 ## Evidence
 
 **Linker padding (hard).** SN64's linker starts every object at a 16-byte
@@ -1044,12 +1074,12 @@ hints for naming, not evidence of Turok 2's layout.
 
 | Region | Modules | Functions | Of which libraries |
 |---|---:|---:|---|
-| `.code` (engine) | 252 | 2,576 | 155 modules, 289 functions: libultra/libaudio/libc (149 ultralib files), libgcc (6) |
+| `.code` (engine) | 254 | 2,576 | 155 modules, 289 functions: libultra/libaudio/libc (149 ultralib files), libgcc (6) |
 | VM module | 45 | 893 | 12 modules, 29 functions: the Controller Pak (`pfs*.c`, `contpfs.c`) |
 | VM module, stale copy | 42 | 835 | the same 12 |
-| all | 339 | 4,304 | |
+| all | 341 | 4,304 | |
 
-(Round 26 o2: 19 more from `.rodata` padding, above.)
+(Round 26 o2: 19 more from `.rodata` padding, above. Round 27 p3: 2 more, `CInstancePool` is three objects.)
 
 The game's own code is 86 modules in `.code` and 28 in the VM module. With
 about one object in four leaving no padding, the real count is nearer 115
@@ -1083,7 +1113,9 @@ module). "Start evidence" is why the module starts there.
 | CGameObjectInstance | engine | CGameObjectInstance__Construct | CGameObjectInstance__ConstructLitVertices | 0x00219BC0 | 65 | 26268 | pad |
 | CScene | engine | CScene__SetInstanceSavedBit | Blast_GetStrength | 0x00220260 | 96 | 27948 | pad |
 | Sort | engine | Sort_Quick | Sort_Insertion | 0x00226F90 | 2 | 684 | pad |
-| CInstancePool | engine | CLevelActorPool__Spawn | DLights_SwapBuffers | 0x00227240 | 18 | 5832 | pad |
+| CLevelActorPool | engine | CLevelActorPool__Spawn | CLevelActorPool__Free | 0x00227240 | 9 | 2512 | pad |
+| CInstancePool | engine | CInstancePool__SpawnAnimInstance | CInstancePool__Free | 0x00227C10 | 7 | 2256 | rodata pad, rodata pad: at 0xA6C6C (stale 'e\en'; of func_00227AE0, func_00227C10: where CLevelActorPool__ gives way to CInstancePool__) |
+| DLightsLoad | engine | DLights_Load | DLights_SwapBuffers | 0x002284E0 | 2 | 1064 | rodata pad, rodata pad: at 0xA6C96 (stale words after 'anim object info'; of func_002280B0, func_002284E0: where CInstancePool__ gives way to DLights_) |
 | DLights | engine | DLights_GetAtPoint | CDLightSet__GetNext | 0x00228910 | 6 | 660 | pad |
 | CSun | engine | CSunFrameData__Construct | func_00228C30 | 0x00228BB0 | 7 | 136 | pad |
 | Color | engine | Color_ShiftHue | Color_Darken | 0x00228C40 | 3 | 1780 | pad |
