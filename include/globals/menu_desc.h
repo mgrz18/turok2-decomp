@@ -18,6 +18,9 @@ extern struct MenuDesc gTeamBloodMenuDesc;
 extern struct MenuDesc gWeaponsMenuDesc;
 extern struct MenuDesc gDeathmatchMenuDesc;
 extern struct MenuDesc gSingleMenuAfterPakDesc;
+extern struct MenuDesc gTeamMenuDesc;          /* the team pick CPlayer__NewGame opens */
+extern struct MenuDesc gSingleMenuDesc;        /* 'single', the same */
+extern struct MenuDesc gFinalScoreMenuDesc;    /* in the main code's data: PlayerState17_Enter opens it */
 extern struct MenuDesc gTitleMenuDesc;
 extern struct MenuDesc gQuitMenuDesc;
 extern struct MenuDesc gSoundOptionsMenuDesc;

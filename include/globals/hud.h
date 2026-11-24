@@ -16,4 +16,8 @@ extern Gfx sHudGlyph16x16LoadDL[8];
 /* "<use this to fade out cinema text>": the CCameraPool text fade-out marker */
 extern char sCinemaTextFadeOut[0x24];
 
+/* The boss bars' COverlay scripts (COnScreen__ResetBossBars; round 25, data_g8) */
+extern u8 sBossOverlayScript[];
+extern u8 sBoss2OverlayScript[];
+
 #endif

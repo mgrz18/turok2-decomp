@@ -7,7 +7,6 @@
 
 s32 MenuItem_TextLength(void *item);
 
-extern char D_800C1768[];
 
 s32 MissionMenu_UpdateObjective2Count(MenuItem *item) {
     s32 rank = -1;
@@ -16,7 +15,7 @@ s32 MissionMenu_UpdateObjective2Count(MenuItem *item) {
         case -1:
         case 0:
         default:
-            item->text = D_800C1768;
+            item->text = sMissionMenuText_Space;
             break;
         case 1:
             item->text = sMissionMenuText_RescuedXOf4;
@@ -40,7 +39,7 @@ s32 MissionMenu_UpdateObjective2Count(MenuItem *item) {
             }
             break;
         case 4:
-            item->text = D_800C1768;
+            item->text = sMissionMenuText_Space;
             break;
         case 5:
             item->text = sMissionMenuText_DestroyedXOf1;

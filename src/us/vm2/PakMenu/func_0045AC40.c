@@ -11,7 +11,6 @@ struct Field {
     char pad18[0x4];
     signed int value;
 };
-extern char *D_800C140C[];
 s32 PakMenu_UpdateSubtitle_2(struct Field *field, s16 *arg1) {
     s32 option;
     u32 rel;
@@ -31,7 +30,7 @@ s32 PakMenu_UpdateSubtitle_2(struct Field *field, s16 *arg1) {
             return 0;
         }
         if (option == 0x15) {
-            field->text = D_800C140C;
+            field->text = sPakMenuText_Space;
         } else if (gPakMenuIsProfile != 0) {
             field->text = sPakMenuText_SaveNote_B487C;
         } else {

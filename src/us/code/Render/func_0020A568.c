@@ -5,7 +5,6 @@
 #include "globals/batch.h"
 #include "protos/iset.h"
 
-extern u8 D_800D8E13;               /* low byte of the pass */
 
 
 /* Returns the node keyed key in the tree under n, or the node a new key would hang from. */
@@ -57,7 +56,9 @@ void Render_FlushModelBatch(void) {
         for (i = 0; i < count; i++) {
             part = CISet__GetBlock(parts, i);
             material = CISet__GetBlock(part, 0);
-            key = (material->id << 8) | D_800D8E13;
+            /* byte 3 of the pass word: its low byte on the N64 (a symbol of its own at 0x800D8E13 before); on a
+             * little-endian host the high byte, as the port read it before (kept: same output) */
+            key = (material->id << 8) | ((u8 *)&sBatchPass)[3];
             if (material->flags & 0x700) {
                 parent = find_node(sTranslucentSortRoot, key);
             } else {

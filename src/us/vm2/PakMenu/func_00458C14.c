@@ -15,7 +15,7 @@ extern Chars4 sPakMenuText_Spaces3; /* local: menu_text.h is not included here: 
 extern u8 sPakMenuFmt_3d[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
 extern char sPakMenuText_FreePagesXxxNeededXxx_B48B4[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
 extern char sPakMenuText_FreePagesXxxNeededXxx_B4914[]; /* local: menu_text.h is not included here: sPakMenuText_Spaces3 is copied as a Chars4 (one lw/sw) */
-extern char D_800C140C[];
+extern char sPakMenuText_Space[]; /* local: menu_text.h is not included here (the Chars4 view above) */
 s32 Pak_GetFreePages_2(s32 pad, s32 *out);
 u32 Pak_BytesToPages_2(u32 n);
 /* variadic on the host: arm64 Apple passes variadic arguments on the stack (docs/port/MACOS.md) */
@@ -95,7 +95,7 @@ s32 PakMenu_FreePagesText_2(MenuItem *item, Menu *own) {
     }
     goto done;
 none:
-    item->text = D_800C140C;
+    item->text = sPakMenuText_Space;
 done:
     return 0;
 }

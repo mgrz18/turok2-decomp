@@ -1,4 +1,4 @@
-/* WRONG CUT: splat named this D_002150B8 (0x2150B8, 500 bytes): its first 8 bytes are junk fill
+/* WRONG CUT: splat cut a symbol at 0x2150B8 (500 bytes): its first 8 bytes are junk fill
  * ("ICKUP_SA" text), the real function starts at the 16-aligned 0x2150C0 (ROM symbol CLevelActor__Construct),
  * 492 bytes; CScene__DecompressGridSection calls it for the level file's third table.
  * Sets up a placed level actor from its 0x20-byte record: position, bounds (position +- radius),

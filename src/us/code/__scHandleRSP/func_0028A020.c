@@ -1,6 +1,6 @@
 /* Boundary fixed in versions/cuts.us.txt: splat starts func_0028A018 two stray words early (`lwc1 $f0, 0x6F98($at)`,
  * `addu $a0, $s3, $zero`, never executed); the function really starts at 0x0028A020,
- * the thread entry osCreateScheduler passes as &D_0028A020. Written whole as __scMain. */
+ * the thread entry osCreateScheduler passes as the address 0x28A020. Written whole as __scMain. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0028E910.c, func_0028E910, with Turok 2's layouts. */
 
 #include "common.h"

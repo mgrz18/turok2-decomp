@@ -35,7 +35,7 @@ struct LightNode;
 typedef struct LightNode LightNode;
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
 /* sized for gendata (docs/port/DATA.md): 0x800F1400..0x800F1800, two halves of 0x20 lights
- * (DLights_SwapBuffers); splat's D_800F1402.. labels inside it made it 16 bytes on the host */
+ * (DLights_SwapBuffers); splat's labels inside it (0x800F1402...) made it 16 bytes on the host */
 extern UnitLight gDLightBuffer[0x40];
 #include "structs/particle.h"
 #include "structs/camera.h"

@@ -252,7 +252,7 @@ typedef struct TotemDefenseState {
  *
  * Fields with symbols of their own (and the files' views anchored there):
  * gLevelScript_swayPhase (swayPhase/swayAmount: BossWait), gLevelScript_spawnsLeft (spawnsLeft...),
- * gLevelScript_values / D_8012F9A8 (values[0] / values[1]), gLevelScript_scriptCOn
+ * gLevelScript_values (values[0]; values[1] at 0x8012F9A8 is read as a member), gLevelScript_scriptCOn
  * (scriptCOn...), gLevelScript_unk3CC (unk3CC...), gLevelScript_bossState (bossState...:
  * BossState), gLevelScript_bossMode (bossMode...: BossMode), gLevelScript_armed (armed,
  * scriptOn), gLevelScript_script (script), gLevelScript_script_steps (script.steps), gLevelScript_script_cursor

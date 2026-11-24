@@ -1,4 +1,4 @@
-/* Player code: CPlayerPool__Construct, 0x0042E834-0x0042E894 (splat had it inside the data D_0042D50C). */
+/* Player code: CPlayerPool__Construct, 0x0042E834-0x0042E894 (splat had it inside the data at 0x0042D50C). */
 #include "common.h"
 #include "structs/player.h"
 #include "protos/list.h"

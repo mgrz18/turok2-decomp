@@ -5,10 +5,9 @@
 #include "globals/menu_text.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
-extern u8 D_800C1144[];
 s32 CheatMenu_WarpText_2(MenuItem *o) {
     switch (sCheatsMenuSelection) {
-    default: o->text = (char *)D_800C1144; break;
+    default: o->text = (char *)sEnterCheatKeyLabels; break;
     case 0: o->text = (char *)sCheatMenuText_WarpPortOfAdia; break;
     case 1: o->text = (char *)sCheatMenuText_WarpRiverOfSouls; break;
     case 2: o->text = (char *)sCheatMenuText_WarpDeathMarshes; break;

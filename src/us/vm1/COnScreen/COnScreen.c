@@ -1,4 +1,4 @@
-/* COnScreen__Construct (the HUD's lookups and font texture), 0x0042EB50-0x0042EBB4 (splat had it inside the data D_0042D50C). */
+/* COnScreen__Construct (the HUD's lookups and font texture), 0x0042EB50-0x0042EBB4 (splat had it inside the data at 0x0042D50C). */
 #include "common.h"
 #include "globals/hud.h"
 #include "structs/player.h"
@@ -34,8 +34,6 @@ typedef struct Lists {
     /* 0x48 */ u8 list1[0x40];
     /* 0x88 */ s32 unk88;
 } Lists;
-extern u8 D_800B2C30[];
-extern u8 D_800B2C40[];
 extern void COverlay__Construct(void *, s32, s32);
 extern void COverlay__StartScript(void *, void *);
 
@@ -49,8 +47,8 @@ void COnScreen__ResetBossBars(void *arg0) {
 
     os->m_pBoss = NULL;
     COverlay__Construct(&os->m_BossOverlay, 0, -40);
-    COverlay__StartScript(&os->m_BossOverlay, D_800B2C30);
+    COverlay__StartScript(&os->m_BossOverlay, sBossOverlayScript);
     os->m_pBoss2 = NULL;
     COverlay__Construct(&os->m_BossOverlay2, 0, -20);
-    COverlay__StartScript(&os->m_BossOverlay2, D_800B2C40);
+    COverlay__StartScript(&os->m_BossOverlay2, sBoss2OverlayScript);
 }

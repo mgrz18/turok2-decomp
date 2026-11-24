@@ -1,5 +1,5 @@
 /* Boundary fixed in versions/cuts.us.txt: splat starts func_002972D8 two words early; the function starts
- * at 0x2972E0 (D_002972E0). */
+ * at 0x2972E0 (alSavePull). */
 /* From decompals/ultralib (libultra 2.0I): src/audio/save.c, alSavePull. */
 #include "common.h"
 #include "globals/strings.h"

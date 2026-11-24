@@ -19,12 +19,12 @@ struct EntryRecAt0V2;
 typedef struct EntryRecAt0V2 EntryRecAt0V2;
 extern u32 sEnterCheatResult; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 extern EntryRecAt0V2 sCheatCodes_unk4_2[]; /* local type: this file typedefs its own s32/u32 instead of common.h (globals/cheat.h has the alias) */
-extern char D_800C1144;
+extern char sEnterCheatKeyLabels; /* local: a char view (its address is all the code takes); menu_text.h has it as unsigned char [] */
 s32 EnterCheatMenu_ResultLabel_2(ObjRecAt14V1 *arg0) {
     if (sEnterCheatResult < 12) {
         arg0->unk14 = sCheatCodes_unk4_2[sEnterCheatResult].ptr;
     } else {
-        arg0->unk14 = &D_800C1144;
+        arg0->unk14 = &sEnterCheatKeyLabels;
     }
     return 0;
 }

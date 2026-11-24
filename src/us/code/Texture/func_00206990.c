@@ -1,6 +1,6 @@
-/* WRONG CUT: splat named this D_00206984 (0x206984, 428 bytes): its first 12 bytes are junk fill
- * ("m_YScale|" text), the real function starts at the 16-aligned 0x206990 (ROM symbol D_00206990), 416 bytes.
- * A load callback (Texture_RequestSync/Texture_Request pass &D_00206990): loads a block of RGBA5551 textures and,
+/* WRONG CUT: splat cut a symbol at 0x206984 (428 bytes): its first 12 bytes are junk fill
+ * ("m_YScale|" text), the real function starts at the 16-aligned 0x206990 (Texture_DecompressCallback), 416 bytes.
+ * A load callback (Texture_RequestSync/Texture_Request pass its address): loads a block of RGBA5551 textures and,
  * by the mode in the top two bits of the request word 2, recolours every pixel:
  * 1 swaps red and green, 2 copies red into green, 3 copies green into red. */
 
