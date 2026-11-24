@@ -10,6 +10,7 @@
 #include "common.h"
 
 struct ArrayTable;
+struct ByteImage;
 
 void *CISet__GetBlock(void *, s32);
 sptr CISet__GetBlockAndSize(s32 *, s32, s32 *);
@@ -21,7 +22,7 @@ sptr CISet__GetROMAddressAndSize(s32 *, sptr, sptr, s32 *);
 void CISet__GetSetAndSize(s32 *, s32 **, s32 *);
 void *CUSet__GetArrayAndSize(struct ArrayTable *, s32 *);
 void CUSet__GetSetAndSize(struct ArrayTable *, void **, s32 *);
-s32 CUSet__GetTotalSize(void *);
-void CUSet__Transpose(void *, void *, s32);
+s32 CUSet__GetTotalSize(struct ArrayTable *);
+void CUSet__Transpose(struct ByteImage *, struct ByteImage *, s32);
 
 #endif

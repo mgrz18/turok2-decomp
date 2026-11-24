@@ -20,7 +20,7 @@ void CPlayer__DrawTargetMarkers(CPlayer *player, void *view) {
 
     sprite = player->m_SightIcon;
     if (sprite == 0x2DA && gEngineApp_m_Settings_multiplayer != 0) {
-        if (gEngineApp_m_Settings_match_tag == 0) {
+        if (gEngineApp_m_Settings_match_tag[0] == 0) {
             if (gEngineApp_m_Settings_match_teams != 0) {
                 show = gEngineApp_m_Settings.teamCrosshairs;
             } else {
@@ -55,7 +55,7 @@ void CPlayer__DrawTargetMarkers(CPlayer *player, void *view) {
 
     sprite = player->m_CrossHairIcon;
     if (sprite == 0x2DA && gEngineApp_m_Settings_multiplayer != 0) {
-        if (gEngineApp_m_Settings_match_tag == 0) {
+        if (gEngineApp_m_Settings_match_tag[0] == 0) {
             if (gEngineApp_m_Settings_match_teams != 0) {
                 show = gEngineApp_m_Settings.teamCrosshairs;
             } else {

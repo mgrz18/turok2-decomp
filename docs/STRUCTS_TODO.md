@@ -858,6 +858,13 @@ it now has the first copy's body (members), so both copies behave the same on th
 
 ### What the 115 names are
 
+**Round 25 (n1)**: the header-work merges took these out of the "same module" and "genuinely
+local" lists: Pair (Texture: `TextureRef`, structs/texture.h), Sortable (CEmitter's comparators
+read CEmitter.m_Height), Material (Render's runtime one is structs/batch.h's, now with its
+texture and colour fields), Vtx (Render: structs/gbi.h's `Vtx_t`), Clip (Rumble: rw/abu_types.h's),
+OffsetTable / TableHeader (structs/table.h's OffsetTable / ArrayTable), ByteImage (into
+structs/table.h), CMutex (CISet: ultra_types.h's). struct_census: 110 of 657 names in 2+ files.
+
 Every name still defined in 2 or more files, by what it would take. "Same module" names become
 one definition when tools/merge_module.py merges their module (round 25, m3's table in
 docs/MODULES.md): the files are one source split by function.
