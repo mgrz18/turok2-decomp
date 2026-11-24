@@ -1,3 +1,5 @@
+/* The second VM module's copy of src/us/vm1/TotemDefense/func_00408CF4.c (byte for byte, at the same link address or 0xE0 below
+ * it, docs/VMASM.md), with the second module's names. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
@@ -5,9 +7,9 @@
 
 
 extern f32 Random_Float(f32 scale);                                      /* random 0..scale */
-extern void Actor_SpawnParticle(void *actor, s32 event, CVector3 pos, s32 arg);
-extern void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);
-extern void EnemyAI_OnDamage(CListedInstance *actor, void *ai, DamageEvent *event);
+void Actor_SpawnParticle(void *, s32, CVector3, s32);
+void DamageEvent_Set(DamageEvent *, void *, s32, f32, s32, void *);
+void EnemyAI_OnDamage(void *, void *, DamageEvent *);
 
 /* One time in four, hurt the first live player actor. */
 void TotemDefense_TryHitEnemy(void) {

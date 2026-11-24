@@ -13,7 +13,7 @@
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
 void Sound__PlaySpeech(s32 sound);
 void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 value);
-s8 CGameObjectInstance__PickRandomAnim(CListedInstance *actor, sptr id, sptr);
+sptr CGameObjectInstance__PickRandomAnim(void *, sptr, sptr);
 void COnScreen__ClearBoss(void *);
 void COnScreen__ClearBoss2(void *);
 

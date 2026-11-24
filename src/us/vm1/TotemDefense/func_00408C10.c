@@ -1,10 +1,15 @@
+/* The second VM module's copy of src/us/vm1/TotemDefense/func_00408C10.c (byte for byte, at the same link address or 0xE0 below
+ * it, docs/VMASM.md), with the second module's names. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/game.h"
 #include "globals/scene.h"
-#include "structs/twin_totemdefense.h"
 
 
+typedef struct {
+    /* 0x00 */ u8 pad00[0x44];
+    /* 0x44 */ s16 limit;
+} TargetDef;
 
 typedef struct {
     /* 0x0 */ void *target;

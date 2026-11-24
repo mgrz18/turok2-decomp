@@ -8,9 +8,7 @@
 #include "globals/engine.h"
 #include "globals/boss.h"
 #include "protos/player.h"
-#ifdef TARGET_PORT
 #include "structs/collision.h"
-#endif
 
 /* Boss fight AI tick: runs the fight phase (timer and helpers, then the
  * random stun of a live helper), and once the boss has waited long enough
@@ -19,9 +17,9 @@
 extern void TotemDefense_DrawTotem();
 extern void TotemDefense_UpdateFight(TotemDefenseState *fight);
 extern f32 Random_Float(f32 range);
-extern void Actor_SpawnParticle(CListedInstance *actor, s32 sound, CVector3 pos, s32 arg);
-extern void DamageEvent_Set(void *out, sptr a, s32 b, f32 c, s32 d, sptr e);
-extern void EnemyAI_OnDamage(CListedInstance *actor, void *ai, void *anim);
+void Actor_SpawnParticle(void *, s32, CVector3, s32);
+void DamageEvent_Set(DamageEvent *, void *, s32, f32, s32, void *);
+void EnemyAI_OnDamage(void *, void *, DamageEvent *);
 extern void CPlayer__Warp(CPlayer *player, s32 track, s32 a, s32 b);
 
 static __inline__ s32 helperAlive(void) {
@@ -48,7 +46,7 @@ static __inline__ void stunHelper(void) {
         for (actor = gScene.m_InstancePool.m_ActiveList.m_pHead; actor != NULL; actor = actor->m_pNext) {
             if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_Health != 0) {
                 Actor_SpawnParticle(actor, 0x17C, actor->m_Instance.header.m_vPos, 0);
-                DamageEvent_Set(anim, 0, 0xFF00, 51.199997f, 0x100000, 0);
+                DamageEvent_Set(anim, NULL, 0xFF00, 51.199997f, 0x100000, NULL);
                 EnemyAI_OnDamage(actor, &actor->m_Instance.m_AI, anim);
                 break;
             }
