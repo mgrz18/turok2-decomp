@@ -7,7 +7,7 @@
 /* AI state: turn toward the target (when there is one); once the anim is done, sends the module's six other
  * objects to anim state 0 and goes to anim state 2. */
 
-extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void AI_UpdateTargets(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
 
 void MotherBoss_Mode06_RecallParts(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;

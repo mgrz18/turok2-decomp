@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 #include "globals/collision.h"
+#include "protos/ai.h" /* CAI__CallHurt(void *, void *, void *): called through CAIHurtFn with its own argument types */
 
 /* When the instance the last collision test hit (gCollisionResults) is one of the AI's two targets during anim state 0xE/0xF, knocks it back
  * away from the point (0, 0, 512) (and upward) and deals it 0x500 damage. */
@@ -12,7 +13,7 @@ extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a +
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern void CVector3__Normalize(CVector3 *v); /* normalise */
 extern void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);
-extern void CAI__CallHurt(CGameObjectInstance *target, CAI *ai, DamageEvent *event);
+typedef void (*CAIHurtFn)(CGameObjectInstance *target, CAI *ai, DamageEvent *event);
 
 void MotherBoss_Collision(CGameObjectInstance *obj, CAI *ai) {
     DamageEvent event;
@@ -30,6 +31,6 @@ void MotherBoss_Collision(CGameObjectInstance *obj, CAI *ai) {
         dir.y = 409.59998f;
         CVector3__Add(&player->m_vVelocity, &player->m_vVelocity, &dir);
         DamageEvent_Set(&event, obj, 0x500, 102.399994f, 0x100000, NULL);
-        CAI__CallHurt(player, &player->m_AI, &event);
+        ((CAIHurtFn) CAI__CallHurt)(player, &player->m_AI, &event);
     }
 }

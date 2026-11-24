@@ -17,8 +17,8 @@ extern s16 WeightedTable_PickStatic(void *table); /* ABI: returns s16 (the host 
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern f32 func_002982F0(f32);
 extern f32 func_002974C0(f32);
-extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, sptr region, f32 lifetime);
-extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
+extern void *CLevelActorPool__Spawn(CLevelActorPool *pool, void *refCount, s32 id, CVector3 vel, CVector3 pos, sptr region, f32 lifetime);
+extern void Actor_SpawnParticle(void *actor, s32 id, CVector3 pos, s32 a5);
 extern void MotherBoss_DropPickupsAtSpawnPoints(s32 lifetime, void *table);
 
 /* MotherBoss_SpawnPickup */

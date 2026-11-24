@@ -5,7 +5,7 @@
 
 /* AI state: turn toward the target (15 degrees per step), resetting the step counter, then go to anim state 0xC. */
 
-extern void AI_UpdateTargets(void *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void AI_UpdateTargets(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
 
 void MotherBoss_Mode17_TrackTarget(void *obj, CAI *ai) {
     CAITargets t;
