@@ -148,3 +148,4 @@ sPakText_MempakReadTempData = 0x800C18B0; /* "Mempak read temp data", readNote i
  * Absolute symbols (were D_14A000 / D_3CAE0 in undefined_syms_auto). */
 gVirtualRomStart = 0x0014A000;
 gVirtualModule1Size = 0x0003CAE0;
+D_800A9DFC = 0x800A9DFC; /* 60.0f, EngineMode01_Legal_Retrace's literal (code/CEngineApp, func_002893D8); read by func_002C232C (asm) */
