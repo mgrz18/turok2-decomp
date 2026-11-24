@@ -8,3 +8,4 @@
 code/CInstancePool/CInstancePool 82 00 12   # 0xA6C95-0xA6C98: stale bytes after "anim object info" (round 27)
 code/Crash/Crash .data after ABCA8.rodata.s     # the crash screen data (0xB7AA0) between the engine data pieces
 code/CMtxF/CMtxF 40 18 21          # 0xA63C9-0xA63CC: stale bytes after "Lit Vertices" (round 29)
+code/CStaticObject/CStaticObject 00 10   # 0xA643A-0xA643C: stale bytes after "stat geometry" (round 29)

@@ -175,11 +175,6 @@ T2_STATIC_OBJECT_CHECK(PlacedProp, matrix, flags);
 
 void CQuaternion__Normalize(f32 *);
 void CQuaternion__ToMatrix(f32 *, void *);
-void CMtxF__ScaleAxes(void *, f32, f32, f32);
-void CMtxF__Translate(void *, f32, f32, f32);
-void CMtxF__SwapYZRows(void *);
-void CMtxF__Copy(f32 *, void *);
-void CMtxF__ToMtxAffine(void *, f32 *);
 f32 HalfToFloat(s32);
 
 static __inline__ s32 next_key(void) {
@@ -246,6 +241,14 @@ void CStaticObject__Construct(PlacedProp *prop, PlacedPropRecord *record, s32 ow
     prop->key = next_key() << 10;
     prop->colorFrame = (u8)gFrameCount - 1;
 }
+
+#ifndef TARGET_PORT
+/* The cache names (globals/strings.h) CStaticObject__Draw, __SpawnEvents, __RequestLitVertices and
+ * __LoadGeometry read by name: in the ROM's .rodata after CStaticObject__Construct's literals, so
+ * defined here (the port keeps the generated copies). */
+const char sCStaticObjectCacheDesc_LitVertices_def[] __asm__("sCStaticObjectCacheDesc_LitVertices") = "lit vertices";
+const char sCStaticObjectCacheDesc_StatObjectIndex_def[] __asm__("sCStaticObjectCacheDesc_StatObjectIndex") = "stat object index";
+#endif
 
 #include "globals/strings.h"
 #include "structs/game.h"
@@ -694,3 +697,9 @@ void Model_PulseVertexColors(s32 *object, u8 *colors) {
         }
     }
 }
+
+#ifndef TARGET_PORT
+/* The last bytes of the object's .rodata (CStaticObject__LoadGeometry's cache name); stale linker
+ * bytes follow up to the next object (versions/ld_fill.us.txt). */
+const char sCStaticObjectCacheDesc_StatGeometry_def[] __asm__("sCStaticObjectCacheDesc_StatGeometry") = "stat geometry";
+#endif

@@ -1669,6 +1669,13 @@ void Sprite_FromImage(Image *image, Image *texture, Sprite *sprite) {
     }
 }
 
+#ifndef TARGET_PORT
+/* Sprite_FromImage's other two literals, which it reads as D_800A652C and the word after it:
+ * defined here, after its own (the port keeps the generated copies). */
+const f32 sSpriteTexelScale_def __asm__("D_800A652C") = 32.0f;
+const f32 sSpriteOne_def __asm__("D_800A6530") = 1.0f;
+#endif
+
 /* Moves point n to its owner particle's draw matrix (-1: the owner is gone, the point keeps the
  * other frame buffer's matrix), scaled to world units (0.2926 for a model particle). */
 void Swoosh_UpdateNodeFromOwner(Swoosh *e, SwooshNode *n) {
