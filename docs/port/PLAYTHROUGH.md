@@ -4154,3 +4154,61 @@ the default). Per fight (damage / lowest): the Harbor Totem 82/118, 133 21/179, 
 29/171, the City Totem 42/129, the Marsh Totem 8/192, the Cave Totem 108/92, the Blind One 35/57,
 **124 29/28** (the thinnest spot, as in round 20), the Hive Totem 23/177, **the Queen 21/156**, the
 Mother 90/110, the lair (assisted) 157/43. The default still gives `cd2d68ce…`.
+
+## 47. Round 26 (part o3): the N64's voice ids and draw key by default, the re-baseline
+
+Round 25 n4 typed the two voice id tables (`sVoiceTrackSounds`, `sVoiceNoUnkC4Sounds`), and the
+host then matched those sound ids as the N64 does; the round-25 merge kept the old byte-swapped
+reading as the default so the reference md5s would not move. Round 26 makes the N64's reading the
+default (`port/audio/t2audio_world.c`). Round 25 also kept `sBatchPass`'s byte 3, the high byte on
+the host, as the draw sort key (`Render_SortDrawItems`); the host now uses the low byte, as the N64
+does. The old readings are DEBUG-ONLY switches, `T2_LEGACY_VOICE=1` and `T2_LEGACY_BATCHKEY=1`
+(port/game/t2debug.c). Only `fullrun.py`/`playthrough.py --legacy` write them (STATUS.md section 1).
+
+The draw key does not reach the det log. Boot + 3 demos still give `6ab97584…`, and the default
+gives `af8bd840…`, the md5 round 25 measured with the voice fix alone.
+
+**The default** (`playthrough.py --all --talismans 2 --cheats-off 1,2,3,4,5,6`, Linux Release,
+ASLR off (`setarch -R`), `aimdrive.py`, 300,000 frames) needed no re-tune. It reaches **END 2 (level 10 at 252,468),
+with all 5 totems, 0 lives lost and 259 hits**, det md5 **`af8bd840…`** (600,000 lines, two runs; first
+difference from `cd2d68ce…` at frame 117,323). The one `death:` line, at 266,566, is in the hub after the credits, as before.
+The lowest health is 76, in 124.
+
+**The stick combination** (`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep
+lair`) lost a life on the new stream (`aaa175f2…`). The Cave Totem by stick with the shredder cost
+140 (21 hits, the fight's whole 4,000-frame window). The Blind One cost 42 more, and the player
+reached 124 with 18 health. The pylons' first volley killed him there, 60 frames in (frame 146,716).
+No level after the Blind One has a health pickup before 124's force field (`tools/assets/levels.py`:
+none in 1, 112 or the hub, and 124's four are under the field). So the fix is the totem's weapon:
+`STICK_CAVE_WEAPON` in fullrun.py, used only with `--stick-aim 4` on the default stream (not
+with `--legacy`), with `T2R26_SCW` as a DEBUG-ONLY test hook. One run per weapon:
+
+| Cave Totem weapon | the totem (damage / left) | 124 (left) | after |
+|---|---|---|---|
+| 9, the shredder (before) | 140 / 60 | dies (came in with 18) | END 2, 1 life |
+| 10, the plasma rifle | 200 / 9, a life | 32 | 2 deaths by 160,000 |
+| 11, the firestorm cannon | 329 / 2, lives | 31 | 3 deaths by 200,000 |
+| **12, the sunfire pod** | **94 / 106** | **47** | **the Queen 122 / 21; END 2, 0 lives** |
+| 13, the cerebral bore | 317 / 1, lives | 46 | 6 deaths by 160,000 |
+| 14, the p.f.m. layer | 179 / 21 | not reached by 200,000 | |
+| 15, the grenade launcher | 122 / 78 | 4 | the Queen: a life |
+| 16, the scorpion launcher | 114 / 86 | 23 | the Queen fight runs to ~227,000 (the stick at 525), then 3 falls in level 6 |
+| 17 | 202 / 1, a life | 36 | |
+
+For 16, the Queen's front distance was also tried (`T2R24_SQF`, to 190,000 frames): 450 cost a
+life, 600 and 700 two or more, and at 350 she was still fighting at 190,000 with the player on 16
+health. Her weapon 9 (`T2G1_QW`) cost 470 damage and 4 lives. Changing the Blind One's weapon does
+not change the run: `b16` gives the same death frame.
+
+With **weapon 12 (the sunfire pod)** the combination ends on **END 2 (level 10 at 263,622), with 5 totems and 0 lives lost (290 hits)**,
+det md5 **`ad941823…`** (600,000 lines, two runs: with `T2R26_SCW=12` and from the committed default; the one `death:` line, at 277,720, is in the hub after the credits). Per fight (damage /
+lowest): the Harbor Totem 82/118, 133 21/179, 134 28/172, 135 29/171, the City Totem 42/129, the
+Cave Totem 94/106, the Blind One 32/74, 124 27/47, the Hive Totem 57/143, **the Queen 122/21**
+(the thinnest spot), the Mother 110/90, and the lair (assisted) 169/21. This is one sample per weapon on a
+chaotic fight, as in 42.1 and 46: the sunfire pod is the best weapon seen, not a proven optimum.
+
+The default and `--legacy` write byte-identical `playthrough.txt` files. Their `teleport.env`
+files differ from round 25's only by `--legacy`'s two new lines. The stick combination's differs
+only by the weapon switch before the Cave Totem (`12@…` instead of `9@…`).
+`--legacy` (290,000 frames) still gives **`ac08c89b…`**: END 2 (252,194), 5 totems, 2 lives
+(level 110), as before.

@@ -1639,6 +1639,32 @@ int T2Port_LegacyNoSound(void) {
     return s;
 }
 
+/* T2_LEGACY_VOICE=1 (DEBUG-ONLY, round 26 o3; port/audio/t2audio_world.c SndVoicePool_AllocVoice): the
+ * two voice id tables (sVoiceTrackSounds, sVoiceNoUnkC4Sounds) read byte-swapped as before round 25, so
+ * no voice matches them (no hasTrack, unkC4 always 1). A player gets the N64's reading (the track voices
+ * stop with the music). fullrun.py/playthrough.py --legacy write it. */
+int T2Port_LegacyVoice(void) {
+    static int s = -1;
+    if (s < 0) {
+        const char *e = getenv("T2_LEGACY_VOICE");
+        s = e != NULL && *e != '0';
+    }
+    return s;
+}
+
+/* T2_LEGACY_BATCHKEY=1 (DEBUG-ONLY, round 26 o3; src/us/code/Render/Render.c Render_SortDrawItems): the
+ * draw sort key takes byte 3 of sBatchPass as before round 26 (the high byte, 0, on a little-endian
+ * host). A player gets the N64's key (the pass word's low byte). fullrun.py/playthrough.py --legacy
+ * write it. */
+int T2Port_LegacyBatchKey(void) {
+    static int s = -1;
+    if (s < 0) {
+        const char *e = getenv("T2_LEGACY_BATCHKEY");
+        s = e != NULL && *e != '0';
+    }
+    return s;
+}
+
 /* T2_RNG_LOAD=T:HEX (DEBUG-ONLY, round 17 f3; src/us/vm1/SceneLoad/func_0042AC0C.c): at the entry of
  * CScene__LoadLevel(scene, T, ...) set gRandomValue to HEX, once, so the level's own load (its actors'
  * random set-up) starts from the same seed as the N64 with n64trace.py --rng-load T:HEX (a breakpoint on
