@@ -8,7 +8,8 @@
 #define AL_SEQ_END_EVT 4
 #define AL_TRACK_END 0x12
 
-u32 __readVarLen(ALCSeq *seq, u32 track);     /* ultralib cseq.c */
+u8 __getTrackByte(ALCSeq *seq, u32 track); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+u32 __readVarLen(ALCSeq *seq, u32 track);
 u32 __alCSeqGetTrackEvent(ALCSeq *seq, u32 track, ALEvent *event);
 
 static __inline__ void alCSeqNew(ALCSeq *seq, u8 *ptr) {

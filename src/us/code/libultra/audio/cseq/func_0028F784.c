@@ -1,5 +1,4 @@
-typedef unsigned int u32;
-typedef float f32;
+#include "common.h"
 
 typedef struct {
     /* 0x00 */ char pad0[0x40];

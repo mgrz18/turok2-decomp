@@ -3,9 +3,11 @@
 
 #include "rw/abu_types.h"
 
+u8 __getTrackByte(ALCSeq *seq, u32 track); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+u32 __readVarLen(ALCSeq *seq, u32 track);
+u32 __alCSeqGetTrackEvent(ALCSeq *seq, u32 track, ALEvent *event);
+
 void alCSeqNextEvent(RuntimeState *state, DecodeResult_func_802AE6BC_de *result) {
-    extern u32 __readVarLen(RuntimeState *state, u32 index);
-    extern s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result);
     u32 minimum;
     u32 index;
     u32 selected;
@@ -25,13 +27,13 @@ void alCSeqNextEvent(RuntimeState *state, DecodeResult_func_802AE6BC_de *result)
         }
         index++;
     } while (index < 16);
-    __alCSeqGetTrackEvent(state, selected, result);
+    __alCSeqGetTrackEvent((ALCSeq *)state, selected, (ALEvent *)result);
     result->value = minimum;
     state->previous = minimum;
     state->total += minimum;
     if (result->type != 0x12) {
         u32 delta;
-        delta = __readVarLen(state, selected);
+        delta = __readVarLen((ALCSeq *)state, selected);
         state->results[selected] += delta;
     }
     state->first = 1;

@@ -3,8 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern u8 __getTrackByte(s32, s32); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
-s32 __readVarLen(sptr arg0, s32 arg1) {
+u8 __getTrackByte(ALCSeq *seq, u32 track); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+u32 __readVarLen(ALCSeq *seq, u32 track);
+u32 __alCSeqGetTrackEvent(ALCSeq *seq, u32 track, ALEvent *event);
+u32 __readVarLen(ALCSeq *arg0, u32 arg1) {
     sptr temp_v0;
     sptr var_s0;
     var_s0 = (u8) __getTrackByte(arg0, arg1);

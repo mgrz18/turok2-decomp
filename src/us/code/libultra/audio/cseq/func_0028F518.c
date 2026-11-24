@@ -3,8 +3,11 @@
 
 #include "rw/abu_types.h"
 
+u8 __getTrackByte(ALCSeq *seq, u32 track); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+u32 __readVarLen(ALCSeq *seq, u32 track);
+u32 __alCSeqGetTrackEvent(ALCSeq *seq, u32 track, ALEvent *event);
+
 void alCSeqNew(RuntimeStateRecAtB8 *state, uptr base) {
-    extern u32 __readVarLen(RuntimeStateRecAtB8 *state, u32 index);
     f64 converted;
     s32 count;
     u32 entry;
@@ -23,7 +26,7 @@ void alCSeqNew(RuntimeStateRecAtB8 *state, uptr base) {
         if (entry != 0) {
             state->active |= 1U << i;
             state->objects[i] = (void *)(base + entry);
-            state->results[i] = __readVarLen(state, i);
+            state->results[i] = __readVarLen((ALCSeq *)state, i);
         } else {
             state->objects[i] = 0;
         }

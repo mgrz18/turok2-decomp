@@ -1,80 +1,44 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/sdk/libgultra_inferred/802AD870_7.CPP, func_802AE030_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef signed int s32;
-typedef unsigned int u32;
-#ifdef TARGET_PORT
-typedef __INTPTR_TYPE__ sptr;
-typedef __UINTPTR_TYPE__ uptr;
-#else
-typedef s32 sptr;
-typedef u32 uptr;
-#endif
-struct RuntimeState;
-typedef struct RuntimeState RuntimeState;
-struct RuntimeState;
-struct RuntimeState {
-    void *resources;
-    u32 active;
-    u32 scale;
-    u32 total;
-    u32 previous;
-    u32 first;
-    u8 *objects[16];
-    u32 values[16];
-    u8 flags98[16];
-    u8 flagsA8[16];
-    u32 results[16];
-};
-struct DecodeResult;
-struct DecodeResult {
-    s16 type;
-    u8 pad2[6];
-    u8 status;
-    u8 first_data;
-    u8 second_data;
-    u8 extra1;
-    u32 extra2;
-};
-struct DecodeResult;
-typedef struct DecodeResult DecodeResult;
+#include "rw/abu_types.h"
+
 struct MeasuredRecAt18 { unsigned char padding[24]; void * value; };
 struct MeasuredRecAt0V3 { u8 value; };
-extern u8 __getTrackByte(sptr, s32); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
-extern u32 __readVarLen(RuntimeState *, u32);
-s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result) {
+u8 __getTrackByte(ALCSeq *seq, u32 track); /* ABI: returns u8 (the host leaves the upper bits of the return register undefined) */
+u32 __readVarLen(ALCSeq *seq, u32 track);
+u32 __alCSeqGetTrackEvent(ALCSeq *seq, u32 track, ALEvent *event);
+u32 __alCSeqGetTrackEvent(ALCSeq *seq, u32 index, ALEvent *event) {
     u8 first;
     u8 command;
     u32 first_value;
     u32 command_value;
-    first = __getTrackByte(state, index);
+    first = __getTrackByte(seq, index);
     first_value = first & 0xFF;
     if (first_value == 0xFF) {
-        command = __getTrackByte(state, index);
+        command = __getTrackByte(seq, index);
         command_value = command & 0xFF;
         if (command_value == 0x51) {
-            result->type = 3;
-            result->status = first;
-            result->first_data = command;
-            result->extra1 = __getTrackByte(state, index);
-            ((u8 *)&result->extra2)[0] = __getTrackByte(state, index);
-            ((u8 *)&result->extra2)[1] = __getTrackByte(state, index);
-            state->flagsA8[index] = 0;
+            event->type = 3;
+            event->msg.tempo.status = first;
+            event->msg.tempo.type = command;
+            event->msg.tempo.byte1 = __getTrackByte(seq, index);
+            event->msg.tempo.byte2 = __getTrackByte(seq, index);
+            event->msg.tempo.byte3 = __getTrackByte(seq, index);
+            seq->lastStatus[index] = 0;
         } else if (command_value == 0x2F) {
-            u32 active = state->active ^ (1U << index);
-            state->active = active;
+            u32 active = seq->validTracks ^ (1U << index);
+            seq->validTracks = active;
             if (active != 0) {
-                result->type = 0x12;
+                event->type = 0x12;
             } else {
-                result->type = 4;
+                event->type = 4;
             }
         } else if (command_value == 0x2E) {
-            __getTrackByte(state, index);
-            __getTrackByte(state, index);
-            state->flagsA8[index] = 0;
-            result->type = 0x13;
+            __getTrackByte(seq, index);
+            __getTrackByte(seq, index);
+            seq->lastStatus[index] = 0;
+            event->type = 0x13;
         } else if (command_value == 0x2D) {
             void *base;
             void *p;
@@ -86,7 +50,7 @@ s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result) 
             u32 byte2;
             u32 byte3;
             void *next;
-            base = (u8 *)state + (index * 4);
+            base = (u8 *)seq + (index * 4);
             p = ((struct MeasuredRecAt18 *)(base))->value;
             lead = ((struct MeasuredRecAt0V3 *)(p))->value;
             p = (u8 *)p + 1;
@@ -112,28 +76,28 @@ s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result) 
                                    (byte2 << 8) + byte3);
             }
             ((struct MeasuredRecAt18 *)(base))->value = next;
-            state->flagsA8[index] = 0;
-            result->type = 0x14;
+            seq->lastStatus[index] = 0;
+            event->type = 0x14;
         }
     } else {
-        result->type = 1;
+        event->type = 1;
         if (first & 0x80) {
-            result->status = first;
-            result->first_data = __getTrackByte(state, index);
-            state->flagsA8[index] = first;
+            event->msg.midi.status = first;
+            event->msg.midi.byte1 = __getTrackByte(seq, index);
+            seq->lastStatus[index] = first;
         } else {
-            u8 running_status = state->flagsA8[index];
-            result->first_data = first;
-            result->status = running_status;
+            u8 running_status = seq->lastStatus[index];
+            event->msg.midi.byte1 = first;
+            event->msg.midi.status = running_status;
         }
-        command_value = result->status & 0xF0;
+        command_value = event->msg.midi.status & 0xF0;
         if ((command_value != 0xC0) && (command_value != 0xD0)) {
-            result->second_data = __getTrackByte(state, index);
-            if ((result->status & 0xF0) == 0x90) {
-                result->extra2 = __readVarLen(state, index);
+            event->msg.midi.byte2 = __getTrackByte(seq, index);
+            if ((event->msg.midi.status & 0xF0) == 0x90) {
+                event->msg.midi.duration = __readVarLen(seq, index);
             }
         } else {
-            result->second_data = 0;
+            event->msg.midi.byte2 = 0;
         }
     }
     return 1;
