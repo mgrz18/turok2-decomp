@@ -809,6 +809,12 @@ byte-exact, `asm_diff --base 88d57333` 0. 92 `.rodata` slices, 6 of the VM part 
 After the merge one string had no owner: `"player anim object info"` (`A7C94.rodata.s`, read as the
 extern `sActorCacheDesc_PlayerAnimObjectInfo`) lay between `func_002525BC`'s and `func_00252E08`'s
 slices; the merged file writes it as a literal (3 uses, pooled) and emits it there.
+The port then crashed in the attract demos (`CPlayerPool__PreUpdate`): taking `protos/cache.h` out of
+four files had left `CCache__Request`, `CCache__Unlock`, `CCache__LockForDisplayList` and
+`CCache__SetFrameDelay` implicitly declared (the same N64 code; on the host an `int` return cut the
+pointer). The merged file declares them; check a merged file with clang
+`-Wimplicit-function-declaration` (the port build does not stop on it). Port md5s after the fix: boot +
+3 demos 6ab97584, default whole game af8bd840.
 `tools/merge_module.py` also learned that a top-level item does not end inside a comment (a comment
 line ending in `;` had cut one in two).
 
