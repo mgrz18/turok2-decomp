@@ -24,6 +24,10 @@ void SingleMenu_InitAfterPak_2(Menu *arg0) {
 #include "globals/menu.h"
 #include "globals/menu_desc.h"
 #include "protos/menu.h"
+/* the module-2 copies of protos/menu.h's functions */
+sptr MenuPool_OpenChildMenu_2(struct MenuPool *, struct Menu *, struct MenuDesc *);
+sptr MenuPool_OpenMenu_2(struct MenuPool *, struct MenuDesc *, sptr, sptr, sptr);
+s32 Menu_StepValue_2(struct Menu *, s32, s32, s32, s32, s32);
 
 s32 SingleMenu_NewGame_2(s32 arg0, Menu *arg1) {
     Controller_WatchPak(arg1->controller->port);
