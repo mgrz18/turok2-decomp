@@ -148,7 +148,7 @@ def check(archive, rom_path, folder=None, log=print, jobs=1):
     n_plans = 0
     if "t2/swap" in names and len(unit_bytes) == len(rows):
         plans = mkarchive.swap_plans(rows, unit_bytes, jobs)
-        if z.read("t2/swap") != mkarchive.swap_table(rows, plans):
+        if z.read("t2/swap") != mkarchive.swap_table(rows, plans, swapcheck.spec_fingerprint(mkarchive.load_spec())):
             err("t2/swap differs from the plans of swap_spec.json")
         for r in rows:
             runs, planes, _ = plans[r["key"]]

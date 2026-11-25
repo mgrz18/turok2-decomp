@@ -147,7 +147,7 @@ static void *sCtx;
 /* ===================================================================================== */
 /* byte order: swap plans (t2/swap, docs/assets/ARCHIVE.md)                              */
 /* ===================================================================================== */
-/* Table layout (little-endian): 'T2SW' u16 major u16 minor u32 count u32 reserved, then count
+/* Table layout (little-endian): 'T2SW' u16 major u16 minor u32 count u32 spec, then count
  * x {u32 key, u32 hostSize, u32 offset, u32 runs, u32 tables} sorted by key; each plan at
  * `offset` (from the table start): runs x {u32 offset, u32 count << 2 | width code (1: 2 bytes,
  * 2: 4, 3: 8)}, then tables x {u32 offset, u32 records, u32 swaps, swaps x {u16 plane, u16 width}}
@@ -157,6 +157,15 @@ static void *sCtx;
 #define SWAP_HDR 16
 #define SWAP_REC 20
 #define SWAP_MAJOR 2
+/* `spec` (round 31): tools/assets/swapcheck.py --fingerprint, a hash of swap_spec.json and the
+ * layouts of the C structs it names, which the plans were made from. The build makes its own
+ * (t2swapspec.h, port/app/CMakeLists.txt) and refuses another: an archive made before
+ * CROMParticleEffect.unk_0E[2] became s16 m_TurnRate left the field in N64 order (4 degrees
+ * read as 1024), and that host played the game differently with no error anywhere
+ * (docs/port/MACOS.md section 23). */
+#ifdef T2_HAVE_SWAPSPEC_H
+#include "t2swapspec.h"
+#endif
 static u8 *sSwap;
 static size_t sSwapLen;
 static u32 sSwapN;
@@ -184,6 +193,11 @@ int T2Asset_SetSwapTable(const void *data, size_t len)
         return fail("t2/swap: bad magic");
     if ((u32)(p[4] | p[5] << 8) != SWAP_MAJOR)
         return fail("t2/swap: format %u, this reader needs %u (rebuild the archive)", (u32)(p[4] | p[5] << 8), SWAP_MAJOR);
+#ifdef T2_SWAP_SPEC_FP
+    if (le32(p + 12) != T2_SWAP_SPEC_FP)
+        return fail("t2/swap: made for another byte-order spec (archive %08X, this build %08X): "
+                    "rebuild the archive with tools/assets/mkarchive.py", le32(p + 12), (u32)T2_SWAP_SPEC_FP);
+#endif
     n = le32(p + 8);
     if ((u64)n * SWAP_REC + SWAP_HDR > len)
         return fail("t2/swap: truncated index");

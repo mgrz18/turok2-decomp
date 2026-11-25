@@ -6,6 +6,42 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 31: Mac and Linux split on a stale archive; t2/swap carries its spec; the references re-baselined
+
+After Phase 5 the whole-game default run gave det md5 `ebd08b15…` on the Mac and `b0d4a8ed…` on
+the Linux box (first difference: frame 37,287, level 133, the particle hash only). The code was not
+the cause. The box's `OUT/turok2.o2r` dated from 2026-11-18. On 2026-11-23, `d8151991` typed
+`CROMParticleEffect.unk_0E[2]` as `s16 m_TurnRate`, and that changes the byte-swap plan of the
+particle unit `01B31794`: the halfword at +0x0E of every template now gets swapped. The box's old plan left it in N64
+order, so `CParticle__Steer` read a homing projectile's turn rate of 4 degrees as 1024 and turned it
+onto its target in one frame. The Mac's archive, made later, read 4, as the N64 does. Every other
+unit and plan was identical. Details in [MACOS.md](MACOS.md) 23.
+
+The fix (no change to `src/` or `include/`; N64 `make verify` and `asm_diff` 0 of 297 files):
+`swapcheck.py --fingerprint` hashes `swap_spec.json` and the layouts of the C structs it names
+(offset, class, count; not the field names or comments). `mkarchive.py` writes that hash in
+t2/swap's reserved word (and in `t2/info.json` as `swap_spec`). The port build generates
+`t2swapspec.h` from the same sources. `T2Asset_SetSwapTable` refuses an archive whose hash differs,
+including every archive made before this round (hash 0), with
+`t2/swap: made for another byte-order spec (archive 00000000, this build 022D32A2): rebuild the
+archive with tools/assets/mkarchive.py`. `archive_check.py` checks the word as well.
+
+**The references on a fresh archive** (Linux Release at 8fb968a5 + this round, ASLR off,
+`aimdrive.py`; the Mac gives the same md5s with ASLR on):
+
+| run | result | det md5 |
+|---|---|---|
+| boot + 3 demos | unchanged | `6ab97584…` (52,000 lines) |
+| **default** (`--all --talismans 2 --cheats-off 1,2,3,4,5,6`, 300,000) | **END 2 (256,978), 5 totems, 0 lives**, 320 hits | **`ebd08b15…`** (Mac = Linux; was `b0d4a8ed…` on the stale archive) |
+| stick combination (`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair`) | no END by 300,000, 4 deaths | `17262ab5…` (Mac = Linux) |
+| `--legacy` (290,000) | no END by 290,000, 6 deaths | `ee545088…` (Mac = Linux) |
+
+Neither the stick combination nor `--legacy` reached END. On the old archive they already did not:
+`/root/C45/runs.sh` at 8fb968a5 this morning gave `c5e9ba17…` (5 deaths) and `867e4221…` (4
+deaths), not round 30's `6649f48b…`/`c9122255…`. Both need a re-tune on the correct stream (open).
+Port tests: `make -C port test`, `gbi_test` (0 mismatches), the runtime test and the audio compares
+pass.
+
 ## Round 30 merge (Phase 5 complete): s2, s1, the five md5-only views typed; the references re-baselined
 
 Merged into `feat/46-hand-matching` in the order s2 (globals: `D_` tokens in `.c`/`.h` 52 -> 3, asm

@@ -117,13 +117,14 @@ def swap_plan_bytes(runs, planes):
     return bytes(out)
 
 
-def swap_table(rows, plans):
-    """t2/swap: 'T2SW' u16 major u16 minor u32 count u32 0, then count x {u32 key, u32 hostSize,
+def swap_table(rows, plans, spec_fp):
+    """t2/swap: 'T2SW' u16 major u16 minor u32 count u32 spec_fp, then count x {u32 key, u32 hostSize,
     u32 offset (from the start of the entry), u32 runs, u32 tables}, sorted by key, then the plans.
-    Units whose plan is empty (byte streams, texels, VADPCM) have no record."""
+    Units whose plan is empty (byte streams, texels, VADPCM) have no record. spec_fp =
+    swapcheck.spec_fingerprint (the plans' spec and C layouts): the port refuses another one."""
     recs = [(r, plans[r["key"]]) for r in rows if plans[r["key"]][0] or plans[r["key"]][1]]
     off = 16 + SWAP_INDEX_SIZE * len(recs)
-    head = bytearray(T2_SWAP_MAGIC + struct.pack("<HHII", FORMAT_MAJOR, FORMAT_MINOR, len(recs), 0))
+    head = bytearray(T2_SWAP_MAGIC + struct.pack("<HHII", FORMAT_MAJOR, FORMAT_MINOR, len(recs), spec_fp))
     body = bytearray()
     for r, (runs, planes, blob) in recs:
         head += struct.pack("<IIIII", r["key"], r["host_size"], off + len(body), len(runs), len(planes))
@@ -170,12 +171,16 @@ def _plan(job):
     return key, runs, planes, swap_plan_bytes(runs, planes), errors
 
 
+def load_spec():
+    return swapcheck.Spec(os.path.join(os.path.dirname(os.path.abspath(__file__)), "swap_spec.json"),
+                          os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+
 def swap_plans(rows, data, jobs=1):
     """{key: (runs, planes, plan bytes)} for every unit, from tools/assets/swap_spec.json."""
     global _DATA, _SPEC
     _DATA = data
-    _SPEC = swapcheck.Spec(os.path.join(os.path.dirname(os.path.abspath(__file__)), "swap_spec.json"),
-                           os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    _SPEC = load_spec()
     work = [(r["key"], r["type"]) for r in rows]
     if jobs > 1:
         ctx = multiprocessing.get_context("fork")
@@ -225,7 +230,8 @@ def build(rom_bytes, jobs=1, log=print):
     data = unit_data(rom, rows, jobs)
     log("unit bytes ready (%.1fs)" % (time.time() - t0))
     plans = swap_plans(rows, data, jobs)
-    swap = swap_table(rows, plans)
+    spec_fp = swapcheck.spec_fingerprint(load_spec())
+    swap = swap_table(rows, plans, spec_fp)
     log("swap plans ready: %d bytes (%.1fs)" % (len(swap), time.time() - t0))
 
     info = {
@@ -240,6 +246,7 @@ def build(rom_bytes, jobs=1, log=print):
         "swap_runs": sum(len(p[0]) for p in plans.values()),
         "swap_tables": sum(len(p[1]) for p in plans.values()),
         "swap_bytes": len(swap),
+        "swap_spec": "%08X" % spec_fp,
     }
     entries = [
         ("version", version_file(rom, sha1)),
