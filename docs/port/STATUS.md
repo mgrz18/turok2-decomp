@@ -6,6 +6,61 @@ new game to the good ending with no invincibility and no life lost, on the N64's
 stream. The Mac app is packaged and ready for its first session in a real window
 ([FIRSTRUN.md](FIRSTRUN.md)); that session has not happened yet.
 
+## Round 30 merge (Phase 5 complete): s2, s1, the five md5-only views typed; the references re-baselined
+
+Merged into `feat/46-hand-matching` in the order s2 (globals: `D_` tokens in `.c`/`.h` 52 -> 3, asm
+`D_` 18 -> 0, 1,782 data names), s1 (struct hoisting: 74 of 576 -> 10 of 510 repeated local names),
+`--no-ff`. The one conflict: both parts moved `MenuColorInit` out of the two MenuItem files; s2's
+`structs/menu.h` definition (with the table named `gMenuColorDefaults`) is kept and s1's
+`twin_menuitem.h` dropped. s1 also declares `HostIo_Call` for the port, so the tree compiles with
+no implicit declaration under clang `-Wimplicit-function-declaration` (s2 alone had 7, all
+`HostIo_Call`).
+
+**The five views s1 kept for the md5 are typed (c1095952 reverted).** The project rule: a player
+gets the N64 behaviour, and host-bug fixes stay. As the real structs the N64 code is identical
+(`asm_diff` 0, `make verify`), and the host now does what the N64 does:
+
+- the translucent draw sort (`CScene__DrawSortedList`, `SortRecord_Compare` / `SortRecord_Swap`)
+  keys on `SortEntry.dist` and swaps whole 16-byte entries (the view read the key at 0x4, inside the
+  item pointer, and swapped half of each entry);
+- `CMemEntry__Unlock` decrements `lockCount` and clears the lock bit in `flags` (it decremented
+  `size` and cleared the bit in the lock count);
+- `CCameraPool__ReleaseCameraTexts` walks `CCamera.m_ActiveTextList` (0xE28 is another member on
+  the host);
+- `EnemyAI` reads its looping sound's id from the `SndSource` (it read the high half of `next`, so
+  the looping sound was stopped and restarted every frame);
+- `StatsMenu_ShowTagsRow_2` sets `items[7].flags`, as its vm1 copy does.
+
+**The references, re-baselined on the final tree** (Linux Release, fresh gendata, ASLR off,
+`aimdrive.py`):
+
+| run | result | det md5 |
+|---|---|---|
+| boot + 3 demos | unchanged | `6ab97584…` (52,000 lines) |
+| **default** (`--all --talismans 2 --cheats-off 1,2,3,4,5,6`, 300,000) | END 2 (262,016), 5 totems, **0 lives**, 347 hits, lowest 39 (the Queen); no re-tune | **`b0d4a8ed…`** (was `af8bd840…`; first difference frame 40,195, level 133) |
+| **stick combination** (`--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair`) | END 2 (269,062), 5 totems, **0 lives**, 294 hits; re-tuned: the Queen at 600 | **`6649f48b…`** (was `ad941823…`) |
+| `--legacy` (290,000) | END 2 (266,218), 5 totems, 3 lives; re-tuned: the lair strafe 80 | `c9122255…` (was `ac08c89b…`) |
+
+The default reached END 2 with 0 lives on the first run. The stick combination, with the Queen
+still put 525 in front of her open spot (`STICK_QUEEN_FRONT`), lost 4 lives to her (476 damage) and
+the game. One run per distance: 450 473 damage and 3 lives, 700 476 and 4, **600 113 damage (lowest
+63), END 2, 0 lives**: `STICK_QUEEN_FRONT` is 600 (`fullrun.py`; only `--stick-aim 5` on the
+default stream reads it). `--legacy` lost 2 lives in the Primagen's lair on the 90-frame strafe and
+did not reach END 2 by 340,000 frames; `--lair-peek 2000` gave END 2 at 271,258 and `--lair-strafe
+80` END 2 at 266,218 (3 lives each, as 110 and the Blind One cost one each on this stream):
+`--legacy` now strafes on 80 (`fullrun.py`, `LEGACY` only). Both were re-run from the committed
+defaults with the same md5. The default's `playthrough.txt` and `teleport.env` are unchanged. The
+swoosh self-test OK (every run exits 0).
+
+Checks: `asm_diff --base a51f830f` 0 differ over the tree (297 files) after each merge and after the
+revert; clean `make setup` + build + `make verify` OK; a fresh `git clone --recursive` builds and
+verifies (ultralib `e24c836`); `mklayout.py --check` up to date; `aligncheck` 0 sites; nested
+`TARGET_PORT` scan at the 2 known sites; `make -C port test`, `gbi_test` 0 mismatches, t2os x3,
+`t2audio_test --direct 0/40` max difference 0, `--adec` OK; abicheck 0 harmful, ptrargs 1/0, outptr
+the one known `BAD` (`MantidQueen.c`), f2ucheck the same 134 sites; n64viewcheck better: linked
+`gptr/BAD` 3, `raw/BAD` 10, `stride/BAD` 2 (was 3), unlinked `cast/BAD` 1 (was 3), `gptr/BAD` 5,
+`raw/BAD` 12, `stride/BAD` 2 (was 4).
+
 ## Round 29 merge (Phase 5): r2, r3, r1, r4 and the CScene object; every module is one C file
 
 Merged into `feat/46-hand-matching` in the order r2 (`SndVoice`, `VM`, `vm1/Pak`), r3 (`vm1/PakMenu`,

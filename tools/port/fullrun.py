@@ -695,8 +695,10 @@ N64_QUEEN_FRONT = os.environ.get("T2I2_QF", "600,200")
 # Round 24 m3 (--stick-aim 5 on the N64 stream): 525. On the round-23 stream 450 cost the combination
 # `--real-weapons 1 --stick-aim 1,2,3,4,5,6 --hub-wait 0 --assist-keep lair` a life at the Queen (211 damage);
 # one run each to 185,000: 350, 700, 900 still fighting her, 600 169 damage (lowest 8), 525 21 (lowest 156)
-# (PLAYTHROUGH.md 46). T2R24_SQF overrides (DEBUG-ONLY test hook)
-STICK_QUEEN_FRONT = os.environ.get("T2R24_SQF", "525,200")
+# (PLAYTHROUGH.md 46). Round 30: 600. With the five host fixes of the round-30 merge (PLAYTHROUGH.md 48) 525 cost
+# 476 damage and 4 lives at the Queen, 450 473 and 3; 600 113 damage (lowest 63), END 2 with 0 lives.
+# T2R24_SQF overrides (DEBUG-ONLY test hook)
+STICK_QUEEN_FRONT = os.environ.get("T2R24_SQF", "600,200")
 N64_QUEEN_WEAPON = os.environ.get("T2G1_QW", "16") or None   # the scorpion launcher: 6-95 damage, 43-138 (a life) with the shredder
 N64_L2_STRETCH = []   # none yet: +800 frames on zombie 44 and +1000 on zombies 45 and 44 (135) did not save the crypt steps
 # Round 17 f1: pick steps put before a step of a segment (segment, before step, [(x, y, z, approach
@@ -1580,7 +1582,9 @@ def level6(r, t):
     # the spot cycles (",K,1": another one each 3,000 frames of a lair wait that does not end; round 14 C29:
     # 600 -> 3,000: the strafing by the lair start (lair_strafe) ends his home waits, the front spots do not)
     drive = LAIR_DRIVE or ("guard" if 4 not in r.cheats_on else "none")
-    strafe = LAIR_STRAFE or ((90, 0) if 4 not in r.cheats_on else (80, 0))
+    # round 30: --legacy strafes on 80 too (the round-30 host fixes moved its stream: on 90 the lair cost 2 lives and
+    # END 2 was not reached by 340,000; on 80 END 2 at 266,218, 3 lives in all; --lair-peek 2000 END 2 at 271,258)
+    strafe = LAIR_STRAFE or ((90, 0) if 4 not in r.cheats_on and not LEGACY else (80, 0))
     # with the lair driver: no relocation at all (an empty spec ends the Queen's, which would act in the lair)
     r.boss_front.append((lair - 100, "" if drive != "none" else LAIR_FRONT))
     r.inputs.append("Z@%d..%d" % (lair + 200, lair + L6_HUB_END))
