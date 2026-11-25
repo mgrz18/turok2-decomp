@@ -482,8 +482,6 @@ s32 __scTaskComplete(OSSched *arg0, OSScTask *arg1) {
     return 1;
 }
 
-extern s32 sSchedRdpTaskStarted;
-extern s32 sSchedRdpTaskCounter;
 
 void __scExec(OSSched *view, OSScTask *current, OSScTask *next) {
     s64 now;

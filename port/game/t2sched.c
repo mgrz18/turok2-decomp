@@ -29,8 +29,8 @@
 #define SC_PRE_NMI_MSG 0x29D
 #define SC_CMD_MSG 6
 
-extern s32 D_800B6E60;
-extern s32 D_800B6E64;
+extern s32 sSchedRdpTaskStarted;
+extern s32 sSchedRdpTaskCounter;
 
 extern void Video_UpdateResolution(void);
 extern void Music_FadeOut(void);
@@ -508,8 +508,8 @@ void __scExec(OSSched *sc, OSScTask *sp, OSScTask *dp) {
     }
     if (dp != NULL && dp != sp) {
         osDpSetNextBuffer(dp->list.t.output_buff, *dp->list.t.output_buff_size);
-        D_800B6E60 = 1;
-        D_800B6E64 = 0;
+        sSchedRdpTaskStarted = 1;
+        sSchedRdpTaskCounter = 0;
         sc->curRDPTask = dp;
     }
 }
