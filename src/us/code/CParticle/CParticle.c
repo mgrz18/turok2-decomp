@@ -4008,48 +4008,24 @@ void CParticle__AddDrawModeBits(CParticle *arg0, s32 *arg1) {
     *arg1 |= var_a2 << 0x1E;
 }
 
-typedef struct Node {
-    u8 pad0[0x1C8];
-    struct Node *next;    /* 0x1C8 */
-} Node;
-typedef struct Bucket {
-    Node *head;
-    u8 pad4[0x10];
-} Bucket;
-#ifdef TARGET_PORT
 #include "structs/particle.h"
-/* the host CParticleSystem by member (the views are at N64 offsets) */
+/* Frees every active particle: the three active lists of the CParticleSystem (round 30: one copy,
+ * the Node/Bucket views of the N64 one gone; the port's had read them by member since round 9). */
 void CParticleSystem__FreeAll(u8 *arg0) {
-    CParticleSystem *sys = (CParticleSystem *) arg0;
     CParticle *node;
     CParticle *cur;
     s32 i;
 
     for (i = 0; i < 3; i++) {
-        node = (CParticle *) sys->m_ActiveList[i].m_pHead;
+        /* m_ActiveList[i] from the byte pointer (the ROM adds its offset to arg0 first) */
+        node = ((CList *) (arg0 + T2_OFFSETOF(CParticleSystem, m_ActiveList)))[i].m_pHead;
         while (node != NULL) {
             cur = node;
             node = node->m_pNext;
-            CParticleSystem__Free(arg0, (Node *) cur);
+            CParticleSystem__Free(arg0, (EffectActor *) cur);
         }
     }
 }
-#else
-void CParticleSystem__FreeAll(u8 *arg0) {
-    s32 i;
-    Node *node;
-    Node *cur;
-
-    for (i = 0; i < 3; i++) {
-        node = ((Bucket *)(arg0 + 0xEC28))[i].head;
-        while (node != NULL) {
-            cur = node;
-            node = node->next;
-            CParticleSystem__Free(arg0, cur);
-        }
-    }
-}
-#endif
 
 s32 CParticle__GetDrawMode(CParticle *arg0) {
     s32 var_a1;
