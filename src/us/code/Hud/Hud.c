@@ -1301,9 +1301,7 @@ typedef struct {
     /* 0x02 */ u8 pad2[6];
     /* 0x08 */ ChunkEntry entries[1];
 } ChunkTable;
-typedef struct {
-    /* 0x00 */ ChunkTable *table;
-} Resource;
+#include "structs/cache.h"
 typedef struct {
     /* 0x00 */ u8 *data;
     /* 0x04 */ u8 flag;
@@ -1313,7 +1311,7 @@ void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
 /* Loads the 0x90-byte block of chunk 42 of resource 2 into sOnScreenFontTextureBuffer and
  * points sOnScreenFontTexture at it (NULL until it is loaded). */
 void COnScreen__LoadFontTexture(void) {
-    Resource *res;
+    CMemEntry *res;
     FontChunk chunk;
     ChunkTable *table;
     ChunkEntry *entries;
@@ -1323,7 +1321,7 @@ void COnScreen__LoadFontTexture(void) {
     sOnScreenFontTexture = NULL;
     res = CScene__LoadGraphicSet(&gScene, 2, 0, 1);
     if (res != NULL) {
-        table = res->table;
+        table = res->data;
         index = 42 % table->count;
         chunk.data = NULL;
         entries = table->entries;
