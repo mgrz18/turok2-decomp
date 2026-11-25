@@ -3680,9 +3680,6 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
     }
 }
 
-typedef struct Quad {
-    s32 w[4];
-} Quad;
 void CCamera__SetViewParams(void *camera, s32 type, f32 a, f32 b, f32 x0, f32 y0, f32 x1, f32 y1, f32 z1,
                    f32 h, CQuaternion quad, struct CGameRegion *region, f32 c, f32 d);
 
@@ -3845,7 +3842,7 @@ typedef struct Player {
         struct { u8 _hp_model[T2_HOFF_PL(m_CharacterActor.header.m_pCurrentRegion)]; CGameRegion *model; }; /* N64 0x10 */
         struct { u8 _hp_def[T2_HOFF_PL(m_CharacterActor.header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
         struct { u8 _hp_velY[T2_HOFF_PL(m_CharacterActor.m_vVelocity.y)]; f32 velY; }; /* N64 0x1C */
-        struct { u8 _hp_unk40[T2_HOFF_PL(m_CharacterActor.m_qGround)]; Quad unk40; }; /* N64 0x40 */
+        struct { u8 _hp_qGround[T2_HOFF_PL(m_CharacterActor.m_qGround)]; CQuaternion qGround; }; /* N64 0x40 */
         struct { u8 _hp_yaw[T2_HOFF_PL(m_CharacterActor.m_RotY)]; f32 yaw; }; /* N64 0x50 */
         struct { u8 _hp_flags[T2_HOFF_PL(m_CharacterActor.m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
         struct { u8 _hp_anim[T2_HOFF_PL(m_CharacterActor.m_CurrentAnimation.m_nAnimIndex)]; s16 anim; }; /* N64 0xDC */
@@ -3855,7 +3852,7 @@ typedef struct Player {
         struct { u8 _hp_emitter[T2_HOFF_PL(m_WeaponActor.header)]; u8 emitter[4]; }; /* N64 0x288 */
         struct { u8 _hp_emitterPos[T2_HOFF_PL(m_WeaponActor.header.m_vPos)]; CVector3 emitterPos; }; /* N64 0x28C */
         struct { u8 _hp_emitterModel[T2_HOFF_PL(m_WeaponActor.header.m_pCurrentRegion)]; CGameRegion *emitterModel; }; /* N64 0x298 */
-        struct { u8 _hp_emitter40[T2_HOFF_PL(m_WeaponActor.m_qGround)]; Quad emitter40; }; /* N64 0x2C8 */
+        struct { u8 _hp_emitterQGround[T2_HOFF_PL(m_WeaponActor.m_qGround)]; CQuaternion emitterQGround; }; /* N64 0x2C8 */
         struct { u8 _hp_emitterYaw[T2_HOFF_PL(m_WeaponActor.m_RotY)]; f32 emitterYaw; }; /* N64 0x2D8 */
         struct { u8 _hp_unk3C8[T2_HOFF_PL(m_WeaponActor.m_AI)]; u8 unk3C8[0x3F4 - 0x3C8]; }; /* N64 0x3C8 */
         struct { u8 _hp_voice[T2_HOFF_PL(m_WeaponActor.m_AI.m_pModeTable)]; Voice_24C47C *voice; }; /* N64 0x3F4 */
@@ -3915,7 +3912,7 @@ typedef struct Player {
     /* 0x0018 */ u8 pad18[4];
     /* 0x001C */ f32 velY;
     /* 0x0020 */ u8 pad20[0x40 - 0x20];
-    /* 0x0040 */ Quad unk40;
+    /* 0x0040 */ CQuaternion qGround;
     /* 0x0050 */ f32 yaw;
     /* 0x0054 */ u8 pad54[0xD4 - 0x54];
     /* 0x00D4 */ u32 flags;
@@ -3932,7 +3929,7 @@ typedef struct Player {
     /* 0x028C */ CVector3 emitterPos;
     /* 0x0298 */ CGameRegion *emitterModel;
     /* 0x029C */ u8 pad29C[0x2C8 - 0x29C];
-    /* 0x02C8 */ Quad emitter40;
+    /* 0x02C8 */ CQuaternion emitterQGround;
     /* 0x02D8 */ f32 emitterYaw;
     /* 0x02DC */ u8 pad2DC[0x3C8 - 0x2DC];
     /* 0x03C8 */ u8 unk3C8[0x3F4 - 0x3C8];
@@ -4456,7 +4453,7 @@ void CPlayer__Update(Player *p) {
     p->emitterPos = p->pos;
     p->emitterYaw = p->yaw;
     p->emitterModel = p->model;
-    p->emitter40 = p->unk40;
+    p->emitterQGround = p->qGround;
     p->lastPos = p->pos;
     if (gEngineApp_m_Settings.cheatFlags & 8) {
         for (i = 0; i < 31; i++) {
