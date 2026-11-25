@@ -225,25 +225,12 @@ void Action_GoEnter(u8 *actor) {
 #include "structs/game.h"
 #include "globals/game.h"
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x34];
-    /* 0x034 */ s8 unk34;
-    /* 0x035 */ u8 pad35;
-    /* 0x036 */ s8 unk36;
-    /* 0x037 */ u8 pad37[0x90];
-    /* 0x0C7 */ s8 active;
-    /* 0x0C8 */ u8 padC8[0x48];
-    /* 0x110 */ s32 done;
-    /* 0x114 */ s32 tagCleared;
-} ActionState;
 extern CPlayer *CPlayerPool__FindTagged(CPlayerPool *list);
 
-/* The port (round 9 x1): the action's CAI by member. The N64 view's 0x34/0x36 are m_Mode and
- * m_ModeBefore, 0xC7 m_AnimRepeatedCount (the go animation played through), 0x110/0x114
- * m_VarBuffer[1]/[2] (Action_Setup and Action_IdleEnter clear them); on the host those offsets
- * fall elsewhere in CAI (its pointers are wider), so a used switch never left mode 1. */
-void Action_GoUpdate(CGameObjectInstance *actor, ActionState *state_) {
-    CAI *state = (CAI *) state_;
+/* The action's CAI by member (round 9 x1 for the port; round 30 dropped the ActionState view the
+ * parameter was typed with): m_Mode / m_ModeBefore, m_AnimRepeatedCount (the go animation played
+ * through), m_VarBuffer[1]/[2] (Action_Setup and Action_IdleEnter clear them). */
+void Action_GoUpdate(CGameObjectInstance *actor, CAI *state) {
     CDoorIntelligence *info = &actor->header.m_pIntelligence->m_Door;
     CGame *game;
     CPlayer *player;
