@@ -16,7 +16,6 @@ typedef struct Marker {
 extern Marker sBootMarker;           /* the boot marker string */
 #include "globals/save.h"          /* the saved players (0x1400) */
 
-extern s32 gImageEnd[];             /* local view: the end of the image and its BSS (an absolute symbol) */
 void memset(void *dst, s32 value, sptr size);
 s32 Util_StrCmp(char *marker, char *name);
 void Util_StrCpy(char *marker, char *name);

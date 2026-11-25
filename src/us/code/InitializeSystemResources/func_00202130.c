@@ -15,7 +15,7 @@ void CDecompressor__Construct(CDecompressor *p, s32 n);
 void CLoader__Construct(CLoader *p, s32 n);
 void VM_Initialize(s32 a, s32 b);
 
-extern u8 gImageEnd[];   /* local view: the end of the loaded image (an absolute symbol) */
+#include "globals/engine.h"     /* gImageEnd */
 
 void InitializeSystemResources(void) {
     u8 *base;
