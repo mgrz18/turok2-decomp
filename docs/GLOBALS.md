@@ -500,9 +500,40 @@ global):
   `sBlindOnePhases_update_2` (a function pointer the counting script misses) and `value` (the
   script's false hit on an anonymous struct member).
 
+## Round 30, part s2: the last `D_` declarations
+
+The names s2 gave the last `D_` data (docs/NAMES.md, "Round 30, part s2") are declared in their
+subsystem's header (`globals/cinema.h`, `engine.h`, `math.h`, `menu.h`, `object.h`, `pager.h`,
+`particle.h`, `player.h`; `MenuColorInit` in `structs/menu.h`); the per-file `extern` copies of the
+previous commit went, so the merged files and the VM twins share one declaration each. `gImageEnd`
+(two local views, `s32[]` in `Boot` and `u8[]` in `InitializeSystemResources`) is one `u8[]` in
+`globals/engine.h`: `Boot` only compares it through a `uptr` cast, so the type does not reach its code.
+
+**The names still without a header** (`extern` lines in `src/` whose name no `include/` header
+declares, counted by a regex over `extern <type> name[...];` lines): **35 names, 50 lines** at the end
+of round 30: the 25 of round 25's list that the regex sees (`ProPack__Decompress` is no longer
+declared locally; `sBlindOnePhases_update_2` and `value` were the old script's misses), plus 10 that
+were `D_` or had no symbol before:
+
+- Absolute symbols, not data (`versions/symbols_manual.us.txt`): `gCodeDataSize`,
+  `gVirtualDataSize`, `gCodeTextSize`, `gVirtualTextSize` (`code/BinaryRange` only: the sizes of the
+  ranges `IsDataPointer` / `IsCodePointer` test, declared `char` so `&sym` is the number; one file,
+  next to the two code-address bounds `CList__Construct` / `Automap_RevealRegion` it reads the same
+  way), `gHostIoHighAddressBias` (`HostIo_MemoryTransfer` adds its address; not an object).
+- Defined in place by its only user: `sCMtxFUp` (`CMtxF.c` defines `{0, 1, 0}` with an asm label;
+  `CVector3` is an untagged typedef that `globals/math.h` cannot name).
+- The 3 `D_` floats of another object's pool (NAMES.md, round 30 s2: `D_800A5EB0`, `D_800C1064`,
+  `D_800C1348`): each `extern` is the reader's view of a literal, not a global.
+- `func_00408FF8` (`vm1/MotherBoss`): the stray object splat starts two junk words before
+  `MotherBoss_Hurt` (`src/us/asm/stray_00408FF8.s`); `MotherBoss_Init` installs `func_00408FF8 + 8`.
+  A code label read as `u8[]`, not a global.
+
+None of the 35 can take a header declaration without changing the code (the field symbols and
+local views of round 25's list) or declaring something that is not a game global.
+
 ## Left
 
-- **Globals without a header (52 lines, 28 names, after round 25 n4; the list and reasons are in "Round 25, part n4" above).**
+- **Globals without a header (50 lines, 35 names, after round 30 s2; the list and reasons are in "Round 25, part n4" and "Round 30, part s2" above; the round-25 list below is still accurate for its names).**
   - Field symbols one of whose users includes the owner's header and needs a view that
     shares a base register across fields, so the header cannot declare the field's type:
     `gEngineApp_m_Settings_difficulty` (6 lines; `CScene__BuildActorLists` reads `CGame` and

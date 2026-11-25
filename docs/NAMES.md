@@ -598,6 +598,71 @@ faithful reading the default; `T2_LEGACY_VOICE=1` (written only by `fullrun.py`/
 --legacy`) keeps the byte-swapped one, and the reference runs were re-baselined (docs/port/STATUS.md,
 round 26).
 
+### Round 30, part s2: the last `D_`
+
+`versions/names/data_s2.us.txt` (52 names) and the rewrites below. Each batch: `tools/asm_diff.py
+--base a51f830f -j 8` over the whole tree 0 differ, `make setup` + build + `make verify` OK. Distinct
+`D_` tokens in `src/` and `include/` `.c`/`.h` (code and comments): **52 -> 3**; in the hand-written
+`src/us/asm/*.s`: 17 -> 0. Data names 1,726 -> **1,782**. This supersedes the "42 left" table of
+round 25 n4 above: the modules are one C file each now (round 29), so "a pool no C file owns yet"
+was re-checked per word.
+
+**Data defined in place** (the merged C files define it with an asm label at its address; the users
+read it by `%hi/%lo`, so it keeps a symbol and now has a name): `sCMtxFUp` (`{0, 1, 0}`),
+`sLitVerticesName` ("Lit Vertices"), `sAlignToGroundMax`, the nine `sDistanceScale*` words of
+`CParticle__GetDistanceScale`, `sSpriteTexelScale` / `sSpriteOne` (`Sprite_FromImage`), the menu format
+strings `sMpMenuText_Space`, `sMpMenuFmt_02d`, `sGameNoteMenuFmt_2d`, `sGameNoteMenuFmt_Time`,
+`sCharNoteMenuFmt_04d`.
+
+**Initialised data of one subsystem** (the engine `.data` blob ABCA8 and the VM data blob C24E0):
+`sAnimMaxKeyCount`, `sReturningHomeFrame` / `sReturningCatchRadius`, `sHiResViewScaleX`,
+`sCharacterClimbSounds` (`CharacterSound[]`, read through `.sound`), `sMountStepLength`,
+`gCinemaHoldFade` / `gCinemaFadeBias`, `gMenuColorDefaults` (`MenuColorInit[8]`, `structs/menu.h`),
+`osViModeNtscHpn1` (`osViModeTable[8]`: `EngineMode17_Switch_Init` needs its own `%hi/%lo`, so the
+element keeps a symbol; the libultra name of the mode), `gViModeChoices` (`ViModeChoice[3][8]`).
+
+**Field symbols kept** (through the struct the code changes): `gRidingForwardMoveTuning_forwardMax`,
+`sChargeShotRecord_count` (with its record `sChargeShotRecord`).
+
+**Write-only words**, named by their one write (nothing reads them): `sSchedRdpTaskStarted`,
+`sSchedRdpTaskCounter` (`__scExec`), `sVMRestartFlag` (`VM_HandleTLBMiss`).
+
+**Interiors as members or macros:** `MAIN_STACK_GUARD` (`globals/frame.h`, the bottom of the main
+stack the recursion guards compare with), `gCharacterSelectSounds[n].sound`, the `MenuColorInit`
+fields, `gViModeChoices[region][flags].index`, `RESOLUTION_LOW_BYTE` (`globals/render.h`: the low
+byte of `gResolution`, `(u8)` on the host, byte 3 on the N64).
+
+**Absolute symbols** (`versions/symbols_manual.us.txt`; not data): `gCodeDataSize`,
+`gVirtualDataSize`, `gCodeTextSize`, `gVirtualTextSize` (the four range sizes `IsDataPointer` /
+`IsCodePointer` add to their start symbols), `gImageEnd` (the end of the image and its BSS),
+`gHostIoHighAddressBias` (`HostIo_MemoryTransfer`'s address offset). The struct tag
+`D_800C7470_Pair` is `CinemaKeyPair`.
+
+**The CCollisionInfo slots** `gCollisionSetupTable` (and its module-2 copy) points at without a name:
+16 more `CCollisionInfo` objects 0x20 apart, each named by the mode tables (Enter, Update, collision
+info) whose records point at it: `gCollisionInfoSwim`, `PlayerRide`, `Platform`, `EnemyDeath`,
+`Jump`, `JumpPad`, `PlayerDeath`, `EnemyGround`, `Mount`, `PlayerDeath32`, `Wade`, `EnemyHover`,
+`Turret`, `Throwable`, `Door`, and `gCollisionInfoSetupUnused` (record 11, written as a raw
+`0x800F1DF0` in the table: no mode table and no code use it). The setup table's junk first words are
+`sPlayerFileHeadFill` / `sPlayerFileHeadFill_2`; the boot stub's comment `(D_28D380)` went.
+
+**The 3 left**, each a float literal in another object's pool (the reader is a VM twin compiled as
+its own object; the word is a literal of the owner's function, so it has no symbol the owner could
+name without turning its literal into a variable, which moves its `.rodata`):
+
+| `D_` | what | owner (its literal) | reader |
+| --- | --- | --- | --- |
+| `D_800A5EB0` | f32 127.0 | `code/CScene/CScene.c`, `CScene__LoadLightSettings` (`127.0f / len`) | `vm2/SceneLoad/SceneLoad_2.c`, `CScene__LoadLightSettings_2` |
+| `D_800C1064` | f32 120.0 | `vm2/GameOverMenu/GameOverMenu_2.c`, `GameOverMenu_Init_2` | `vm1/GameOverMenu/GameOverMenu.c`, `GameOverMenu_Init` |
+| `D_800C1348` | f32 15.0 | `vm1/NameEntryMenu/NameEntryMenu.c`, `NameEntryMenu_UpdateName` | `vm2/NameEntryMenu/NameEntryMenu_2.c`, `NameEntryMenu_UpdateName_2` |
+
+Each pair is the two VM modules' copies of one source function: the original build compiled the
+module-2 copy against the module-1 object's pool (or the other way round), so the reader's `lwc1`
+reaches into the other copy's literals. A name would need the owner to read a named `const` instead
+of its literal: GCC 2 would emit the word as a variable, in the variable's place in `.rodata`, not in
+the function's pool, and the owner's other literals would move. They stay `D_`, declared in the reader
+(the only `extern` of each).
+
 ## Declarations
 
 The named globals now have one declaration each, with the real type, in
