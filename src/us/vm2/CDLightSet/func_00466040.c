@@ -1,41 +1,21 @@
 #include "common.h"
 #include "protos/list.h"
 
-/* Initialise a pool of 8 nodes: an empty used list and a free list holding them all. */
+#include "structs/particle.h"
 
-typedef struct {
-    void *head; /* 0x00 */
-    void *tail; /* 0x04 */
-    u8 pad8[0xC];
-} List; /* 0x14 bytes */
-
-typedef struct {
-    void *prev;  /* 0x00 */
-    void *next;  /* 0x04 */
-    s32 value;   /* 0x08 */
-    f32 scale;   /* 0x0C */
-    u8 pad10[6];
-    s16 count;   /* 0x16 */
-} PoolNode; /* 0x18 bytes */
-
-typedef struct {
-    List used;          /* 0x00 */
-    List free;          /* 0x14 */
-    PoolNode nodes[8];  /* 0x28 */
-} Pool;
-
-
-void CDLightSet__Construct_2(Pool *pool) {
+/* The vm2 copy of CDLightSet__Construct: an empty used list and the 8 lights on the free list,
+ * each with no light record, full colour and disabled. */
+void CDLightSet__Construct_2(CDLightSet *pool) {
     s32 i;
-    PoolNode *node;
+    CDLight *node;
 
-    CList__Construct(&pool->used, 0, sizeof(void *));
-    CList__Construct(&pool->free, 0, sizeof(void *));
+    CList__Construct(&pool->m_UsedList, 0, sizeof(void *));
+    CList__Construct(&pool->m_FreeList, 0, sizeof(void *));
     for (i = 0; i < 8; i++) {
-        node = &pool->nodes[i];
-        CList__AddTail(&pool->free, node);
-        node->value = 0;
-        node->scale = 1.0f;
-        node->count = 0;
+        node = &pool->m_Lights[i];
+        CList__AddTail(&pool->m_FreeList, node);
+        node->m_pROMLight = 0;
+        node->m_ColorFade = 1.0f;
+        node->m_bEnabled = 0;
     }
 }
