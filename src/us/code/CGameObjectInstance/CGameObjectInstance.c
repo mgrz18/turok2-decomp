@@ -1424,26 +1424,6 @@ void CGameObjectInstance__WobbleBone(s32 time, s32 flags, f32 *matrix) {
 #define T2_F2U(x) ((u32)(x))
 #endif
 
-/* A bone's track references: -1 means "use the default frame". */
-typedef struct JointRef {
-    /* 0x0 */ s16 pos;
-    /* 0x2 */ s16 rot;
-} JointRef;
-typedef struct DefaultFrame {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ s16 rot[4];
-} DefaultFrame;
-typedef struct KeyLookup {
-    /* 0x00 */ JointRef *joints;
-    /* 0x04 */ DefaultFrame *frames;
-    /* 0x08 */ void *posTable;
-    /* 0x0C */ void *rotTable;
-    /* 0x10 */ s32 rotFrame0;
-    /* 0x14 */ s32 rotFrame1;
-    /* 0x18 */ s32 posFrame0;
-    /* 0x1C */ s32 posFrame1;
-    /* 0x20 */ f32 blend;
-} KeyLookup;
 typedef struct TwistPart {
     /* 0x00 */ u8 pad0[0x12];
     /* 0x12 */ s8 count;
@@ -1505,8 +1485,8 @@ struct PoseContext {
     /* 0x14 */ sptr arg2;
     /* 0x18 */ void *channel;
     /* 0x1C */ void *blendChannel;
-    /* 0x20 */ KeyLookup keys;
-    /* 0x44 */ KeyLookup blendKeys;
+    /* 0x20 */ CAnimationKeys keys;
+    /* 0x44 */ CAnimationKeys blendKeys;
     /* 0x68 */ s32 visible;
     /* 0x6C */ s32 blend;
     /* 0x70 */ s32 moving;
@@ -1537,7 +1517,7 @@ void CMtxF__ScaleAxes(void *m, f32 x, f32 y, f32 z);
 u32 T2Port_N64Address(const void *p);
 f32 CGameRegion__GetCeilingHeight(CGameRegion *region, f32 x, f32 z); /* the ceiling height */
 
-static __inline__ void trackPos(KeyLookup *t, s32 i, CVector3 *out) {
+static __inline__ void trackPos(CAnimationKeys *t, s32 i, CVector3 *out) {
     if (t->joints[i].pos == -1) {
         *out = t->frames[i].pos;
     } else {
@@ -1552,7 +1532,7 @@ static __inline__ void trackPos(KeyLookup *t, s32 i, CVector3 *out) {
     }
 }
 
-static __inline__ void defaultRot(KeyLookup *t, s32 i, CQuaternion *out) {
+static __inline__ void defaultRot(CAnimationKeys *t, s32 i, CQuaternion *out) {
     DefaultFrame *frame = &t->frames[i];
 
     out->x = frame->rot[0] * (1.0f / 32767.0f);
@@ -1562,7 +1542,7 @@ static __inline__ void defaultRot(KeyLookup *t, s32 i, CQuaternion *out) {
 }
 
 /* Spherical interpolation between the two keys. */
-static __inline__ void slerpRot(KeyLookup *t, s32 i, CQuaternion *out) {
+static __inline__ void slerpRot(CAnimationKeys *t, s32 i, CQuaternion *out) {
     if (t->joints[i].rot != -1) {
         f32 *data = CISet__GetBlock(t->rotTable, t->joints[i].rot);
 
@@ -1573,7 +1553,7 @@ static __inline__ void slerpRot(KeyLookup *t, s32 i, CQuaternion *out) {
 }
 
 /* Linear interpolation between the two keys. */
-static __inline__ void lerpRot(KeyLookup *t, s32 i, CQuaternion *out) {
+static __inline__ void lerpRot(CAnimationKeys *t, s32 i, CQuaternion *out) {
     if (t->joints[i].rot == -1) {
         defaultRot(t, i, out);
     } else {
@@ -1837,27 +1817,6 @@ void CGameObjectInstance__PoseBone(PoseObject *obj, PoseContext *ctx, s32 bone, 
  * fixed-point 65536 units), timing that call in a profile slot. Then draws
  * the object's attachments. Returns whether the matrices were built. */
 
-typedef struct AnimChannel {
-    /* 0x00 */ f32 time;
-    /* 0x04 */ s16 current;
-    /* 0x06 */ s16 next;
-    /* 0x08 */ s16 frames;
-    /* 0x0A */ s8 active;
-    /* 0x0B */ s8 blending;
-    /* 0x0C */ u32 loopStart;
-    /* 0x10 */ void *resource; /* CAnimationState.pmeAnimData */
-} AnimChannel;
-typedef struct AnimKeyLookup {
-    /* 0x00 */ void *posKeys;
-    /* 0x04 */ void *rotKeys;
-    /* 0x08 */ void *posTracks;
-    /* 0x0C */ void *rotTracks;
-    /* 0x10 */ s32 offset0;
-    /* 0x14 */ s32 offset1;
-    /* 0x18 */ s32 rootOffset0;
-    /* 0x1C */ s32 rootOffset1;
-    /* 0x20 */ f32 frac;
-} AnimKeyLookup;
 #ifdef TARGET_PORT
 typedef struct AnimObject {
 /* the view at the host offsets of CGameObjectInstance (tools/port/hostview.py): each field in its own
@@ -1870,8 +1829,8 @@ typedef struct AnimObject {
         struct { u8 _hp_animFile[T2_HOFF_AnimObject(m_rpAnims)]; sptr animFile; }; /* N64 0xA8: a ROM address */
         struct { u8 _hp_animCount[T2_HOFF_AnimObject(m_nAnims)]; s16 animCount; }; /* N64 0xBA */
         struct { u8 _hp_flags[T2_HOFF_AnimObject(m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
-        struct { u8 _hp_channel[T2_HOFF_AnimObject(m_CurrentAnimation)]; AnimChannel channel; }; /* N64 0xD8 */
-        struct { u8 _hp_blendChannel[T2_HOFF_AnimObject(m_BlendAnimation)]; AnimChannel blendChannel; }; /* N64 0xEC */
+        struct { u8 _hp_channel[T2_HOFF_AnimObject(m_CurrentAnimation)]; CAnimationState channel; }; /* N64 0xD8 */
+        struct { u8 _hp_blendChannel[T2_HOFF_AnimObject(m_BlendAnimation)]; CAnimationState blendChannel; }; /* N64 0xEC */
         struct { u8 _hp_hasEffects[T2_HOFF_AnimObject(m_ActiveSwooshes)]; u8 hasEffects; }; /* N64 0x10F */
         struct { u8 _hp_attachMask[T2_HOFF_AnimObject(m_AI.m_VisBits)]; u32 attachMask; }; /* N64 0x14C */
         struct { u8 _hp_owner[T2_HOFF_AnimObject(m_AI.m_pParent)]; struct AnimObject *owner; }; /* N64 0x1A8 */
@@ -1891,8 +1850,8 @@ typedef struct AnimObject {
     /* 0x0BA */ s16 animCount;
     /* 0x0BC */ u8 padBC[0x18];
     /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ AnimChannel channel;
-    /* 0x0EC */ AnimChannel blendChannel;
+    /* 0x0D8 */ CAnimationState channel;
+    /* 0x0EC */ CAnimationState blendChannel;
     /* 0x100 */ u8 pad100[0xF];
     /* 0x10F */ u8 hasEffects;
     /* 0x110 */ u8 pad110[0x3C];
@@ -1913,10 +1872,10 @@ typedef struct AnimPoseContext {
     /* 0x0C */ s32 *anims;
     /* 0x10 */ s32 *file;
     /* 0x14 */ sptr arg2;
-    /* 0x18 */ AnimChannel *channel;
-    /* 0x1C */ AnimChannel *blendChannel;
-    /* 0x20 */ AnimKeyLookup keys;
-    /* 0x44 */ AnimKeyLookup blendKeys;
+    /* 0x18 */ CAnimationState *channel;
+    /* 0x1C */ CAnimationState *blendChannel;
+    /* 0x20 */ CAnimationKeys keys;
+    /* 0x44 */ CAnimationKeys blendKeys;
     /* 0x68 */ s32 visible;
     /* 0x6C */ s32 blend;
     /* 0x70 */ s32 moving;
@@ -1950,7 +1909,7 @@ extern Profile sBoneMatrixProfile;
 extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
 s32 Cinema_PathPlaying(void);
 void *MtxPool_Alloc(void *pool, s32 count);
-void CAnimationState__FindKeys(AnimChannel *channel, AnimKeyLookup *keys);
+void CAnimationState__FindKeys(CAnimationState *channel, CAnimationKeys *keys);
 void SwooshSystem_AddBonePoints(void *effects, AnimObject *obj, void *bones);
 void GameObject_EmitHotPoints(void *list, s32 count, void *bones, void *obj, void *anims);
 
@@ -1971,8 +1930,8 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
     s32 isType9;
     s32 inCinema;
     s32 type;
-    AnimChannel *channel;
-    AnimChannel *blendChannel;
+    CAnimationState *channel;
+    CAnimationState *blendChannel;
     Profile *prof;
     u32 elapsed;
     s32 *lists;
@@ -2027,7 +1986,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, sptr arg2
                 }
             }
             if (!Cinema_PathPlaying()) {
-                if ((channel->blending || blendChannel->blending) && type != 1) {
+                if ((channel->m_bAnimActive || blendChannel->m_bAnimActive) && type != 1) {
                     ctx.moving = 1;
                 } else {
                     ctx.moving = 0;
@@ -2343,20 +2302,8 @@ static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0
  * grown by 0.003 per unit of height, turned like the actor and set on the
  * ground; then it is submitted (CGameObjectInstance__SubmitShadowModel). */
 
-#ifdef TARGET_PORT
 #include "structs/model.h"
-/* CDrawArgs.m_pOffset at its host offset */
-typedef struct {
-    u8 pad0[__builtin_offsetof(CDrawArgs, m_pOffset)];
-    sptr blobType;
-} ShadowParams;
-#else
-typedef struct {
-    u8 pad0[0x10];
-    s32 blobType;           /* 0x10 */
-} ShadowParams;
-#endif
-void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, sptr unused, ShadowParams *s);
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, sptr unused, CDrawArgs *s);
 
 void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, sptr arg1, CDrawArgs *params) {
     pickSets(actor, params->m_nVariant, &params->m_nModel, &params->m_nShadowModel);
@@ -2464,45 +2411,12 @@ void DLights_GetAtPoint(void *, f32, f32, f32, CVector3 *, f32 *);
 void CVector3__Normalize(CVector3 *);
 void CMtxF__SetShadowProjection(void *, CVector3 *, f32);
 void CMtxF__ScaleColumns(void *, f32, f32, f32);
-void Shadow_DrawBlob(); /* (ShadowActor *, CVector3 *offset, s32), func_0021E03C.c: the blob type travels as the offset */
-#ifdef TARGET_PORT
+void Shadow_DrawBlob(); /* (CGameObjectInstance *, CVector3 *offset, s32): the CDrawArgs' m_pOffset */
 #include "structs/camera.h"
 #include "structs/model.h"
-/* Model is the view's CCamera (m_mfProjection, m_mProjection[2]) and ModelRef the
- * CDrawArgs: their host members (the N64 offsets put the shadow's projection, and the
- * one restored after it, on the wrong bytes: every actor drawn after a shadow got it) */
-typedef struct Model {
-    union {
-        struct { u8 _hp_unk1CC[__builtin_offsetof(CCamera, m_mfProjection)]; u8 unk1CC[0x40]; };
-        struct { u8 _hp_mtx[__builtin_offsetof(CCamera, m_mProjection)]; Mtx mtx[2]; };
-    };
-} Model;
+void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *owner, CDrawArgs *ref, void *arg2, s32 arg3);
 
-typedef struct ModelRef {
-    union {
-        struct { u8 _hp_model[__builtin_offsetof(CDrawArgs, m_pCamera)]; Model *model; };
-        struct { u8 _hp_unkC[__builtin_offsetof(CDrawArgs, m_hModel)]; sptr unkC; };
-        struct { u8 _hp_unk1C[__builtin_offsetof(CDrawArgs, m_nShadowModel)]; s32 unk1C; };
-    };
-} ModelRef;
-#else
-typedef struct Model {
-    u8 pad0[0x1CC];
-    u8 unk1CC[0x368 - 0x1CC];   /* 0x1CC */
-    Mtx mtx[2];                 /* 0x368: one per frame buffer */
-} Model;
-
-typedef struct ModelRef {
-    u8 pad0[0x8];
-    Model *model;               /* 0x08 */
-    s32 unkC;                   /* 0x0C */
-    u8 pad10[0x1C - 0x10];
-    s32 unk1C;                  /* 0x1C */
-} ModelRef;
-#endif
-void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *owner, ModelRef *ref, void *arg2, s32 arg3);
-
-void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, sptr unused, ShadowParams *s) {
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, sptr unused, CDrawArgs *s) {
     CVector3 dir;
     f32 r;
     u8 m[0x40];
@@ -2579,7 +2493,7 @@ clampy:
             }
             CGameObjectInstance__SubmitShadowModel(a, s, a->m_pmfShadow, a->m_ShadowAlpha);
         } else {
-            Shadow_DrawBlob(a, s->blobType, 0);
+            Shadow_DrawBlob(a, s->m_pOffset, 0);
         }
     }
 end:
@@ -2589,38 +2503,18 @@ end:
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-typedef struct ObjDef {
-    u16 pad0;
-    u16 flags;                  /* 0x02 */
-} ObjDef;
-typedef struct ShadowActor {
-    u8 pad0[0x4];
-    CVector3 pos;                   /* 0x04 */
-    ObjDef *def;                /* 0x10 */
-    u8 pad14[0x40 - 0x14];
-    u8 rot[0x54 - 0x40];        /* 0x40 */
-    f32 unk54;                  /* 0x54 */
-    u8 pad58[0x10E - 0x58];
-    u8 shadowAlpha;             /* 0x10E */
-} ShadowActor;
-s32 CGameRegion__IsSteep(ObjDef *def);
-f32 GameObject_GetGroundHeight(ShadowActor *actor, s32 arg1);    /* ground height */
-f32 GameObject_GetWallRadius(ShadowActor *actor);              /* radius */
+s32 CGameRegion__IsSteep(struct CGameRegion *region);
+f32 GameObject_GetGroundHeight(CGameObjectInstance *actor, s32 arg1);    /* ground height */
+f32 GameObject_GetWallRadius(CGameObjectInstance *actor);              /* radius */
 void CVector3__ClampLength(void *v, f32 length);
 void CMtxF__ToMtxAffine(CMtxF *m, void *dst);
 void Render_DrawShadowQuad(void *mtx, s32 arg1, s32 alpha);
-/* Draws the blob shadow under an actor. */
-#ifdef TARGET_PORT
-#include "structs/game_object.h"
-/* The port (round 11 z1): the actor by member of CGameObjectInstance (the N64 view: 0x04 m_vPos,
- * 0x10 the region (its flags at 0x02), 0x40 m_qGround, 0x54 m_CollisionYOffset, 0x10E
- * m_ShadowAlpha). Through the N64 offsets the alpha's read-modify-write landed in byte 2 of
- * m_CurrentAnimation.pmeAnimData: the first-person weapon's blob shadow (CPlayerPool__ReloadAnimInfo)
- * turned a released animation (NULL) into 0x630000 and the next weapon animation switch copied it
- * into the blend channel: CAnimationState__FindKeys crashed (level 135 of the River of Souls). */
-void Shadow_DrawBlob(ShadowActor *actor_, CVector3 *offset, s32 arg2) {
-    CGameObjectInstance *actor = (CGameObjectInstance *) actor_;
-    ObjDef *def = (ObjDef *) actor->header.m_pCurrentRegion;
+/* Draws the blob shadow under an actor: the region under it (steep, or REGION flag 0x4000: none),
+ * its m_qGround, m_CollisionYOffset and m_ShadowAlpha (round 11 z1 typed the port's copy so: through
+ * the N64 offsets the alpha's read-modify-write landed in m_CurrentAnimation.pmeAnimData on the
+ * host and CAnimationState__FindKeys crashed on level 135; round 30 made it the only copy, the
+ * ShadowActor / ObjDef views gone). */
+void Shadow_DrawBlob(CGameObjectInstance *actor, CVector3 *offset, s32 arg2) {
     CMtxF mtx;
     CVector3 pos;
     void *gmtx;
@@ -2632,8 +2526,8 @@ void Shadow_DrawBlob(ShadowActor *actor_, CVector3 *offset, s32 arg2) {
     f32 a;
     u8 alpha;
 
-    visible = !CGameRegion__IsSteep(def);
-    if (def != NULL && (def->flags & 0x4000)) {
+    visible = !CGameRegion__IsSteep(actor->header.m_pCurrentRegion);
+    if (actor->header.m_pCurrentRegion != NULL && (actor->header.m_pCurrentRegion->m_wFlags & 0x4000)) {
         visible = 0;
     }
     if (!visible) {
@@ -2643,9 +2537,9 @@ void Shadow_DrawBlob(ShadowActor *actor_, CVector3 *offset, s32 arg2) {
     if (gmtx == NULL) {
         return;
     }
-    ground = GameObject_GetGroundHeight(actor_, 0);
+    ground = GameObject_GetGroundHeight(actor, 0);
     height = actor->header.m_vPos.y + actor->m_CollisionYOffset - ground;
-    size = MAX(MIN(GameObject_GetWallRadius(actor_), GameObject_GetWallRadius(actor_) - height * 0.1f), 0.0f);
+    size = MAX(MIN(GameObject_GetWallRadius(actor), GameObject_GetWallRadius(actor) - height * 0.1f), 0.0f);
     if (arg2) {
         lift = 15.36f;
         size *= 0.5f;
@@ -2666,54 +2560,6 @@ void Shadow_DrawBlob(ShadowActor *actor_, CVector3 *offset, s32 arg2) {
     actor->m_ShadowAlpha = actor->m_ShadowAlpha + (alpha - actor->m_ShadowAlpha) * 0.5f;
     Render_DrawShadowQuad(gmtx, arg2 == 0, actor->m_ShadowAlpha);
 }
-#else
-void Shadow_DrawBlob(ShadowActor *actor, CVector3 *offset, s32 arg2) {
-    CMtxF mtx;
-    CVector3 pos;
-    void *gmtx;
-    s32 visible;
-    f32 ground;
-    f32 height;
-    f32 size;
-    f32 lift;
-    f32 a;
-    u8 alpha;
-
-    visible = !CGameRegion__IsSteep(actor->def);
-    if (actor->def != NULL && (actor->def->flags & 0x4000)) {
-        visible = 0;
-    }
-    if (!visible) {
-        return;
-    }
-    gmtx = MtxPool_Alloc(gScene.m_Heap, 1);
-    if (gmtx == NULL) {
-        return;
-    }
-    ground = GameObject_GetGroundHeight(actor, 0);
-    height = actor->pos.y + actor->unk54 - ground;
-    size = MAX(MIN(GameObject_GetWallRadius(actor), GameObject_GetWallRadius(actor) - height * 0.1f), 0.0f);
-    if (arg2) {
-        lift = 15.36f;
-        size *= 0.5f;
-    } else {
-        lift = 0.0f;
-        size *= 0.7f;
-    }
-    pos.x = actor->pos.x + offset->x;
-    pos.z = actor->pos.z + offset->z;
-    pos.y = ground + lift + offset->y;
-    CVector3__ClampLength(&pos, 20000.0f);
-    CQuaternion__ToMatrix(actor->rot, &mtx);
-    CMtxF__ScaleAxes(&mtx, size, 1.0f, size);
-    CMtxF__Translate(&mtx, pos.x, pos.y, pos.z);
-    CMtxF__ToMtxAffine(&mtx, gmtx);
-    a = 200.0f - height * 1.2207031f;
-    alpha = a > 255.0f ? 255 : a < 0.0f ? 0 : a > 255.0f ? 255 : (u8)a;
-    actor->shadowAlpha = actor->shadowAlpha + (alpha - actor->shadowAlpha) * 0.5f;
-    Render_DrawShadowQuad(gmtx, arg2 == 0, actor->shadowAlpha);
-}
-#endif
 
 typedef struct Box {
     CVector3 corners[8];            /* 0x00 */
@@ -3267,16 +3113,16 @@ void CMtxF__ClampEntries(f32 (*mf)[4]);
 void CMtxF__ToMtx(f32 (*mf)[4], Mtx *m);
 void Render_DrawModelFlat(s32, sptr, sptr, s32, Slot24 *, sptr, s32, s32);
 
-void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *owner, ModelRef *ref, void *arg2, s32 arg3) {
+void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *owner, CDrawArgs *ref, void *arg2, s32 arg3) {
     f32 mf[4][4];
-    Model *model;
+    CCamera *model;
     Mtx *m;
 
     if (owner->m_pmtDrawMtxs != NULL) {
         m = MtxPool_Alloc(gScene.m_Heap, 1);
         if (m != NULL) {
-            model = ref->model;
-            CMtxF__Multiply(mf, arg2, model->unk1CC);
+            model = ref->m_pCamera;
+            CMtxF__Multiply(mf, arg2, &model->m_mfProjection);
             CMtxF__ClampEntries(mf);
             CMtxF__ToMtx(mf, m);
             {
@@ -3284,12 +3130,12 @@ void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *owner, ModelRef
                 g->w0 = 0xDA380007;
                 g->w1 = GBI_ADDR(m);
             }
-            Render_DrawModelFlat((u8)arg3, ref->unkC, (sptr) owner->m_pmtDrawMtxs, 1, &owner->m_Lights[gEvenOdd], 0, ref->unk1C,
+            Render_DrawModelFlat((u8)arg3, ref->m_hModel, (sptr) owner->m_pmtDrawMtxs, 1, &owner->m_Lights[gEvenOdd], 0, ref->m_nShadowModel,
                           owner->m_AI.m_nTexture);
             {
                 Gfx *g = gDList++;
                 g->w0 = 0xDA380007;
-                g->w1 = GBI_ADDR(&model->mtx[gEvenOdd]);
+                g->w1 = GBI_ADDR(&model->m_mProjection[gEvenOdd]);
             }
         }
     }

@@ -3679,9 +3679,6 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
     }
 }
 
-typedef struct Quad {
-    s32 w[4];
-} Quad;
 void CCamera__SetViewParams(void *camera, s32 type, f32 a, f32 b, f32 x0, f32 y0, f32 x1, f32 y1, f32 z1,
                    f32 h, CQuaternion quad, struct CGameRegion *region, f32 c, f32 d);
 
@@ -3774,20 +3771,7 @@ void CPlayer__UpdateWeaponSet(CPlayer *player) {
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/8021CD70_8.CPP, func_80220ED4_de, with Turok 2's layouts. */
 
-typedef struct Model {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 flags;
-} Model;
-/* What the actor stands in (GameObject_GetRegionInfo). */
-typedef struct Surface {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ u32 flags;
-    /* 0x48 */ u16 unk48;
-    /* 0x4A */ u8 pad4A[2];
-    /* 0x4C */ u16 item;
-    /* 0x4E */ u8 pad4E[0x54 - 0x4E];
-    /* 0x54 */ u16 unk54;
-} Surface;
+#include "structs/region.h" /* CRegionInfo: what the actor stands in (GameObject_GetRegionInfo) */
 typedef struct Controller_24C47C {
     /* 0x00 */ u8 pad0[8];
     /* 0x08 */ CVector3 pos;
@@ -3835,7 +3819,7 @@ typedef struct Voice_24C47C {
 #endif
 /* CPlayer (structs/player.h) as CPlayer__Update reads it, kept local: it uses
  * the player both as itself and as its m_CharacterActor (actor = p), and
- * several words are typed against the header (0x10 the region as a Model,
+ * several words are typed against the header (0x10 the region as a CGameRegion,
  * the controller's 0x08 as a position, the weapon actor's 0x3F4 as a voice,
  * u32 flags), which would take a cast at most uses. */
 #ifdef TARGET_PORT
@@ -3845,10 +3829,10 @@ typedef struct Player {
 #define T2_HOFF_PL(m) __builtin_offsetof(CPlayer, m)
     union {
         struct { u8 _hp_pos[T2_HOFF_PL(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_model[T2_HOFF_PL(m_CharacterActor.header.m_pCurrentRegion)]; Model *model; }; /* N64 0x10 */
+        struct { u8 _hp_model[T2_HOFF_PL(m_CharacterActor.header.m_pCurrentRegion)]; CGameRegion *model; }; /* N64 0x10 */
         struct { u8 _hp_def[T2_HOFF_PL(m_CharacterActor.header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
         struct { u8 _hp_velY[T2_HOFF_PL(m_CharacterActor.m_vVelocity.y)]; f32 velY; }; /* N64 0x1C */
-        struct { u8 _hp_unk40[T2_HOFF_PL(m_CharacterActor.m_qGround)]; Quad unk40; }; /* N64 0x40 */
+        struct { u8 _hp_qGround[T2_HOFF_PL(m_CharacterActor.m_qGround)]; CQuaternion qGround; }; /* N64 0x40 */
         struct { u8 _hp_yaw[T2_HOFF_PL(m_CharacterActor.m_RotY)]; f32 yaw; }; /* N64 0x50 */
         struct { u8 _hp_flags[T2_HOFF_PL(m_CharacterActor.m_dwFlags)]; u32 flags; }; /* N64 0xD4 */
         struct { u8 _hp_anim[T2_HOFF_PL(m_CharacterActor.m_CurrentAnimation.m_nAnimIndex)]; s16 anim; }; /* N64 0xDC */
@@ -3857,8 +3841,8 @@ typedef struct Player {
         struct { u8 _hp_owner[T2_HOFF_PL(m_CharacterActor.m_AI.m_pParent)]; struct Player *owner; }; /* N64 0x1A8 */
         struct { u8 _hp_emitter[T2_HOFF_PL(m_WeaponActor.header)]; u8 emitter[4]; }; /* N64 0x288 */
         struct { u8 _hp_emitterPos[T2_HOFF_PL(m_WeaponActor.header.m_vPos)]; CVector3 emitterPos; }; /* N64 0x28C */
-        struct { u8 _hp_emitterModel[T2_HOFF_PL(m_WeaponActor.header.m_pCurrentRegion)]; Model *emitterModel; }; /* N64 0x298 */
-        struct { u8 _hp_emitter40[T2_HOFF_PL(m_WeaponActor.m_qGround)]; Quad emitter40; }; /* N64 0x2C8 */
+        struct { u8 _hp_emitterModel[T2_HOFF_PL(m_WeaponActor.header.m_pCurrentRegion)]; CGameRegion *emitterModel; }; /* N64 0x298 */
+        struct { u8 _hp_emitterQGround[T2_HOFF_PL(m_WeaponActor.m_qGround)]; CQuaternion emitterQGround; }; /* N64 0x2C8 */
         struct { u8 _hp_emitterYaw[T2_HOFF_PL(m_WeaponActor.m_RotY)]; f32 emitterYaw; }; /* N64 0x2D8 */
         struct { u8 _hp_unk3C8[T2_HOFF_PL(m_WeaponActor.m_AI)]; u8 unk3C8[0x3F4 - 0x3C8]; }; /* N64 0x3C8 */
         struct { u8 _hp_voice[T2_HOFF_PL(m_WeaponActor.m_AI.m_pModeTable)]; Voice_24C47C *voice; }; /* N64 0x3F4 */
@@ -3913,12 +3897,12 @@ typedef struct Player {
 typedef struct Player {
     /* 0x0000 */ u8 pad0[4];
     /* 0x0004 */ CVector3 pos;
-    /* 0x0010 */ Model *model;
+    /* 0x0010 */ CGameRegion *model;
     /* 0x0014 */ CIntelligence *def;
     /* 0x0018 */ u8 pad18[4];
     /* 0x001C */ f32 velY;
     /* 0x0020 */ u8 pad20[0x40 - 0x20];
-    /* 0x0040 */ Quad unk40;
+    /* 0x0040 */ CQuaternion qGround;
     /* 0x0050 */ f32 yaw;
     /* 0x0054 */ u8 pad54[0xD4 - 0x54];
     /* 0x00D4 */ u32 flags;
@@ -3933,9 +3917,9 @@ typedef struct Player {
     /* 0x01AC */ u8 pad1AC[0x288 - 0x1AC];
     /* 0x0288 */ u8 emitter[4];
     /* 0x028C */ CVector3 emitterPos;
-    /* 0x0298 */ Model *emitterModel;
+    /* 0x0298 */ CGameRegion *emitterModel;
     /* 0x029C */ u8 pad29C[0x2C8 - 0x29C];
-    /* 0x02C8 */ Quad emitter40;
+    /* 0x02C8 */ CQuaternion emitterQGround;
     /* 0x02D8 */ f32 emitterYaw;
     /* 0x02DC */ u8 pad2DC[0x3C8 - 0x2DC];
     /* 0x03C8 */ u8 unk3C8[0x3F4 - 0x3C8];
@@ -4033,7 +4017,7 @@ s32 CPlayer__CheckJumpPad(CPlayer *player, void *actor);
 s32 CPlayer__CheckWater(CPlayer *player, CGameObjectInstance *actor);
 s32 CPlayer__CheckState12Hit(CPlayer *player, CGameObjectInstance *actor);
 s32 CPlayer__CheckClimb(CPlayer *player, CGameObjectInstance *actor);
-void GameObject_ApplyCurrent(Player *, Surface *, CVector3 *, s32);
+void GameObject_ApplyCurrent(Player *, CRegionInfo *, CVector3 *, s32);
 void CPlayer__UpdateWaterRegion(CPlayer *arg0, CGameObjectInstance *arg1, CRegionInfo *arg2);
 s32 Collision_MoveInstance(void *, CVector3, void *);
 s32 CPlayer__RamWithMount(CPlayer *player, CGameObjectInstance *body, u32 *stateFlags);
@@ -4058,24 +4042,24 @@ static __inline__ s32 not_flagged(u32 flags, u32 bit) {
 /* Entering a surface that changes the player's state (flags 0x40000): through
  * a 0x200000 surface only from one without the flag, otherwise only from
  * above the floor. */
-static __inline__ void enter_surface(Player *p, Player *actor, Surface *before, Surface *after, Model *model) {
+static __inline__ void enter_surface(Player *p, Player *actor, CRegionInfo *before, CRegionInfo *after, CGameRegion *model) {
     s32 ok = 0;     /* dead store, but it keeps the 2.5f of the shake out of the loop's hoisted invariants */
 
     if (p->stateFlags & 0x8000) {
         return;
     }
-    if (not_flagged(after->flags, 0x40000)) {
+    if (not_flagged(after->m_dwFlags, 0x40000)) {
         return;
     }
-    if (after->flags & 0x200000) {
-        ok = not_flagged(before->flags, 0x40000);
+    if (after->m_dwFlags & 0x200000) {
+        ok = not_flagged(before->m_dwFlags, 0x40000);
     } else if (CGameRegion__GetHeight(model, actor->pos.x, actor->pos.z) < actor->pos.y) {
         ok = 0;
     } else {
         ok = 1;
     }
     if (ok) {
-        CPlayer__Warp(p, after->unk48, (after->unk54 & 1) ? 1 : 2, 0);
+        CPlayer__Warp(p, after->m_WarpID, (after->m_wFlags54 & 1) ? 1 : 2, 0);
     }
 }
 
@@ -4097,11 +4081,11 @@ void CPlayer__Update(Player *p) {
     Player *actor;
     GameSettings *game;
     s32 enable;
-    Model *oldModel;
-    Model *model;
-    Surface *material;
-    Surface *before;
-    Surface *under;
+    CGameRegion *oldModel;
+    CGameRegion *model;
+    CRegionInfo *material;
+    CRegionInfo *before;
+    CRegionInfo *under;
     u32 *stateFlags;
     s32 hit;
     s32 landed;
@@ -4219,7 +4203,7 @@ void CPlayer__Update(Player *p) {
         if (gEngineApp_m_Settings.multiplayer == 0) {
             CVector3 *pos = &p->pos;
 
-            if (model != NULL && pos != NULL && (model->flags & 0x40)) {
+            if (model != NULL && pos != NULL && (model->m_wFlags & 0x40)) {
                 f32 amount = (s32) (CGameRegion__GetCeilingHeight(model, p->pos.x, pos->z) - CGameRegion__GetHeight(model, p->pos.x, pos->z));
 
                 if (amount < 1024.0f) {
@@ -4285,7 +4269,7 @@ void CPlayer__Update(Player *p) {
         material = GameObject_GetRegionInfo(actor);
         if (material != NULL) {
             GameObject_ApplyCurrent(actor, material, &p->goal, 1);
-            if ((material->flags & 0x4000) && actor->pos.y <= CGameRegion__GetHeight(actor->model, actor->pos.x, actor->pos.z)) {
+            if ((material->m_dwFlags & 0x4000) && actor->pos.y <= CGameRegion__GetHeight(actor->model, actor->pos.x, actor->pos.z)) {
                 CPlayer__Hurt(p, actor, 0x3E700, 0, 0x1D);
             }
         }
@@ -4356,7 +4340,7 @@ void CPlayer__Update(Player *p) {
                 GameObject_FireTriggers((u8 *)gCollisionResults.m_pInstance, soundFlags | 2, actor);
             }
             if (gCollisionResults.m_pWallRegion != NULL) {
-                CGameRegion__FireTriggers((Model *)gCollisionResults.m_pWallRegion, linkFlags | 4, actor);
+                CGameRegion__FireTriggers((CGameRegion *)gCollisionResults.m_pWallRegion, linkFlags | 4, actor);
             }
             CPlayer__RamWithMount(p, actor, stateFlags);
             landed = CPlayer__TryMount(p, actor, stateFlags);
@@ -4373,18 +4357,18 @@ void CPlayer__Update(Player *p) {
             CPlayer__TouchPickup(p, (u8 *)gCollisionResults.m_pInstance);
         }
         if (before != NULL && material != NULL) {
-            if ((p->stateFlags & 0x8000) && !landed && !(before->unk54 & 8) && (material->unk54 & 8)) {
+            if ((p->stateFlags & 0x8000) && !landed && !(before->m_wFlags54 & 8) && (material->m_wFlags54 & 8)) {
                 CPlayer__Dismount(p, actor);
             }
-            if (material->flags & 0x4000000) {
-                if (material->item != p->item) {
-                    p->item = material->item;
+            if (material->m_dwFlags & 0x4000000) {
+                if (material->m_PendingWarpID != p->item) {
+                    p->item = material->m_PendingWarpID;
                 }
             }
-            if (material->flags & 0x8000000) {
-                p->item = material->item;
-                p->lastItem = material->item;
-                gScene_m_PendingWarpID = material->item;
+            if (material->m_dwFlags & 0x8000000) {
+                p->item = material->m_PendingWarpID;
+                p->lastItem = material->m_PendingWarpID;
+                gScene_m_PendingWarpID = material->m_PendingWarpID;
             }
             enter_surface(p, actor, before, material, model);
         }
@@ -4396,7 +4380,7 @@ void CPlayer__Update(Player *p) {
     p->input = saved;
     gFrameIncrement = scale;
     under = GameObject_GetRegionInfo(actor);
-    if (under != NULL && (under->flags & 0x4000)) {
+    if (under != NULL && (under->m_dwFlags & 0x4000)) {
         f32 x2 = actor->pos.x * actor->pos.x;
         f32 z2 = actor->pos.z * actor->pos.z;
 
@@ -4411,7 +4395,7 @@ void CPlayer__Update(Player *p) {
                 y = -y;
             }
             actor->pos.y = y;
-            if (under->flags & 0x4000) {
+            if (under->m_dwFlags & 0x4000) {
                 actor->pos.y = GameObject_GetRegionFloorHeight(actor, 0) - 1.0f;
             }
         }
@@ -4459,7 +4443,7 @@ void CPlayer__Update(Player *p) {
     p->emitterPos = p->pos;
     p->emitterYaw = p->yaw;
     p->emitterModel = p->model;
-    p->emitter40 = p->unk40;
+    p->emitterQGround = p->qGround;
     p->lastPos = p->pos;
     if (gEngineApp_m_Settings.cheatFlags & 8) {
         for (i = 0; i < 31; i++) {
@@ -5987,14 +5971,8 @@ VM_TEXT void CPlayer__SetCharacter(CPlayer *p, s32 character) {
 
 #define PLAYER_LAST T2_OFFSETOF(CPlayer, m_pLast)
 #define PLAYER_NEXT T2_OFFSETOF(CPlayer, m_pNext)
+#include "structs/cache.h"
 
-typedef struct PlayerList_42E5AC {
-    /* 0x00 */ CPlayer **handle;
-    /* 0x04 */ CPlayer *players;
-    /* 0x08 */ s32 count;
-    CPlayerCList list0[1];
-    CPlayerCList list1[1];
-} PlayerList_42E5AC;
 struct CMemEntry *CCache__Allocate(s32, s32, u32, char *);
 void CCache__Deallocate(sptr, void *);
 void CCache__Flush(s32);
@@ -6015,51 +5993,51 @@ VM_TEXT static __inline__ void initPlayer(CPlayer *p, s32 index, CPlayerOptions 
     CPlayer__Reset(p);
 }
 
-VM_TEXT void CPlayerPool__NewGame(PlayerList_42E5AC *list, s32 count, s32 arg2) {
+VM_TEXT void CPlayerPool__NewGame(CPlayerPool *list, s32 count, s32 arg2) {
     GameSettings *flags;
     CPlayerOptions *options;
     CPlayer *p;
     s32 i;
 
-    CList__Construct(list->list0, PLAYER_LAST, PLAYER_NEXT);
-    CList__Construct(list->list1, PLAYER_LAST, PLAYER_NEXT);
+    CList__Construct(&list->m_IdleList, PLAYER_LAST, PLAYER_NEXT);
+    CList__Construct(&list->m_ActiveList, PLAYER_LAST, PLAYER_NEXT);
     Controller_SetRumbleOptionAll(0);
     CCache__Flush(0);
     flags = &gEngineApp_m_Settings;
-    if (list->handle != NULL) {
-        CCache__Deallocate(0, list->handle);
-        list->handle = NULL;
-        list->players = NULL;
-        list->count = 0;
+    if (list->m_pmePlayers != NULL) {
+        CCache__Deallocate(0, list->m_pmePlayers);
+        list->m_pmePlayers = NULL;
+        list->m_Players = NULL;
+        list->m_nPlayers = 0;
     }
     if (count == 0) {
         return;
     }
-    list->count = count;
-    list->handle = CCache__Allocate(0, count * sizeof(CPlayer), 0x23, "Players");
-    list->players = *list->handle;
-    memset(list->players, 0, count * sizeof(CPlayer));
-    for (i = 0; i < list->count; i++) {
-        CList__AddTail(list->list0, &list->players[i]);
+    list->m_nPlayers = count;
+    list->m_pmePlayers = CCache__Allocate(0, count * sizeof(CPlayer), 0x23, "Players");
+    list->m_Players = list->m_pmePlayers->data;
+    memset(list->m_Players, 0, count * sizeof(CPlayer));
+    for (i = 0; i < list->m_nPlayers; i++) {
+        CList__AddTail(&list->m_IdleList, &list->m_Players[i]);
     }
     options = &flags->defaultSlot;
     if (flags->multiplayer) {
-        for (i = 0; i < list->count; i++) {
-            p = &list->players[i];
+        for (i = 0; i < list->m_nPlayers; i++) {
+            p = &list->m_Players[i];
             options = &flags->slots[i];
             initPlayer(p, i, options);
             if (options->m_bActive) {
                 CPlayer__NewGame(p, options->m_nCharacter, 1);
-                CList__Remove(list->list0, p);
-                CList__AddHead(list->list1, p);
+                CList__Remove(&list->m_IdleList, p);
+                CList__AddHead(&list->m_ActiveList, p);
             }
         }
     } else {
-        p = list->players;
+        p = list->m_Players;
         initPlayer(p, options->m_nController, options);
         CPlayer__NewGame(p, options->m_nCharacter, arg2);
-        CList__Remove(list->list0, p);
-        CList__AddHead(list->list1, p);
+        CList__Remove(&list->m_IdleList, p);
+        CList__AddHead(&list->m_ActiveList, p);
     }
     gEngineApp_m_Settings.match.tagPhase = 1;
 }
@@ -7985,26 +7963,9 @@ void CPlayer__DrawSightIcon(void *arg0, void *arg1)
 }
 #endif
 
-struct ScreenRectangle;
-#ifdef TARGET_PORT
-/* The camera's viewport at its host offsets (round 12 a5, tools/port/n64viewcheck.py): the N64 view
- * read 0x288.. of the host CCamera, which has pointers before m_Viewport. */
-#include "structs/camera.h"
-#define T2_HOFF_ScreenRectangle(m) __builtin_offsetof(CCamera, m)
-typedef struct ScreenRectangle {
-    union {
-        struct { u8 _hp_x[T2_HOFF_ScreenRectangle(m_Viewport.m_Width)]; f32 x; }; /* N64 0x288 */
-        struct { u8 _hp_y[T2_HOFF_ScreenRectangle(m_Viewport.m_Height)]; f32 y; }; /* N64 0x28C */
-        struct { u8 _hp_width[T2_HOFF_ScreenRectangle(m_Viewport.m_ScreenPosX)]; f32 width; }; /* N64 0x290 */
-        struct { u8 _hp_height[T2_HOFF_ScreenRectangle(m_Viewport.m_ScreenPosY)]; f32 height; }; /* N64 0x294 */
-    };
-} ScreenRectangle;
-#else
-typedef struct ScreenRectangle { char pad0[0x288]; f32 x,y,width,height; } ScreenRectangle;
-#endif
-void CPlayer__DrawCenterIcon(void *arg0, struct ScreenRectangle *arg1);
+void CPlayer__DrawCenterIcon(void *arg0, CCamera *arg1);
 
-void CPlayer__DrawCenterIcon(void *arg0, struct ScreenRectangle *arg1)
+void CPlayer__DrawCenterIcon(void *arg0, CCamera *arg1)
 {
   f32 x;
   f32 y;
@@ -8017,17 +7978,17 @@ void CPlayer__DrawCenterIcon(void *arg0, struct ScreenRectangle *arg1)
   f32 screenX;
   f32 screenY;
   Hud_SetupTextureMode(gEngineApp_m_Settings.hudAlpha);
-  x = arg1->x;
+  x = arg1->m_Viewport.m_Width;
   ax = x * 0.5f;
-  y = arg1->y;
+  y = arg1->m_Viewport.m_Height;
   ay = y * 0.5f;
   sx = x / ((f32) gScreenWidth);
   bx = sx * 16.0f;
   sy = y / ((f32) gScreenHeight);
   by = sy * 16.0f;
-  screenX = ((arg1->width) + ax) - bx;
-  screenY = ((arg1->height) + ay) - by;
-  Hud_DrawSprite(0x1FB, 0, (s16) ((s32) (((arg1->width) + ax) - bx)), (s16) ((s32) screenY), sx, sy, 1);
+  screenX = ((arg1->m_Viewport.m_ScreenPosX) + ax) - bx;
+  screenY = ((arg1->m_Viewport.m_ScreenPosY) + ay) - by;
+  Hud_DrawSprite(0x1FB, 0, (s16) ((s32) (((arg1->m_Viewport.m_ScreenPosX) + ax) - bx)), (s16) ((s32) screenY), sx, sy, 1);
 }
 
 s32 CPlayer__IsInMatchEndState(CPlayer *arg0) {
@@ -8846,23 +8807,14 @@ set_value:
 #include "structs/game_object.h"
 #endif
 
-typedef struct {
-#ifdef TARGET_PORT /* the body: its vertical velocity at the host offset (round 11 z5; at the N64 0x1C the
-                    * dodge's hop wrote into another member on the host) */
-    u8 pad0[__builtin_offsetof(CGameObjectInstance, m_vVelocity.y)];
-#else
-    /* 0x00 */ u8 pad0[0x1C];
-#endif
-    /* 0x1C */ f32 unk1C;
-} Arg1;
 
-void PlayerDodge_Enter(CPlayer *arg0, Arg1 *arg1) {
+void PlayerDodge_Enter(CPlayer *arg0, CGameObjectInstance *arg1) {
     if (arg0->m_ContState.m_FinalMoveX < 0.0f) {
         arg0->m_SideSpeed = (f32) -30.72f;
     } else {
         arg0->m_SideSpeed = (f32) 30.72f;
     }
-    arg1->unk1C = (f32) 307.19998f;
+    arg1->m_vVelocity.y = (f32) 307.19998f; /* the dodge's hop */
 }
 void PlayerDodgeFall_Update(sptr arg0, sptr arg1);
 

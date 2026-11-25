@@ -330,26 +330,19 @@ void * Texture_Request(TextureRef *arg0) {
     return CCache__Request(0, arg0->unk0, arg0->unk4, 0, 0, &Texture_DecompressCallback, &sTextureCacheDesc_Texture, 0);
 }
 
-/* What this reads out of a resource: two words and a pointer. */
-typedef struct {
-    /* 0x0 */ s32 unk0;
-    /* 0x4 */ s32 unk4;
-    /* 0x8 */ s32 *data;
-} ResourceView;
-
-void Texture_GetInfo(s32 **arg0, ResourceView *arg1) {
+void Texture_GetInfo(s32 **arg0, TextureInfo *arg1) {
     s32 *temp_s0;
 
     temp_s0 = *arg0;
     if (*temp_s0 != 0) {
-        arg1->data = CISet__GetBlock(temp_s0, 0);
-        arg1->unk0 = (s32) *(s32 *)CISet__GetBlock(temp_s0, 1);
-        arg1->unk4 = (s32) *(s32 *)CISet__GetBlock(temp_s0, 2);
+        arg1->frame = CISet__GetBlock(temp_s0, 0);
+        arg1->count = (s32) *(s32 *)CISet__GetBlock(temp_s0, 1);
+        arg1->palettes = (s32) *(s32 *)CISet__GetBlock(temp_s0, 2);
         return;
     }
-    arg1->data = NULL;
-    arg1->unk0 = 0;
-    arg1->unk4 = 0;
+    arg1->frame = NULL;
+    arg1->count = 0;
+    arg1->palettes = 0;
 }
 
 void Texture_InvalidateCache(void) {

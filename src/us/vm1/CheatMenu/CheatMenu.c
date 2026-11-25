@@ -1,20 +1,9 @@
 #include "common.h"
 #include "globals/menu.h"
 #include "globals/game.h"
-#ifdef TARGET_PORT
 #include "structs/menu.h"
-#endif
 
-typedef struct {
-    /* 0x000 */ char pad0[0x2D8];
-    /* 0x2D8 */ s32 flags;
-} Player41A4D4;
-typedef struct {
-    /* 0x00 */ char pad0[0xC];
-    /* 0x0C */ Player41A4D4 *player;
-} Menu41A4D4;
-
-void CheatsMenu_Init(Menu41A4D4 *menu) {
+void CheatsMenu_Init(Menu *menu) {
     s32 weapon = 0;
     s32 tries;
     s32 mask;
@@ -71,9 +60,9 @@ found:
     sCheatsMenuSelection = weapon;
     /* the N64 word at items + 0x2D8: the 19th item's flags (MenuItem is larger on the host) */
     if (weapon != -1) {
-        ((Menu *) menu)->items[18].flags |= 0x1800000;
+        menu->items[18].flags |= 0x1800000;
     } else {
-        ((Menu *) menu)->items[18].flags &= ~0x1800000;
+        menu->items[18].flags &= ~0x1800000;
     }
 }
 

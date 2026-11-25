@@ -32,8 +32,16 @@ for mod,names in sorted(bymod.items()):
             if i not in incs and re.search(r'"(common.h|ultra_types.h|structs/[^"]*|rw/abu_types.h)"',i): incs.append(i)
     hn="twin_%s.h"%mod.lower(); guard="STRUCTS_TWIN_%s_H"%mod.upper()
     body="".join(next(raw for (p,b,raw,pos) in defs[n]) for n in order)
+    incs=[i for i in incs if hn not in i]
     h=("/* Local types that vm1/%s and its vm2 copy both define (one layout): one definition\n"
        " * for both copies (tools/struct_census.py). */\n#ifndef %s\n#define %s\n\n%s\n\n%s\n#endif\n")%(mod,guard,guard,"\n".join(incs),body)
-    open("include/structs/"+hn,"w").write(h)
+    hp="include/structs/"+hn
+    if os.path.exists(hp):  # append to the header an earlier run wrote
+        prev=open(hp).read(); k=prev.rstrip().rfind("#endif")
+        top=prev.find("\n\ntypedef")
+        add=[i for i in incs if i not in prev]
+        prev=prev[:top]+("\n"+"\n".join(add) if add else "")+prev[top:k]
+        h=prev.rstrip("\n")+"\n"+body+"\n#endif\n"
+    open(hp,"w").write(h)
     r=subprocess.run(["python3","tools/hoist_structs.py","structs/"+hn,"--"]+allf,capture_output=True,text=True)
     print(mod,hn,order,len(allf),"files",r.returncode,r.stderr.strip()[:200])

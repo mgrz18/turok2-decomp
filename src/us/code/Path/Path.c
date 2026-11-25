@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
+#include "structs/collision.h"
 #include "globals/ai.h"
 #include "globals/path.h"
 
@@ -255,11 +256,6 @@ CGameRegion *Path_FindFleeRegion(CInstanceHeader *inst, CGameRegion *exclude, CV
     return best;
 }
 
-typedef struct Sphere {
-    /* 0x00 */ CVector3 center;
-    /* 0x0C */ f32 radius;
-    /* 0x10 */ f32 radiusSq;
-} Sphere;
 f32 GameObject_GetSweepRadius(sptr);
 void Sphere_Set(Sphere *sphere, CVector3 *center, f32 radius);
 s32 Cylinder_ContainsPoint(Sphere *sphere, CVector3 *point);

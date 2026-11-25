@@ -38,6 +38,33 @@ typedef struct {
     /* 0x10 */ struct CMemEntry *pmeAnimData;
 } CAnimationState; /* size 0x14 */
 
+/* A bone's track references in an animation (-1: use the default frame) and the
+ * default frame they fall back to. */
+typedef struct JointRef {
+    /* 0x0 */ s16 pos;
+    /* 0x2 */ s16 rot;
+} JointRef;
+typedef struct DefaultFrame {
+    /* 0x00 */ CVector3 pos;
+    /* 0x0C */ s16 rot[4];
+} DefaultFrame;
+
+/* What CAnimationState__FindKeys finds for a channel and CGameObjectInstance__PoseBone
+ * reads: the animation's tables (blocks 1 and 2 past their 8-byte headers, the track
+ * tables of block 5), the byte offsets of the keys before and after the channel's time
+ * (rotations, then the root position, which loops on its own) and the fraction between. */
+typedef struct CAnimationKeys {
+    /* 0x00 */ JointRef *joints;
+    /* 0x04 */ DefaultFrame *frames;
+    /* 0x08 */ void *posTable;
+    /* 0x0C */ void *rotTable;
+    /* 0x10 */ s32 rotFrame0;
+    /* 0x14 */ s32 rotFrame1;
+    /* 0x18 */ s32 posFrame0;
+    /* 0x1C */ s32 posFrame1;
+    /* 0x20 */ f32 blend;
+} CAnimationKeys; /* size 0x24 */
+
 typedef struct {
     /* 0x00 */ s8 m_Mode;
     /* 0x01 */ u8 m_nCurrentPathIndex;

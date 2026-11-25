@@ -411,20 +411,9 @@ void Trail_PlaceNodes(Swoosh *e) {
  * the animation frame, sets the combiner and colours, then emits two vertex
  * rows per node and the triangle strip between them. */
 
-typedef struct {
-    /* 0x00 */ u8 kind;
-    /* 0x01 */ u8 unknown1;
-    /* 0x02 */ u8 shiftS;
-    /* 0x03 */ u8 shiftT;
-} AnimFrame;
-typedef struct {
-    /* 0x00 */ s32 count;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ AnimFrame *frame;
-    /* 0x0C */ s32 unkC;
-} AnimInfo;
+#include "structs/texture.h"
 extern void *Texture_Request(void *model);
-extern void Texture_GetInfo(void *model, AnimInfo *info);
+extern void Texture_GetInfo(void *model, TextureInfo *info);
 extern void Render_SetCombineMode(s32 mode);
 extern void Render_SetRenderMode(s32 mode);
 s32 Trail_GetAnimFrame(Swoosh *anim, SwooshInfo *def, s32 *count);
@@ -432,9 +421,9 @@ extern void Texture_Load(void *slot, void *model, s32 frame, s32 a, s32 b, s32 c
 sptr RibbonVtxPool_Alloc(void *arg0, s32 arg1);
 
 void Trail_DrawTextured(void *pool, Swoosh *trail, s32 unused) {
-    AnimInfo info;
+    TextureInfo info;
     Morph storage;
-    AnimInfo *anim;
+    TextureInfo *anim;
     void *model;
     SwooshInfo *track;
     SwooshNode *clock, *next, *node;
@@ -476,7 +465,7 @@ void Trail_DrawTextured(void *pool, Swoosh *trail, s32 unused) {
     period = 1.0f;
     while (trail->unk28 >= period) trail->unk28 -= period;
     GFX_CMD(0xE7000000, 0)
-    switch (info.frame->kind) {
+    switch (info.frame->format) {
     case 3:
         Render_SetCombineMode(0x29);
         GFX_CMD(0xFB000000, (track->env[0] << 24) | (track->env[1] << 16) | (track->env[2] << 8) | 0xFF)

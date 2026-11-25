@@ -480,11 +480,8 @@ typedef struct AnimHeader {
     /* 0x18 */ f32 frameCount;
     /* 0x1C */ f32 frameStep;
 } AnimHeader;
-typedef struct Resource {
-    /* 0x0 */ s32 *file;
-    /* 0x4 */ s32 size;
-} Resource;
-s32 ProPackDecompress(Resource **res, s32 arg1);
+#include "structs/cache.h"
+s32 ProPackDecompress(CMemEntry **res, s32 arg1);
 void func_0029E460(void *dst, void *src, s32 size);
 
 static __inline__ void packInit(AnimPack *pack, s32 count) {
@@ -550,7 +547,8 @@ static __inline__ s32 decodeAnim(void *src, void *dst) {
     return ok;
 }
 
-void Anim_Decompress(s32 arg0, Resource **res) {
+/* the cache block (CMemEntry) the animation was read into */
+void Anim_Decompress(s32 arg0, CMemEntry **res) {
     s32 size0;
     s32 size1;
     s32 size2;
@@ -579,7 +577,7 @@ void Anim_Decompress(s32 arg0, Resource **res) {
     if (ProPackDecompress(res, 1) == 0) {
         return;
     }
-    file = (*res)->file;
+    file = (*res)->data;
     oldSize = (*res)->size;
     chunk0 = CISet__GetBlockAndSize(file, 0, &size0);
     chunk1 = CISet__GetBlockAndSize(file, 1, &size1);

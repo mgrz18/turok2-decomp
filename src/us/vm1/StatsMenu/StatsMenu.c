@@ -69,26 +69,16 @@ s32 StatsMenu_ContinueYes(s32 menu, Menu *c) {
     return 1;
 }
 
-typedef struct RenderCounters {
-    char pad0[0x34];
-    s32 option34;              /* 0x34 (Rage Wars 0x54) */
-    char pad38[0x40 - 0x38];
-    s32 unk40;                 /* 0x40 (Rage Wars 0x74) */
-} RenderCounters;
-typedef struct Shared_Game {
-    char pad0[0x5D8];
-    RenderCounters counters;   /* 0x5D8 */
-} Shared_Game;
 extern int gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern void CEngineApp__QuitToLegal(char *);
 
 int StatsMenu_ContinueNo(int unused, Menu *menu) {
-    RenderCounters *sync = (RenderCounters *) &gEngineApp_m_Settings.match;
+    GameMatch *sync = &gEngineApp_m_Settings.match;
     int team;
-    if (sync->option34 != 0) {
+    if (sync->tag != 0) {
         team = menu->player->m_pOptions->m_TagMode;
         if (team == 1) {
-            sync->unk40 = team;
+            sync->tagPhase = team;
         }
     }
     if (gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount == 1) {

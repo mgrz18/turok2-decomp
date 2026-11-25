@@ -2308,9 +2308,7 @@ void CParticle__DrawShadow(ShadowActor *actor, void *view) { /* view: unused (CP
  * emits the colour and draw commands. */
 
 
-#ifndef STRUCTS_GBI_H /* the port includes structs/gbi.h through structs/game.h */
-typedef struct { u8 pad0[0x40]; } Mtx;
-#endif
+#include "structs/gbi.h"
 /* The leading 0x34 bytes of a game object, as the collision test reads them. */
 #ifdef TARGET_PORT
 typedef struct ParticleHead {
@@ -2332,17 +2330,7 @@ typedef struct {
 } ParticleHead;
 #endif /* size 0x34 */
 
-typedef struct {
-    /* 0x0 */ u8 kind;
-    /* 0x1 */ u8 pad1;
-    /* 0x2 */ u8 shiftS;
-    /* 0x3 */ u8 shiftT;
-} AnimFrame;
-typedef struct {
-    /* 0x0 */ s32 count;
-    /* 0x4 */ s32 unk4;
-    /* 0x8 */ AnimFrame *frame;
-} AnimInfo;
+#include "structs/texture.h"
 typedef struct {
     /* 0x0 */ u8 pad0[0x6];
     /* 0x6 */ u8 prim[3];
@@ -2458,7 +2446,7 @@ extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: 
 extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* the current view */
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
 extern void *Texture_Request(s32 *ref);
-extern void Texture_GetInfo(void *model, AnimInfo *info);
+extern void Texture_GetInfo(void *model, TextureInfo *info);
 extern void Texture_Load(s32 *ref, void *model, s32 frame, s32 a3, s32 shiftS, s32 shiftT, s32 a6, s32 a7, s32 a8);
 void *CCamera__GetPlayer(void *cam);
 extern void *MtxPool_Alloc(void *pool, s32 count);
@@ -2507,7 +2495,7 @@ static __inline__ s32 Particle_Scale(f32 value, f32 div) {
 #define LERP(to, from, t) (((to) - (from)) * (t) + (from))
 
 void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
-    AnimInfo info;
+    TextureInfo info;
     u8 env[3];
     u8 prim[3];
     CVector3 viewPos;
@@ -2654,7 +2642,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     shiftS = 1 << (((desc->flags & 0x100) ? 7 : 6) + info.frame->shiftS);
     shiftT = 1 << (((desc->flags & 0x200) ? 7 : 6) + info.frame->shiftT);
     Texture_Load(&particle->model, model, frame, 0, shiftS, shiftT, 1, 1, 0);
-    switch (info.frame->kind) {
+    switch (info.frame->format) {
         case 0:
         case 1:
             Render_SetCombineMode(0x18);
@@ -2707,7 +2695,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
         }
     }
 
-    if (info.frame->kind == 3) {
+    if (info.frame->format == 3) {
         switch (mode) {
             case 0:
             default:
@@ -4019,48 +4007,24 @@ void CParticle__AddDrawModeBits(CParticle *arg0, s32 *arg1) {
     *arg1 |= var_a2 << 0x1E;
 }
 
-typedef struct Node {
-    u8 pad0[0x1C8];
-    struct Node *next;    /* 0x1C8 */
-} Node;
-typedef struct Bucket {
-    Node *head;
-    u8 pad4[0x10];
-} Bucket;
-#ifdef TARGET_PORT
 #include "structs/particle.h"
-/* the host CParticleSystem by member (the views are at N64 offsets) */
+/* Frees every active particle: the three active lists of the CParticleSystem (round 30: one copy,
+ * the Node/Bucket views of the N64 one gone; the port's had read them by member since round 9). */
 void CParticleSystem__FreeAll(u8 *arg0) {
-    CParticleSystem *sys = (CParticleSystem *) arg0;
     CParticle *node;
     CParticle *cur;
     s32 i;
 
     for (i = 0; i < 3; i++) {
-        node = (CParticle *) sys->m_ActiveList[i].m_pHead;
+        /* m_ActiveList[i] from the byte pointer (the ROM adds its offset to arg0 first) */
+        node = ((CList *) (arg0 + T2_OFFSETOF(CParticleSystem, m_ActiveList)))[i].m_pHead;
         while (node != NULL) {
             cur = node;
             node = node->m_pNext;
-            CParticleSystem__Free(arg0, (Node *) cur);
+            CParticleSystem__Free(arg0, (EffectActor *) cur);
         }
     }
 }
-#else
-void CParticleSystem__FreeAll(u8 *arg0) {
-    s32 i;
-    Node *node;
-    Node *cur;
-
-    for (i = 0; i < 3; i++) {
-        node = ((Bucket *)(arg0 + 0xEC28))[i].head;
-        while (node != NULL) {
-            cur = node;
-            node = node->next;
-            CParticleSystem__Free(arg0, cur);
-        }
-    }
-}
-#endif
 
 s32 CParticle__GetDrawMode(CParticle *arg0) {
     s32 var_a1;

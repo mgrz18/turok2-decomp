@@ -3,7 +3,7 @@
  * inlined (guOrthoF itself is guOrthoF). */
 
 typedef float Matrix[4][4];
-typedef struct { long m[4][4]; } Mtx;
+#include "structs/gu.h"
 
 void guMtxIdentF(float mf[4][4]);          /* guMtxIdentF */
 void guMtxF2L(float mf[4][4], Mtx *m);  /* guMtxF2L */

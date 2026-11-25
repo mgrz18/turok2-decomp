@@ -39,5 +39,28 @@ typedef struct {
     /* 0x04 */ ViCommonRegs comRegs;
     /* 0x28 */ ViFieldRegs fldRegs[2];
 } ViMode; /* OSViMode, 0x50 */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x4];
+    /* 0x04 */ s8 id;
+} ItemData;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x10];
+    /* 0x10 */ u32 unk10;
+} CallbackArg;
+typedef struct {
+    /* the host Menu's leading fields (structs/menu.h: cursor .. param), pointers 8 bytes wide */
+    s16 cursor, offsetX, offsetY;
+    u8 _pad6[2];
+    void *block, *items;
+    s32 count;
+    void *desc, *param;
+    /* 0x1C */ struct CPlayer *owner;
+    /* 0x20 */ ItemData *data;
+    /* 0x24 */ void *string;
+} Item;
+typedef struct {
+    /* 0x000 */ u8 pad0[0x684];
+    /* 0x684 */ s32 unk684;
+} Entry;
 
 #endif
