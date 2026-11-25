@@ -3065,29 +3065,17 @@ void CCameraText__Reset(CCameraText *arg0) {
     arg0->m_nId = 0;
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ s32 unk10;
-} Arg0;
 
-void CShakeAxis__Construct(Arg0 *arg0) {
-    arg0->unk4 = 0;
-    arg0->unk8 = 0;
-    arg0->unkC = 0;
-    arg0->unk10 = 0;
+void CShakeAxis__Construct(CShakeAxis *arg0) {
+    arg0->m_Shake = 0.0f;
+    arg0->m_LastShake = 0.0f;
+    arg0->m_Amp = 0.0f;
+    arg0->m_Angle = 0.0f;
 }
 
-typedef struct {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ f32 value;
-} Setting;
-
-void CShakeAxis__Set(Setting *arg0, f32 arg1, s32 arg2) {
-    arg0->type = arg2;
-    arg0->value = (f32) (arg1 * 0.1f);
+void CShakeAxis__Set(CShakeAxis *arg0, f32 arg1, s32 arg2) {
+    arg0->m_Type = arg2;
+    arg0->m_Shake = (f32) (arg1 * 0.1f);
 }
 f32 CShakeAxis__GetOffset(struct Wave *wave);
 
