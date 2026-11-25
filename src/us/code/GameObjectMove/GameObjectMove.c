@@ -10,16 +10,7 @@ extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);            /* o
 extern void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);   /* out = lerp(a, b, t) */
 extern void Angle_Wrap(f32 *angle);                              /* wraps an angle */
 /* A surface that carries what stands on it (water current, conveyor). */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x52];
-    /* 0x52 */ u16 flags;
-    /* 0x54 */ u8 pad54[0x5D - 0x54];
-    /* 0x5D */ u8 strength;
-    /* 0x5E */ u8 pad5E;
-    /* 0x5F */ s8 x;
-    /* 0x60 */ s8 y;
-    /* 0x61 */ s8 z;
-} Material;
+#include "structs/region.h"
 
 static __inline__ s32 currentEnabled(CGameObjectInstance *actor) {
     if (actor->m_AI.m_dwFlags & 0x280) return 1;
@@ -29,7 +20,7 @@ static __inline__ s32 currentEnabled(CGameObjectInstance *actor) {
 
 /* Applies a surface current to an actor: pushes pos, turns the actor with it
  * (flags 0x600 spin, 0x2000 face the flow) and handles the vertical part. */
-void GameObject_ApplyCurrent(CGameObjectInstance *actor, Material *mat, CVector3 *pos, s32 active) {
+void GameObject_ApplyCurrent(CGameObjectInstance *actor, CRegionInfo *mat, CVector3 *pos, s32 active) {
     CGameObjectInstance *rider;
     CVector3 flow;
     CVector3 flat;
@@ -54,20 +45,20 @@ void GameObject_ApplyCurrent(CGameObjectInstance *actor, Material *mat, CVector3
         enabled = 0;
         blocked = 0;
     }
-    if (blocked != 0 || (enabled == 0 && !(mat->flags & 0x8000))) {
+    if (blocked != 0 || (enabled == 0 && !(mat->m_wFlags52 & 0x8000))) {
         actor->m_vWaterDisplacement.x = 0.0f;
         actor->m_vWaterDisplacement.y = 0.0f;
         actor->m_vWaterDisplacement.z = 0.0f;
         return;
     }
-    if ((mat->flags & 0x100) && active != 0) {
-        flow.x = mat->x * 0.007874016f;
-        flow.y = mat->y * 0.007874016f;
-        flow.z = mat->z * 0.007874016f;
-        strength = mat->strength;
+    if ((mat->m_wFlags52 & 0x100) && active != 0) {
+        flow.x = mat->m_CurrentX * 0.007874016f;
+        flow.y = mat->m_CurrentY * 0.007874016f;
+        flow.z = mat->m_CurrentZ * 0.007874016f;
+        strength = mat->m_CurrentStrength;
         spin = (strength + 1.0f) * 0.008726647f;
         CVector3__Scale(&flow, &flow, strength * 3.0f);
-        flags = mat->flags;
+        flags = mat->m_wFlags52;
         if (flags & 0x600) {
             if (flags & 0x400) {
                 spin = -spin;
@@ -76,7 +67,7 @@ void GameObject_ApplyCurrent(CGameObjectInstance *actor, Material *mat, CVector3
                 actor->m_RotY += spin;
             }
         }
-        if ((mat->flags & 0x2000) && actor->header.m_Type == 1) {
+        if ((mat->m_wFlags52 & 0x2000) && actor->header.m_Type == 1) {
             rider = actor;
             flat = flow;
             flat.y = 0.0f;
@@ -95,10 +86,10 @@ void GameObject_ApplyCurrent(CGameObjectInstance *actor, Material *mat, CVector3
                 target = want;
                 from = cur;
                 if (from < target) {
-                    cur = from + mat->strength * sSurfaceCurrentRates[1] * gFrameIncrement * 0.017453294f;
+                    cur = from + mat->m_CurrentStrength * sSurfaceCurrentRates[1] * gFrameIncrement * 0.017453294f;
                     if (target < cur) cur = target;
                 } else {
-                    cur = from - mat->strength * sSurfaceCurrentRates[1] * gFrameIncrement * 0.017453294f;
+                    cur = from - mat->m_CurrentStrength * sSurfaceCurrentRates[1] * gFrameIncrement * 0.017453294f;
                     if (cur < target) cur = target;
                 }
                 Angle_Wrap(&cur);
@@ -110,13 +101,13 @@ void GameObject_ApplyCurrent(CGameObjectInstance *actor, Material *mat, CVector3
         flow.y = 0.0f;
         flow.z = 0.0f;
     }
-    blend = mat->strength * sSurfaceCurrentRates[0] * gFrameIncrement;
+    blend = mat->m_CurrentStrength * sSurfaceCurrentRates[0] * gFrameIncrement;
     blend = ((blend < 0.0f ? 0.0f : blend) > 1.0f ? 1.0f : (blend < 0.0f ? 0.0f : blend));
     current = &actor->m_vWaterDisplacement;
     CVector3__Lerp(current, blend, current, &flow);
     pos->x += actor->m_vWaterDisplacement.x;
     pos->z += actor->m_vWaterDisplacement.z;
-    if (mat->flags & 0x100) {
+    if (mat->m_wFlags52 & 0x100) {
         if (flow.y != 0.0f) {
             actor->m_vVelocity.y = 0.0f;
         } else {

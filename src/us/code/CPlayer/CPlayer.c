@@ -3772,16 +3772,7 @@ void CPlayer__UpdateWeaponSet(CPlayer *player) {
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/8021CD70_8.CPP, func_80220ED4_de, with Turok 2's layouts. */
 
-/* What the actor stands in (GameObject_GetRegionInfo). */
-typedef struct Surface {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ u32 flags;
-    /* 0x48 */ u16 unk48;
-    /* 0x4A */ u8 pad4A[2];
-    /* 0x4C */ u16 item;
-    /* 0x4E */ u8 pad4E[0x54 - 0x4E];
-    /* 0x54 */ u16 unk54;
-} Surface;
+#include "structs/region.h" /* CRegionInfo: what the actor stands in (GameObject_GetRegionInfo) */
 typedef struct Controller_24C47C {
     /* 0x00 */ u8 pad0[8];
     /* 0x08 */ CVector3 pos;
@@ -4027,7 +4018,7 @@ s32 CPlayer__CheckJumpPad(CPlayer *player, void *actor);
 s32 CPlayer__CheckWater(CPlayer *player, CGameObjectInstance *actor);
 s32 CPlayer__CheckState12Hit(CPlayer *player, CGameObjectInstance *actor);
 s32 CPlayer__CheckClimb(CPlayer *player, CGameObjectInstance *actor);
-void GameObject_ApplyCurrent(Player *, Surface *, CVector3 *, s32);
+void GameObject_ApplyCurrent(Player *, CRegionInfo *, CVector3 *, s32);
 void CPlayer__UpdateWaterRegion(CPlayer *arg0, CGameObjectInstance *arg1, CRegionInfo *arg2);
 s32 Collision_MoveInstance(void *, CVector3, void *);
 s32 CPlayer__RamWithMount(CPlayer *player, CGameObjectInstance *body, u32 *stateFlags);
@@ -4052,24 +4043,24 @@ static __inline__ s32 not_flagged(u32 flags, u32 bit) {
 /* Entering a surface that changes the player's state (flags 0x40000): through
  * a 0x200000 surface only from one without the flag, otherwise only from
  * above the floor. */
-static __inline__ void enter_surface(Player *p, Player *actor, Surface *before, Surface *after, CGameRegion *model) {
+static __inline__ void enter_surface(Player *p, Player *actor, CRegionInfo *before, CRegionInfo *after, CGameRegion *model) {
     s32 ok = 0;     /* dead store, but it keeps the 2.5f of the shake out of the loop's hoisted invariants */
 
     if (p->stateFlags & 0x8000) {
         return;
     }
-    if (not_flagged(after->flags, 0x40000)) {
+    if (not_flagged(after->m_dwFlags, 0x40000)) {
         return;
     }
-    if (after->flags & 0x200000) {
-        ok = not_flagged(before->flags, 0x40000);
+    if (after->m_dwFlags & 0x200000) {
+        ok = not_flagged(before->m_dwFlags, 0x40000);
     } else if (CGameRegion__GetHeight(model, actor->pos.x, actor->pos.z) < actor->pos.y) {
         ok = 0;
     } else {
         ok = 1;
     }
     if (ok) {
-        CPlayer__Warp(p, after->unk48, (after->unk54 & 1) ? 1 : 2, 0);
+        CPlayer__Warp(p, after->m_WarpID, (after->m_wFlags54 & 1) ? 1 : 2, 0);
     }
 }
 
@@ -4093,9 +4084,9 @@ void CPlayer__Update(Player *p) {
     s32 enable;
     CGameRegion *oldModel;
     CGameRegion *model;
-    Surface *material;
-    Surface *before;
-    Surface *under;
+    CRegionInfo *material;
+    CRegionInfo *before;
+    CRegionInfo *under;
     u32 *stateFlags;
     s32 hit;
     s32 landed;
@@ -4279,7 +4270,7 @@ void CPlayer__Update(Player *p) {
         material = GameObject_GetRegionInfo(actor);
         if (material != NULL) {
             GameObject_ApplyCurrent(actor, material, &p->goal, 1);
-            if ((material->flags & 0x4000) && actor->pos.y <= CGameRegion__GetHeight(actor->model, actor->pos.x, actor->pos.z)) {
+            if ((material->m_dwFlags & 0x4000) && actor->pos.y <= CGameRegion__GetHeight(actor->model, actor->pos.x, actor->pos.z)) {
                 CPlayer__Hurt(p, actor, 0x3E700, 0, 0x1D);
             }
         }
@@ -4367,18 +4358,18 @@ void CPlayer__Update(Player *p) {
             CPlayer__TouchPickup(p, (u8 *)gCollisionResults.m_pInstance);
         }
         if (before != NULL && material != NULL) {
-            if ((p->stateFlags & 0x8000) && !landed && !(before->unk54 & 8) && (material->unk54 & 8)) {
+            if ((p->stateFlags & 0x8000) && !landed && !(before->m_wFlags54 & 8) && (material->m_wFlags54 & 8)) {
                 CPlayer__Dismount(p, actor);
             }
-            if (material->flags & 0x4000000) {
-                if (material->item != p->item) {
-                    p->item = material->item;
+            if (material->m_dwFlags & 0x4000000) {
+                if (material->m_PendingWarpID != p->item) {
+                    p->item = material->m_PendingWarpID;
                 }
             }
-            if (material->flags & 0x8000000) {
-                p->item = material->item;
-                p->lastItem = material->item;
-                gScene_m_PendingWarpID = material->item;
+            if (material->m_dwFlags & 0x8000000) {
+                p->item = material->m_PendingWarpID;
+                p->lastItem = material->m_PendingWarpID;
+                gScene_m_PendingWarpID = material->m_PendingWarpID;
             }
             enter_surface(p, actor, before, material, model);
         }
@@ -4390,7 +4381,7 @@ void CPlayer__Update(Player *p) {
     p->input = saved;
     gFrameIncrement = scale;
     under = GameObject_GetRegionInfo(actor);
-    if (under != NULL && (under->flags & 0x4000)) {
+    if (under != NULL && (under->m_dwFlags & 0x4000)) {
         f32 x2 = actor->pos.x * actor->pos.x;
         f32 z2 = actor->pos.z * actor->pos.z;
 
@@ -4405,7 +4396,7 @@ void CPlayer__Update(Player *p) {
                 y = -y;
             }
             actor->pos.y = y;
-            if (under->flags & 0x4000) {
+            if (under->m_dwFlags & 0x4000) {
                 actor->pos.y = GameObject_GetRegionFloorHeight(actor, 0) - 1.0f;
             }
         }
