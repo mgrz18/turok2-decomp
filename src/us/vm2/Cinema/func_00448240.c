@@ -30,8 +30,6 @@
  * 0x198 bytes at 0x800C0950. The second VM module has a copy of the block at the
  * same link address (Cinema_SplineEval_2, Cinema_DrawLetterbox_2, ...) that reads this pool. */
 
-extern s32 D_800C1BC4;
-extern f32 D_800C1BC8;
 extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */ /* current player */
 /* gScene: a function that reads two of its fields does it through a local CScene * (one register). */
 
@@ -688,8 +686,8 @@ f32 Cinema_GetFadeAlpha_2(f32 t) {
         u = (t - key[-1].time) / (key->time - key[-1].time);
         v = key[-1].value * (1.0f - u) + key->value * u;
     }
-    v *= 2.0f * D_800C1BC8 + 1.0f;
-    v -= D_800C1BC8;
+    v *= 2.0f * gCinemaFadeBias + 1.0f;
+    v -= gCinemaFadeBias;
     if (1.0f < v) {
         v = 1.0f;
     }
@@ -701,12 +699,12 @@ f32 Cinema_GetFadeAlpha_2(f32 t) {
 
 f32 Cinema_GetFOV_2(f32 t) {
     s32 *track;
-    D_800C7470_Pair *key;
+    CinemaKeyPair *key;
     s32 count;
     s32 i;
     f32 u;
     track = CISet__GetBlock(gCinemaPlayerP->resource, 3);
-    key = (D_800C7470_Pair *)(track + 2);
+    key = (CinemaKeyPair *)(track + 2);
     count = track[1];
     for (i = 0; i < count; i++) {
     }
@@ -916,7 +914,7 @@ void Cinema_DrawFade_2(ScreenRectangle *rectangle) {
     f32 value;
 
     if (!gCinemaPlayerP->active) {
-        if (!D_800C1BC4) {
+        if (!gCinemaHoldFade) {
             return;
         }
     } else {

@@ -41,5 +41,7 @@ extern f32 sFinalScoreTimer;
 extern f32 sResolutionToggleDelay;
 extern s32 sPauseRumbleOn[4];   /* the controllers' rumble state, saved while paused */
 extern CharacterSound gCharacterSelectSounds[];   /* by character */
+extern CharacterSound sCharacterClimbSounds[];    /* by deathmatch character: .sound is the climbing step sound (CPlayer) */
+extern MenuColorInit gMenuColorDefaults[8];       /* the colour records Menu_Construct copies into each window */
 
 #endif

@@ -482,8 +482,6 @@ s32 __scTaskComplete(OSSched *arg0, OSScTask *arg1) {
     return 1;
 }
 
-extern s32 D_800B6E60;
-extern s32 D_800B6E64;
 
 void __scExec(OSSched *view, OSScTask *current, OSScTask *next) {
     s64 now;
@@ -512,8 +510,8 @@ void __scExec(OSSched *view, OSScTask *current, OSScTask *next) {
     }
     if (next != 0 && next != current) {
         osDpSetNextBuffer(next->list.t.output_buff, *next->list.t.output_buff_size);
-        D_800B6E60 = 1;
-        D_800B6E64 = 0;
+        sSchedRdpTaskStarted = 1;
+        sSchedRdpTaskCounter = 0;
         view->curRDPTask = next;
     }
 }

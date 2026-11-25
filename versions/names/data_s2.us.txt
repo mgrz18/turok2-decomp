@@ -1,0 +1,58 @@
+// Round 30, part s2: the last D_ data that can carry a name (docs/NAMES.md "Round 30, part s2").
+// Data defined in place by the merged C files (asm-label definitions):
+sCMtxFUp = 0x800A5404; // CVector3 {0, 1, 0}: CMtxF__SetLookDirection copies it as its up vector
+sLitVerticesName = 0x800A57BC; // string "Lit Vertices": the cache description CMtxF passes to CCache__Allocate
+sAlignToGroundMax = 0x800A5AF8; // f32 1.0: CGameObjectInstance__AlignToGround clamps its slerp factor to it
+sDistanceScaleNear = 0x800A6404; // f32 16.0: CParticle__GetDistanceScale (Ramp2) subtracts it from the distance
+sDistanceScaleInvRange = 0x800A6408; // f32 1/2032: Ramp2, the slope of the ramp (clamp test)
+sDistanceScaleRampMax = 0x800A640C; // f32 1.0: Ramp2, the top of the ramp
+sDistanceScaleInvRange2 = 0x800A6410; // f32 1/2032: Ramp2, the slope of the ramp (value)
+sDistanceScaleUnit = 0x800A6414; // f32 0.001: Ramp2, the unit of the result
+sDistanceScaleDefault = 0x800A6418; // f32 1.0: CParticle__GetDistanceScale without the distance flag
+sDistanceScaleFovRef = 0x800A641C; // f32 47.5: CParticle__GetDistanceScale, the reference view angle
+sDistanceScaleFovBlend = 0x800A6420; // f32 0.25: CParticle__GetDistanceScale, the blend toward it
+sDistanceScaleInvFovRef = 0x800A6424; // f32 1/47.5: CParticle__GetDistanceScale, the normalisation
+sSpriteTexelScale = 0x800A652C; // f32 32.0: Sprite_FromImage
+sSpriteOne = 0x800A6530; // f32 1.0: Sprite_FromImage (the word after sSpriteTexelScale)
+sMpMenuText_Space = 0x800C0E78; // string " ": the blank items of the vm1 menu tables
+sMpMenuFmt_02d = 0x800C0E7C; // string "%02d": MpMenu
+sGameNoteMenuFmt_2d = 0x800C1414; // string "%2d": PakMenu game note menu
+sGameNoteMenuFmt_Time = 0x800C1418; // string "%3d.%02d.%02d": PakMenu game note menu
+sCharNoteMenuFmt_04d = 0x800C1428; // string "%04d": PakMenu character note menu
+// Initialised data (the engine .data blob ABCA8, the VM data blob C24E0): variables of one subsystem each
+sAnimMaxKeyCount = 0x800ACB50; // f32 90.0: Anim_CalcKeyCount, the largest key count accepted
+sReturningHomeFrame = 0x800ACE68; // f32 15.0: CParticle__UpdateReturning flies home after this frame
+sReturningCatchRadius = 0x800ACE6C; // f32 512.0: CParticle__UpdateReturning, the catch radius
+sHiResViewScaleX = 0x800ADDB8; // f32: CPlayer draws its view model with this X scale at gResolution 2
+sCharacterClimbSounds = 0x800AE310; // CharacterSound[]: per deathmatch character, the climbing step sound (.sound)
+sMountStepLength = 0x800AE344; // f32: the riding step length (the CPlayer mount update, m_OnEnemyStompTime)
+gCinemaHoldFade = 0x800C1BC4; // s32: Cinema_SetHoldFade writes it; the cinema draw keeps the fade while it is set
+gCinemaFadeBias = 0x800C1BC8; // f32: Cinema_GetFadeAlpha stretches the fade value by it
+gMenuColorDefaults = 0x800C1CD0; // the 8 colour records (six words each) Menu_Construct copies into each window; read 2 bytes in
+osViModeNtscHpn1 = 0x800B7E60; // osViModeTable[OS_VI_NTSC_HPN1], libultra name for the mode: EngineMode17_Switch_Init needs a symbol of its own (&osViModeTable[8] shares the table %hi with its [0] and changes the code)
+gViModeChoices = 0x800C21A8; // ViModeChoice[3][8]: Video_SetMode picks the VI mode by region and flags (reads the low half of each word)
+// Kept field symbols (the member access changes the code)
+gRidingForwardMoveTuning_forwardMax = 0x800ADDE4; // gRidingForwardMoveTuning.forwardMax: the mount charge (CPlayer) reads it by its own %hi/%lo; through the struct 4 words differ
+sChargeShotRecord = 0x800AE9CC; // the 4-halfword shot record of the charge weapon (a weapon descriptor at 0x800AECE8 points at it)
+sChargeShotRecord_count = 0x800AE9D2; // its last halfword: WeaponMode_Charge_Update stores the shot count (charge * 3, at least 1) into it
+// Write-only words: named by their one write (nothing in the ROM reads them)
+sSchedRdpTaskStarted = 0x800B6E60; // s32, a scheduler static after sSchedResetBlankRetraces: __scExec sets it to 1 when it hands the RDP a new task
+sSchedRdpTaskCounter = 0x800B6E64; // s32, the next one: __scExec clears it at the same time (followed by 8 bytes of linker fill)
+sVMRestartFlag = 0x800B7658; // s32: VM_HandleTLBMiss writes -1 after its jump to the reset vector (which does not return)
+// The CCollisionInfo slots gCollisionSetupTable fills that had no name: each named by the mode tables whose records point at it (us/asm/data, the AI / player / object mode tables: Enter, Update, collision info)
+gCollisionInfoSwim = 0x800F1AC0; // PlayerSwim modes; setup record 5
+gCollisionInfoPlayerRide = 0x800F1B20; // PlayerRideIdle / PlayerRideMove modes (the player on a mount); setup record 8
+gCollisionInfoPlatform = 0x800F1BC0; // the Platform modes (AtStart, Forward, AtEnd, Back); setup record 29
+gCollisionInfoEnemyDeath = 0x800F1C00; // EnemyMode_Death / EnemyMode_DeathMelt (modes 0x34-0x3C); setup record 12
+gCollisionInfoJump = 0x800F1C80; // PlayerJump and PlayerFall; setup record 2
+gCollisionInfoJumpPad = 0x800F1CA0; // PlayerState12 and PlayerJumpPad; setup record 6
+gCollisionInfoPlayerDeath = 0x800F1DD0; // the PlayerDeath* modes, PlayerState15, PlayerCinema50; setup record 3
+gCollisionInfoSetupUnused = 0x800F1DF0; // setup record 11 points at it; no mode table and no code does (it was a raw address in the table)
+gCollisionInfoEnemyGround = 0x800F1E50; // the generic EnemyMode set of the walking / swimming / ram enemies; setup record 14
+gCollisionInfoMount = 0x800F1E70; // EnemyMode_PlayerRide (modes 0x2C-0x2E: the enemy the player rides); setup record 10
+gCollisionInfoPlayerDeath32 = 0x800F1E90; // PlayerDeath32 only; setup record 4
+gCollisionInfoWade = 0x800F1ED0; // PlayerWade; setup record 7
+gCollisionInfoEnemyHover = 0x800F1F30; // the generic EnemyMode set of the enemy tables with the EnemyHover modes; setup record 13
+gCollisionInfoTurret = 0x800F1F70; // the Turret modes; setup record 31
+gCollisionInfoThrowable = 0x800F1F90; // the Throwable modes (idle, picked up, flying); setup record 17
+gCollisionInfoDoor = 0x800F1FB0; // the Door modes (open, close); setup record 20

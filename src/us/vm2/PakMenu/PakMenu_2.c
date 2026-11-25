@@ -386,7 +386,7 @@ void *PakMenu_GetReturnMenu_2(Menu *c) {
 
 /* Checks the controller pak in the given slot before a save/load menu:
  * returns the pak status, or -1 after opening the "pak full" dialog; opens the
- * matching warning dialog (templates D_0043xxxx) when the pak is missing,
+ * matching warning dialog (templates in module 1's data, 0x0043xxxx) when the pak is missing,
  * damaged or unformatted. */
 
 

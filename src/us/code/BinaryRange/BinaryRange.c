@@ -299,7 +299,7 @@ f32 SmoothStep(f32 arg0)
 
 #ifdef TARGET_PORT
 /* Host body (round 7 v2): the N64 tests the game's data segments (gHashSize + the size symbol
- * D_11059, gPrimagenPaths + D_94F), meaningless in the host link. The only caller
+ * gCodeDataSize, gPrimagenPaths + gVirtualDataSize), meaningless in the host link. The only caller
  * (CAI__UpdateModeAnim) asks it of an animation word that is not code: an id (small) or a
  * table in the game data. */
 extern int IsCodePointer(uptr arg0);
@@ -307,15 +307,15 @@ int IsDataPointer(uptr arg0) {
     return arg0 >= 0x10000 && !IsCodePointer(arg0);
 }
 #else
-extern char D_11059;
-extern char D_94F;
+extern char gCodeDataSize;     /* local: an absolute symbol, the size of the range (versions/symbols_manual.us.txt) */
+extern char gVirtualDataSize;  /* local: an absolute symbol, the size of the range */
 int IsDataPointer(uptr arg0) {
     if (arg0 >= (uptr)&gHashSize &&
-        arg0 < (uptr)&gHashSize + (uptr)&D_11059) {
+        arg0 < (uptr)&gHashSize + (uptr)&gCodeDataSize) {
         return 1;
     }
     if (arg0 >= (uptr)&gPrimagenPaths &&
-        arg0 < (uptr)&gPrimagenPaths + (uptr)&D_94F) {
+        arg0 < (uptr)&gPrimagenPaths + (uptr)&gVirtualDataSize) {
         return 1;
     }
     return 0;
@@ -323,7 +323,7 @@ int IsDataPointer(uptr arg0) {
 #endif
 #ifdef TARGET_PORT
 /* Host body (round 7 v2): the N64 tests the address against the game's code segments
- * (CList__Construct + the size symbol D_A4694, Automap_RevealRegion + D_29E60), which mean
+ * (CList__Construct + the size symbol gCodeTextSize, Automap_RevealRegion + gVirtualTextSize), which mean
  * nothing in the host link (and the u32 argument cut host pointers). A mode row's animation
  * word (CAIModeInfo.unk_10, CAI__UpdateModeAnim) is an id, an animation picker function or a
  * table: here a code pointer is one in the executable's text. */
@@ -349,16 +349,16 @@ int IsCodePointer(uptr arg0) {
 #endif
 #else
 extern char CList__Construct;      /* local: a code address, the start of a range (a function, not data) */
-extern char D_A4694;
+extern char gCodeTextSize;     /* local: an absolute symbol, the size of the range */
 extern char Automap_RevealRegion;  /* local: a code address, the start of a range (a function, not data) */
-extern char D_29E60;
+extern char gVirtualTextSize;  /* local: an absolute symbol, the size of the range */
 int IsCodePointer(u32 arg0) {
     if (arg0 >= (uptr)&CList__Construct &&
-        arg0 < (uptr)&CList__Construct + (uptr)&D_A4694) {
+        arg0 < (uptr)&CList__Construct + (uptr)&gCodeTextSize) {
         return 1;
     }
     if (arg0 >= (uptr)&Automap_RevealRegion &&
-        arg0 < (uptr)&Automap_RevealRegion + (uptr)&D_29E60) {
+        arg0 < (uptr)&Automap_RevealRegion + (uptr)&gVirtualTextSize) {
         return 1;
     }
     return 0;

@@ -383,10 +383,10 @@ void CMtxF__InvertAffine(f32 *out, f32 *m) {
 }
 
 #ifndef TARGET_PORT
-/* The up vector CMtxF__SetLookDirection copies (as D_800A5404): in the ROM's .rodata between
+/* The up vector CMtxF__SetLookDirection copies (as sCMtxFUp): in the ROM's .rodata between
  * CMtxF__InvertAffine's literal and CMtxF__MultiplyAffine's, so defined here (the port keeps the
  * generated copy). */
-const CVector3 sCMtxFUp_def __asm__("D_800A5404") = { 0.0f, 1.0f, 0.0f };
+const CVector3 sCMtxFUp_def __asm__("sCMtxFUp") = { 0.0f, 1.0f, 0.0f };
 #endif
 
 void CMtxF__MultiplyAffine(f32 *out, f32 *left, f32 *right)
@@ -1506,13 +1506,13 @@ typedef struct {
     /* 0x2C */ f32 m23;
     /* 0x30 */ f32 m30, m31, m32, m33;
 } DirMtx;
-extern CVector3 D_800A5404; /* {0, 1, 0} */
 
+extern CVector3 sCMtxFUp;   /* local: {0, 1, 0}, defined above with an asm label (CVector3 is an untagged typedef, so globals/math.h cannot declare it) */
 /* Builds an orientation matrix whose forward axis is direction. */
 void CMtxF__SetLookDirection(DirMtx *m, CVector3 *direction) {
     CVector3 up;
 
-    up = D_800A5404;
+    up = sCMtxFUp;
     if (direction->y < 0.0f ? 0.99f <= -direction->y : 0.99f <= direction->y) {
         m->right.y = 0;
         m->right.z = 0;
@@ -3425,7 +3425,6 @@ void Lighting_WriteVertexColors(s32 *file, CVector3 *src) {
 /* A world region record (0xC0 bytes). */
 
 
-extern char D_800A57B8[];
 void func_0029E460(void *dst, void *src, s32 size);
 
 /* Collects the region records whose box overlaps q (at most 64); returns whether one is flagged. */
@@ -3515,7 +3514,7 @@ s32 **Lighting_BuildLitVertices(sptr model, s32 *regions, CBox *box, sptr arg3, 
     } while (0);
     if (ret != 0) {
         total2 = countVerts(src);
-        blk = CCache__Allocate(0, size + 0x10 + total2 * 4, 0, D_800A57B8 + 4);
+        blk = CCache__Allocate(0, size + 0x10 + total2 * 4, 0, sLitVerticesName);
         if (blk == NULL) {
             return NULL;
         }
@@ -3530,7 +3529,7 @@ s32 **Lighting_BuildLitVertices(sptr model, s32 *regions, CBox *box, sptr arg3, 
         dst = (u8 *) *blk + hdr[1];
         colors = (u8 *) *blk + hdr[2];
     } else {
-        blk = CCache__Allocate(0, size + 8, 0, D_800A57B8 + 4);
+        blk = CCache__Allocate(0, size + 8, 0, sLitVerticesName);
         if (blk == NULL) {
             return NULL;
         }
@@ -3708,5 +3707,5 @@ s32 func_00214188(s32 *arg0) {
 #ifndef TARGET_PORT
 /* The last bytes of the object's .rodata: a cache name no function in the ROM reads (Rage Wars' lit
  * vertices are "lit vertices"); stale linker bytes follow up to the next object (versions/ld_fill.us.txt). */
-const char sLitVerticesName_def[] __asm__("D_800A57BC") = "Lit Vertices";
+const char sLitVerticesName_def[] __asm__("sLitVerticesName") = "Lit Vertices";
 #endif

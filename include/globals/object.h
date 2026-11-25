@@ -38,4 +38,8 @@ extern f32 sPoseCeilingHeight;          /* the ground height */
 extern f32 sPoseCollisionHeight;        /* the object's height */
 extern f32 sPoseCeilingOverlap;         /* the depth below the ground */
 
+/* Round 30 s2 */
+extern f32 sAlignToGroundMax;           /* 1.0: CGameObjectInstance__AlignToGround clamps its slerp factor to it */
+extern f32 sAnimMaxKeyCount;            /* 90.0: Anim_CalcKeyCount, the largest key count accepted (engine .data) */
+
 #endif

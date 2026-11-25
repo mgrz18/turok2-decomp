@@ -23,7 +23,7 @@
 #include "common.h"
 #include "structs/light.h"
 /* the real function is 0x0042AC0C-0x0042B3E4 (size 0x7D8, 502 words); splat cut it into CScene__LoadLevel +
- * D_0042B304. All 502 words match (checked over the real extent). Reusing one scratch pointer for the
+ * a label at 0x0042B304. All 502 words match (checked over the real extent). Reusing one scratch pointer for the
  * CPlayerPool__GetFirstActive result and the actor array keeps the last loop's load in $v0, `actor += 0x288` gives the player
  * loop its register order, and the sound switch with one shared call keeps w in $s3. */
 #include "common.h"
@@ -3607,7 +3607,7 @@ void *func_0029E460(void *, void *, s32);           /* memcpy */
 /* Copies the level's name (sub-block 8 of its level file, a handle: data then size) into
  * arg2, at most arg3 bytes. The level file stays loaded when it is the current level. */
 /* The one object's literals: "level index" is CScene__LoadLevel's (pooled), "level name" is output here,
- * between func_0042C194's and func_00223A94's .rodata (0xA6BD0, sCSceneCacheDesc_LevelName). */
+ * between CScene__FindWarpDests's and CScene__Blast's .rodata (0xA6BD0, sCSceneCacheDesc_LevelName). */
 DEFERRED void CScene__GetLevelName(struct CScene *arg0, s32 arg1, void *arg2, s32 arg3) {
     sptr sp20;
     sptr temp_s2;

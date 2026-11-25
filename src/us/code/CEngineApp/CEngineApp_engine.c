@@ -248,7 +248,7 @@ typedef struct {
     /* 0x44 */ s32 unk44;
     /* 0x48 */ s32 unk48;
 } Unk8011ACB0;
-extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("gEngineApp_m_Settings_match");
+extern Unk8011ACB0 sSettingsMatchView[] __asm__("gEngineApp_m_Settings_match");
 extern void *memset(void *dst, s32 value, uptr size);
 extern void osCreateScheduler(void *, void *, s32, s32, s32);
 extern void osScAddClient(void *, void *, void *);
@@ -290,8 +290,8 @@ void CEngineApp__Construct(CEngineApp *state) {
     state->m_Settings.ready = 1;
     state->m_Settings.unk1C4 = 0;
     state->m_Settings.paused = 0;
-    D_8011ACB0_arr->unk44 = 0;
-    D_8011ACB0_arr->unk48 = 0;
+    sSettingsMatchView->unk44 = 0;
+    sSettingsMatchView->unk48 = 0;
     gCameraPoolHideViews = 0;
     for (; i < gTotalFramebuffers; i++) {
         prev = (i - 1 + gTotalFramebuffers) % gTotalFramebuffers;
@@ -1983,7 +1983,7 @@ void EngineMode17_Switch_Init(CEngineApp *arg0) {
     OSViMode *var_a0;
 
     if (arg0->m_Settings.unk1C8 != 0) {
-        var_a0 = &D_800B7E60;
+        var_a0 = &osViModeNtscHpn1;
         if (gResolution == 0) {
             var_a0 = &osViModeTable[0];
         }

@@ -1641,7 +1641,6 @@ typedef struct Sprite {
     /* 0x1C */ f32 extentY;
     /* 0x20 */ f32 step;
 } Sprite;
-extern float D_800A652C;
 
 void Sprite_FromImage(Image *image, Image *texture, Sprite *sprite) {
     f32 scale;
@@ -1661,19 +1660,19 @@ void Sprite_FromImage(Image *image, Image *texture, Sprite *sprite) {
     sprite->height = image->header->height * scale;
     if (texture != 0) {
         sprite->extentX = 1 << (texture->header->widthShift + 5);
-        sprite->extentX = sprite->extentX * image->header->scale - D_800A652C;
+        sprite->extentX = sprite->extentX * image->header->scale - sSpriteTexelScale;
         height = 1 << (texture->header->heightShift + 5);
-        unit = &D_800A652C + 1;
+        unit = &sSpriteTexelScale + 1;
         sprite->step = *unit / ((f32)sprite->format - *unit);
         sprite->extentY = height;
     }
 }
 
 #ifndef TARGET_PORT
-/* Sprite_FromImage's other two literals, which it reads as D_800A652C and the word after it:
+/* Sprite_FromImage's other two literals, which it reads as sSpriteTexelScale and the word after it:
  * defined here, after its own (the port keeps the generated copies). */
-const f32 sSpriteTexelScale_def __asm__("D_800A652C") = 32.0f;
-const f32 sSpriteOne_def __asm__("D_800A6530") = 1.0f;
+const f32 sSpriteTexelScale_def __asm__("sSpriteTexelScale") = 32.0f;
+const f32 sSpriteOne_def __asm__("sSpriteOne") = 1.0f;
 #endif
 
 /* Moves point n to its owner particle's draw matrix (-1: the owner is gone, the point keeps the
