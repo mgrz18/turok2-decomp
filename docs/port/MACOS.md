@@ -21,7 +21,8 @@ cp <rom> baserom.us.z64
 # 1. python: pyelftools + libclang bindings for Apple's libclang (CLT 21)
 python3.13 -m venv .venv && .venv/bin/pip install pyelftools 'clang==21.*'
 
-# 2. the archive (or copy the box's: the container differs, the units do not, §3)
+# 2. the archive (or copy the box's: the container differs, the units do not, §3); remake it
+#    whenever swap_spec.json or a struct it names changes: the build refuses a stale one (§23)
 .venv/bin/python tools/assets/mkarchive.py baserom.us.z64 -o OUT/turok2.o2r -j 4
 
 # 3. configure + game library (about 13 s for 3,917 files on 10 cores)
@@ -1668,3 +1669,80 @@ initialised, quit and initialised again, the usable bounds both times 1512x875 a
 | `OUT/build_r20` (this branch), the default (`--all --talismans 2 --cheats-off 1,2,3,4,5,6`, 300,000) | 600,000 lines, md5 **`0959aac5…`** (= the box), END reached (level 10 from 258,880), run hurt summary 0 deaths, exit 0, 63.8 s |
 | the scratch clone's `OUT/rel` (70f3333c as a fresh user builds it), the same | md5 `0959aac5…`, exit 0, 58.1 s |
 | `OUT/build_r20`, `--legacy` (290,000) | 580,000 lines, md5 **`281904eb…`** (= STATUS), level 10 from 252,194, 2 deaths (the City Totem, as documented), exit 0, 41.8 s |
+
+## 23. Round 31: the Mac and Linux det logs split again, a stale byte-swap plan
+
+Branch `main` (from 8fb968a5), the Mac (M5, macOS 27.2) and the Linux box, headless. **No change to
+`src/` or `include/`.** N64: `make verify` passes and `asm_diff` against a51f830f finds 0 of 297
+files that differ.
+
+### 23.1 The symptom
+
+The whole-game default run (`playthrough.py RUN --all --talismans 2 --cheats-off 1,2,3,4,5,6`,
+300,000 frames under `aimdrive.py`, `T2_DET_LOG=1`) gave `ebd08b15…` on the Mac
+(`OUT/build_r20` of the Phase-5 tree, `OUT/turok2_final5.o2r`) and `b0d4a8ed…` on the box
+(`/root/C45/runs/def1`). Mac == Linux had held up to round 20. First difference: line 74,574,
+`det: frame 37287 actors 32 hash 800b8ba903d65844 ptcl …`, where only the particle hash differs.
+`-ffp-contract=off` was already on, and turning it on for the game code had no effect.
+
+### 23.2 The bisection (the det log at finer grain)
+
+| step | knobs | finding |
+|---|---|---|
+| 1 | `T2_DET_FROM=37270 T2_DET_ACTORS=1 T2_DET_PARTICLES=1`, 37,300 frames (5 s on the Mac) | pool slot 35, a type-265 projectile (list 2) in flight since before 37,285: same position and velocity on both hosts up to frame 37,286. At 37,287 its velocity is `(-2878.9, -446.8, -986.5)` on the Mac and `(-2873.3, -483.4, -986.6)` on Linux |
+| 2 | `+ T2_DET_MTX=1 T2_DET_POSE=1` | every actor's draw matrices, poses, ground tilt and orientation are equal: the inputs of the projectile are equal |
+| 3 | a temporary `printf` in `CParticleSystem__Spawn` (inputs, `mtx`, outputs) | the one spawn of the frame (kind 243, the projectile's trail) is bit-identical; type 265 is moved by `CParticle__Steer`, not spawned |
+| 4 | a temporary `printf` after the homing turn in `CParticle__Steer` | equal `pos`, target point, `dir`, `q0`, `q1`, speed and angle; **`def->turnRate` 4 on the Mac, 1024 on Linux**, so `w` = 0.853 vs 1 (a full turn onto the target) |
+
+0x0004 against 0x0400 is the same halfword in two byte orders. The template is the host copy that
+`t2particles.c` builds from block 2 of the particle unit, after the archive's t2/swap plan has run on it.
+
+### 23.3 The cause: the box's archive predated the headers
+
+The archives' units were identical, member for member, except `t2/swap` (and the zlib version in
+`t2/info.json`). Decoding both plans: one unit differs, `01B31794` (the particle effects). At
+every template (+79,004 + 60·k, stride `sizeof(CROMParticleEffect)` 0x3C) the Mac swaps **two**
+halfwords from +0x0C (`m_nSound`, `m_TurnRate`) and the box **one**. The plans come from
+`swap_spec.json` plus the C layouts it names (`"op": "cstruct", "name": "CROMParticleEffect"`).
+`d8151991` (2026-11-23) turned `u8 unk_0E[2]` (bytes: kept in ROM order) into `s16 m_TurnRate`
+(swapped). The box's `OUT/turok2.o2r` dated from 2026-11-18 and was never remade. On the N64 the
+field is a big-endian 4 (degrees per frame), which is what the Mac read. So the round-30 references
+(`b0d4a8ed…` default and the others) were measured on a wrong stream.
+
+A new archive on the box (`mkarchive.py`) has the Mac's plan byte for byte (t2/swap md5
+`fdaf0447…`), and its default run gives **`ebd08b15…`, the Mac's md5**.
+
+### 23.4 The fix: the archive carries its spec
+
+- `tools/assets/swapcheck.py`: `spec_fingerprint(spec)`, a u32 SHA-1 prefix (never 0) over the
+  spec's rules and types without `doc`/`note`, and the flattened layouts (offset, class, count) of
+  the C structs its `cstruct` rules name. A renamed field or an edited comment leaves it unchanged
+  (checked: `m_TurnRate` → `m_Turn` plus a comment edit gives the same `022D32A2`). The pre-`d8151991`
+  `particle.h` gives `998AB86B`. `--fingerprint [--header FILE]` prints it and writes it as
+  `#define T2_SWAP_SPEC_FP`; no ROM is needed.
+- `tools/assets/mkarchive.py`: writes it in t2/swap's header word at +12 (reserved, 0 until now)
+  and in `t2/info.json` (`"swap_spec"`). `archive_check.py` recomputes it with the plans.
+- `port/app/CMakeLists.txt`: generates `gen/t2swapspec.h` (it depends on `swap_spec.json`,
+  `swapcheck.py` and `include/structs/*.h`). `t2asset` is built with it.
+- `port/assets/t2asset.c` (`T2Asset_SetSwapTable`): refuses a table whose word differs, so
+  `turok2` stops at start-up with
+  `FAIL: T2Asset_OpenLus: t2/swap: made for another byte-order spec (archive 00000000, this build
+  022D32A2): rebuild the archive with tools/assets/mkarchive.py` (checked with the old
+  `OUT/turok2_final5.o2r`). `port/Makefile`'s tests build `t2asset.c` without the header and do
+  not check.
+
+**Every archive made before this round is refused once**. Remaking one takes 3-9 s.
+
+### 23.5 The runs on the new archives
+
+| run | Mac (`OUT/build_r20` + this round, `OUT/turok2_r31.o2r`, ASLR on) | Linux (`OUT/rel`, ASLR off) |
+|---|---|---|
+| default, 300,000 | `ebd08b15…`, 48.9 s | `ebd08b15…`: END 2 (256,978), 5 totems, 0 deaths, 320 hits |
+| stick combination, 300,000 | `17262ab5…`, 70.9 s | `17262ab5…`: no END, 4 deaths |
+| `--legacy`, 290,000 | `ee545088…`, 33.7 s | `ee545088…`: no END, 6 deaths |
+| boot + 3 demos | (not run) | `6ab97584…` (unchanged) |
+
+Mac == Linux again on all three routes. Neither the stick combination nor `--legacy` reaches END,
+but on the stale archive at 8fb968a5 they did not either (`c5e9ba17…`, `867e4221…`). Their re-tune
+on the correct stream is open (STATUS.md, round 31).
+

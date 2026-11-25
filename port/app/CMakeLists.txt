@@ -7,6 +7,19 @@ target_include_directories(t2asset PUBLIC ${T2_PORT_DIR}/assets)
 # miniz must not export zlib names: LUS links libzip, which links the system zlib.
 target_compile_definitions(t2asset PRIVATE MINIZ_NO_ZLIB_COMPATIBLE_NAMES _LARGEFILE64_SOURCE)
 set_source_files_properties(${T2_PORT_DIR}/third_party/miniz/miniz.c PROPERTIES COMPILE_OPTIONS "-w")
+# The byte-order spec the archive's t2/swap must have been made from (round 31, MACOS.md 23):
+# swapcheck.py hashes swap_spec.json and the layouts of the C structs it names.
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(T2_SWAPSPEC_H ${CMAKE_CURRENT_BINARY_DIR}/gen/t2swapspec.h)
+file(GLOB T2_SWAPSPEC_STRUCTS ${T2_REPO_DIR}/include/structs/*.h)
+add_custom_command(OUTPUT ${T2_SWAPSPEC_H}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/gen
+    COMMAND ${Python3_EXECUTABLE} ${T2_REPO_DIR}/tools/assets/swapcheck.py --fingerprint --header ${T2_SWAPSPEC_H}
+    DEPENDS ${T2_REPO_DIR}/tools/assets/swap_spec.json ${T2_REPO_DIR}/tools/assets/swapcheck.py ${T2_SWAPSPEC_STRUCTS}
+    COMMENT "byte-order spec fingerprint (t2swapspec.h)" VERBATIM)
+target_sources(t2asset PRIVATE ${T2_SWAPSPEC_H})
+target_include_directories(t2asset PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen)
+target_compile_definitions(t2asset PRIVATE T2_HAVE_SWAPSPEC_H)
 
 add_executable(turok2 main.cpp t2asset_lus.cpp testdl.c offscreen_gl.cpp t2display.cpp)
 set_target_properties(turok2 PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON C_STANDARD 11)
