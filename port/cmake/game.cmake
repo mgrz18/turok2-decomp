@@ -104,6 +104,12 @@ target_include_directories(t2_game_flags BEFORE INTERFACE
     ${T2_ROOT}/include)
 target_compile_definitions(t2_game_flags INTERFACE
     TARGET_PORT=1 _LANGUAGE_C F3DEX_GBI_2 GAME_VERSION="us")
+if(APPLE)
+    # macOS's <string.h> turns memset/memcpy into fortify macros (secure/_string.h),
+    # which break the game's own `void *memset(...)` declarations in the merged
+    # module files; the game code does not want the checked variants anyway.
+    target_compile_options(t2_game_flags INTERFACE -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0)
+endif()
 
 add_library(turok2_game STATIC ${T2_GAME_LINKED})
 target_link_libraries(turok2_game PRIVATE t2_game_flags)
