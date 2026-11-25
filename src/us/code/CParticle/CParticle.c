@@ -276,8 +276,7 @@ playing:
 extern f32 Math_AcosLookup(f32);                              /* acosf */
 extern void CPlayer__TransformByView(CPlayer *player, CVector3 *pos);      /* player-relative point to world */
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);
-extern f32 sReturningHomeFrame; /* speed above which it flies home (15) */
-extern f32 sReturningCatchRadius; /* catch radius (512) */
+#include "globals/particle.h"   /* sReturningHomeFrame, sReturningCatchRadius */
 
 void CParticle__UpdateReturning(CParticle *obj) {
     CVector3 aim;
@@ -4481,15 +4480,6 @@ const f32 sDistanceScaleFovRef_def __asm__("sDistanceScaleFovRef") = 47.5f;
 const f32 sDistanceScaleFovBlend_def __asm__("sDistanceScaleFovBlend") = 0.25f;
 const f32 sDistanceScaleInvFovRef_def __asm__("sDistanceScaleInvFovRef") = 0.0210526325f;
 #endif
-extern f32 sDistanceScaleNear;
-extern f32 sDistanceScaleInvRange;
-extern f32 sDistanceScaleRampMax;
-extern f32 sDistanceScaleInvRange2;
-extern f32 sDistanceScaleUnit;
-extern f32 sDistanceScaleDefault;
-extern f32 sDistanceScaleFovRef;
-extern f32 sDistanceScaleFovBlend;
-extern f32 sDistanceScaleInvFovRef;
 
 /* Static inline in the Rage Wars source file (dropped by the importer). */
 static inline f32 Ramp2(CROMParticleEffect *par, f32 xin) {

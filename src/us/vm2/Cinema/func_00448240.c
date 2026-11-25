@@ -30,8 +30,6 @@
  * 0x198 bytes at 0x800C0950. The second VM module has a copy of the block at the
  * same link address (Cinema_SplineEval_2, Cinema_DrawLetterbox_2, ...) that reads this pool. */
 
-extern s32 gCinemaHoldFade;
-extern f32 gCinemaFadeBias;
 extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */ /* current player */
 /* gScene: a function that reads two of its fields does it through a local CScene * (one register). */
 

@@ -51,6 +51,7 @@ extern f32 gCharacterHealthRegen[13];   /* health regained per second, by charac
 
 extern CMoveTuning gStandMoveTuning;
 extern CMoveTuning gRidingForwardMoveTuning;
+extern f32 gRidingForwardMoveTuning_forwardMax; /* field symbol: the mount charge reads it by its own %hi/%lo (through the struct 4 words differ) */
 extern CMoveTuning gRidingBackwardMoveTuning;
 extern CMoveTuning gDodgeMoveTuning;
 extern CMoveTuning gCrouchMoveTuning;
@@ -87,5 +88,10 @@ extern HitFrame sBlastShieldFrame;       /* the shield CGameObjectInstance__GetN
 extern struct CPlayer *sCinema50Player;
 extern struct CPlayer *sDeathCinemaPlayer;
 extern u8 gDeathTintColor[4];
+
+/* Round 30 s2 (engine .data) */
+extern f32 sHiResViewScaleX;        /* CPlayer draws its view model with this X scale at gResolution 2 */
+extern f32 sMountStepLength;        /* the riding step length (m_OnEnemyStompTime wraps at it) */
+extern s16 sChargeShotRecord_count; /* field symbol: the last halfword of the charge weapon's shot record; WeaponMode_Charge_Update stores the shot count */
 
 #endif

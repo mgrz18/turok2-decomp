@@ -1641,7 +1641,6 @@ typedef struct Sprite {
     /* 0x1C */ f32 extentY;
     /* 0x20 */ f32 step;
 } Sprite;
-extern float sSpriteTexelScale;
 
 void Sprite_FromImage(Image *image, Image *texture, Sprite *sprite) {
     f32 scale;

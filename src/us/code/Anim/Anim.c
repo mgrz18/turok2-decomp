@@ -425,7 +425,6 @@ s32 Anim_DecodeTracks(sptr source, TrackTable *table, s32 tracks, s32 channels, 
     return 1;
 }
 
-extern f32 sAnimMaxKeyCount; /* 90.0f: the largest value accepted */
 /* r = ceil(x), through an int. */
 #define CEILF(r, x)                     \
     if ((x) <= 0.0f) {                  \

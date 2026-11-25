@@ -508,7 +508,6 @@ s32 Cinema_OverridesMusic1(void) {
     return gCinemaPlayerP->spec.unk40;
 }
 
-extern s32 gCinemaHoldFade;
 
 void Cinema_SetHoldFade(s32 arg0) {
     gCinemaHoldFade = arg0;

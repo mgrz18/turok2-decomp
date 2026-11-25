@@ -20,4 +20,6 @@ extern PageEntry gPager_entries[24];     /* gPager.entries */
 extern s16 gPager_expanded;               /* gPager.expanded */
 extern u8 gVMPages[];                     /* the page frames, 0x1000 bytes each */
 
+extern s32 sVMRestartFlag;                /* VM_HandleTLBMiss writes -1 after its jump to the reset vector (which does not return) */
+
 #endif

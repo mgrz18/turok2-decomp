@@ -1107,7 +1107,6 @@ void WeaponMode_AE7F4_Enter(CGameObjectInstance *obj, CAI *ai) {
     *(f32 *) &ai->m_VarBuffer[3] = (f32) (gWeaponInfoTable[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * 15.0f);
 }
 
-extern s16 sChargeShotRecord_count;
 extern f32 Random_Blend(f32 lo, f32 hi); /* random in range */
 
 /* Weapon state: on release, charges by the time held (0.1 + t/45, at most 1)

@@ -721,12 +721,6 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
 extern void *func_00416B28_4143DC() __asm__("MenuPool_GetCamera");
 extern void func_00416C00_4143DC() __asm__("Menu_ResetFlash");
 extern void func_00416C0C_4143DC(void *p) __asm__("Menu_StartFlash");
-/* The colour records a window starts with (Menu colors): 8 records of six
- * words, of which it reads the low parts: halfwords at 2, 6, 0xA and bytes at
- * 0xF, 0x13, 0x17 (the ROM reads them at those addresses, 2 bytes into the
- * table, as halfword and byte loads: a word read and a cast would not match). */
-typedef struct { u8 pad0[2]; u16 a; u8 pad4[2]; u16 b; u8 pad8[2]; u16 c; u8 padC[3]; u8 d; u8 pad10[3]; u8 e; u8 pad14[3]; u8 f; } MenuColorInit;
-extern MenuColorInit gMenuColorDefaults[8];
 /* Builds a window in its block: the items from the desc's table, the
  * extras after them, the colours, then the desc's init and the items' select
  * callbacks flagged 0x04000000. */

@@ -1506,8 +1506,8 @@ typedef struct {
     /* 0x2C */ f32 m23;
     /* 0x30 */ f32 m30, m31, m32, m33;
 } DirMtx;
-extern CVector3 sCMtxFUp; /* {0, 1, 0} */
 
+extern CVector3 sCMtxFUp;   /* local: {0, 1, 0}, defined above with an asm label (CVector3 is an untagged typedef, so globals/math.h cannot declare it) */
 /* Builds an orientation matrix whose forward axis is direction. */
 void CMtxF__SetLookDirection(DirMtx *m, CVector3 *direction) {
     CVector3 up;
@@ -3425,7 +3425,6 @@ void Lighting_WriteVertexColors(s32 *file, CVector3 *src) {
 /* A world region record (0xC0 bytes). */
 
 
-extern char sLitVerticesName[];   /* "Lit Vertices" (defined below) */
 void func_0029E460(void *dst, void *src, s32 size);
 
 /* Collects the region records whose box overlaps q (at most 64); returns whether one is flagged. */

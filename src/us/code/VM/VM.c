@@ -202,7 +202,6 @@ void VM_UnmapTLBEntry(PageMapping *mapping) {
     mapping->slot = 0xFF;
 }
 
-extern s32 sVMRestartFlag;
 extern FaultedThread *__osGetCurrFaultedThread(void);     /* __osGetCurrFaultedThread */
 extern void osSetIntMask(s32);
 extern void SavedPlayers_Arm(void);

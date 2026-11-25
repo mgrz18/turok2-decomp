@@ -524,7 +524,6 @@ typedef struct { s32 m[4][4]; } Mtx64;   /* a packed N64 Mtx, 0x40 bytes */
 /* A model shown in the HUD (the weapon held up to the view). */
 
 
-extern f32 sHiResViewScaleX;
 void Render_InvalidateModeCache(void);
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
@@ -5497,7 +5496,6 @@ void PlayerSwim_Update(CPlayer *player, CGameObjectInstance *body) {
     }
 }
 
-extern CharacterSound sCharacterClimbSounds[];   /* per deathmatch character: .sound is the climbing step sound */
 s32 CGameRegion__IsSteep(void *region);
 f32 CGameRegion__GetDownhillYaw(void *region);
 f32 Angle_Difference(f32 from, f32 to);
@@ -5824,8 +5822,6 @@ typedef struct {
 } Mount;
 #endif
 
-extern f32 sMountStepLength;          /* step length */
-extern f32 gRidingForwardMoveTuning_forwardMax;          /* charge speed: gRidingForwardMoveTuning.forwardMax, its own symbol (through the struct 4 words differ) */
 void CCamera__SetShake(void *ui, f32 a, f32 b, f32 c, f32 d, s32 e, CVector3 pos);
 void CMtxF__SetRotateY(CMtxF *m, f32 angle);
 

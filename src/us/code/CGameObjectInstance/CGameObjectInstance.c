@@ -639,7 +639,6 @@ struct B10H {
     u8 pad0[0x2];
                 u16 h2;
 };
-extern f32 sAlignToGroundMax;
 s32 GameObject_IsOnGround(void *actor);
 /* The ground rotation through an out pointer: the definition's struct return (its hidden first
  * argument) under its own name on the N64, the port's shim (port/game/t2abi.c, ABI.md struct_scalar). */
