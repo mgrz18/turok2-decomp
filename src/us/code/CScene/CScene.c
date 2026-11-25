@@ -739,22 +739,18 @@ typedef struct {
 s32 CScene__IsLevelActorKilledInLevel(Unk00226B34 *arg0, s32 arg1, s32 arg2);
 s32 CScene__IsEventFiredInLevel(CScene *arg0, s32 arg1, s32 arg2);
 sptr CScene__GetLinkGroupCountPtr(CScene *arg0, s32 arg1);
-void SortRecord_Swap(RenderSortRecord *left, RenderSortRecord *right);
+void SortRecord_Swap(SortEntry *left, SortEntry *right);
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
 void CStaticObject__Draw(void *object, void *camera);
 void CGameObjectInstance__Draw(void *actor, void *camera);
 void CLevelActor__Draw(void *actor);
 typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ f32 key;
-} SortItem;
-typedef struct {
     /* 0x0 */ s32 unk0;
     /* 0x4 */ f32 key;
 } SortEntry_00226D0C;
 s32 SortRecord_CompareDescending(SortEntry_00226D0C *arg0, SortEntry_00226D0C *arg1);
-s32 SortRecord_Compare(SortItem *arg0, SortItem *arg1);
+s32 SortRecord_Compare(SortEntry *arg0, SortEntry *arg1);
 
 /* Sorts the list by distance from the camera, then draws it. */
 void CScene__DrawSortedList(DrawList *list, void *cam) {
@@ -6443,8 +6439,10 @@ DEFERRED sptr CScene__GetLinkGroupCountPtr(CScene *arg0, s32 arg1) {
     return CISet__GetBlock(temp_v0, 1) + arg1;
 }
 
-DEFERRED void SortRecord_Swap(RenderSortRecord *left, RenderSortRecord *right) {
-    RenderSortRecord temporary = *left;
+/* Sort_Quick's swap for CScene__DrawSortedList's SortEntry (round 30: typed as the entry; the
+ * RenderSortRecord it was typed with is the same 8 bytes on the N64 but half the host entry). */
+DEFERRED void SortRecord_Swap(SortEntry *left, SortEntry *right) {
+    SortEntry temporary = *left;
     *left = *right;
     *right = temporary;
 }
@@ -6460,11 +6458,12 @@ DEFERRED s32 SortRecord_CompareDescending(SortEntry_00226D0C *arg0, SortEntry_00
     return var_v0;
 }
 
-/* qsort-style comparator on the f32 key at 0x4. */
-DEFERRED s32 SortRecord_Compare(SortItem *arg0, SortItem *arg1) {
+/* Sort_Quick's comparator for the SortEntry: the farthest first (round 30: typed as the entry;
+ * the SortItem view read the key at 0x4, inside the host entry's item pointer). */
+DEFERRED s32 SortRecord_Compare(SortEntry *arg0, SortEntry *arg1) {
     s32 r = 1;
 
-    if (arg0->key > arg1->key) {
+    if (arg0->dist > arg1->dist) {
         r = -1;
     }
     return r;
