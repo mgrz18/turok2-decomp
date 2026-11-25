@@ -8,11 +8,11 @@
 .set noreorder
 .section .text, "ax"
 
-.globl D_0046642C
-.type D_0046642C, @object
-D_0046642C:
+.globl sPlayerFileHeadFill_2
+.type sPlayerFileHeadFill_2, @object
+sPlayerFileHeadFill_2:
     .word 0x27BD0028
-.size D_0046642C, 4
+.size sPlayerFileHeadFill_2, 4
 
 .globl gCollisionSetupTable_2
 .type gCollisionSetupTable_2, @object
