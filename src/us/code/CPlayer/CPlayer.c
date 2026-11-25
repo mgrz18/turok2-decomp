@@ -3775,10 +3775,6 @@ void CPlayer__UpdateWeaponSet(CPlayer *player) {
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/8021CD70_8.CPP, func_80220ED4_de, with Turok 2's layouts. */
 
-typedef struct Model {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 flags;
-} Model;
 /* What the actor stands in (GameObject_GetRegionInfo). */
 typedef struct Surface {
     /* 0x00 */ u8 pad0[0x44];
@@ -3836,7 +3832,7 @@ typedef struct Voice_24C47C {
 #endif
 /* CPlayer (structs/player.h) as CPlayer__Update reads it, kept local: it uses
  * the player both as itself and as its m_CharacterActor (actor = p), and
- * several words are typed against the header (0x10 the region as a Model,
+ * several words are typed against the header (0x10 the region as a CGameRegion,
  * the controller's 0x08 as a position, the weapon actor's 0x3F4 as a voice,
  * u32 flags), which would take a cast at most uses. */
 #ifdef TARGET_PORT
@@ -3846,7 +3842,7 @@ typedef struct Player {
 #define T2_HOFF_PL(m) __builtin_offsetof(CPlayer, m)
     union {
         struct { u8 _hp_pos[T2_HOFF_PL(m_CharacterActor.header.m_vPos)]; CVector3 pos; }; /* N64 0x4 */
-        struct { u8 _hp_model[T2_HOFF_PL(m_CharacterActor.header.m_pCurrentRegion)]; Model *model; }; /* N64 0x10 */
+        struct { u8 _hp_model[T2_HOFF_PL(m_CharacterActor.header.m_pCurrentRegion)]; CGameRegion *model; }; /* N64 0x10 */
         struct { u8 _hp_def[T2_HOFF_PL(m_CharacterActor.header.m_pIntelligence)]; CIntelligence *def; }; /* N64 0x14 */
         struct { u8 _hp_velY[T2_HOFF_PL(m_CharacterActor.m_vVelocity.y)]; f32 velY; }; /* N64 0x1C */
         struct { u8 _hp_unk40[T2_HOFF_PL(m_CharacterActor.m_qGround)]; Quad unk40; }; /* N64 0x40 */
@@ -3858,7 +3854,7 @@ typedef struct Player {
         struct { u8 _hp_owner[T2_HOFF_PL(m_CharacterActor.m_AI.m_pParent)]; struct Player *owner; }; /* N64 0x1A8 */
         struct { u8 _hp_emitter[T2_HOFF_PL(m_WeaponActor.header)]; u8 emitter[4]; }; /* N64 0x288 */
         struct { u8 _hp_emitterPos[T2_HOFF_PL(m_WeaponActor.header.m_vPos)]; CVector3 emitterPos; }; /* N64 0x28C */
-        struct { u8 _hp_emitterModel[T2_HOFF_PL(m_WeaponActor.header.m_pCurrentRegion)]; Model *emitterModel; }; /* N64 0x298 */
+        struct { u8 _hp_emitterModel[T2_HOFF_PL(m_WeaponActor.header.m_pCurrentRegion)]; CGameRegion *emitterModel; }; /* N64 0x298 */
         struct { u8 _hp_emitter40[T2_HOFF_PL(m_WeaponActor.m_qGround)]; Quad emitter40; }; /* N64 0x2C8 */
         struct { u8 _hp_emitterYaw[T2_HOFF_PL(m_WeaponActor.m_RotY)]; f32 emitterYaw; }; /* N64 0x2D8 */
         struct { u8 _hp_unk3C8[T2_HOFF_PL(m_WeaponActor.m_AI)]; u8 unk3C8[0x3F4 - 0x3C8]; }; /* N64 0x3C8 */
@@ -3914,7 +3910,7 @@ typedef struct Player {
 typedef struct Player {
     /* 0x0000 */ u8 pad0[4];
     /* 0x0004 */ CVector3 pos;
-    /* 0x0010 */ Model *model;
+    /* 0x0010 */ CGameRegion *model;
     /* 0x0014 */ CIntelligence *def;
     /* 0x0018 */ u8 pad18[4];
     /* 0x001C */ f32 velY;
@@ -3934,7 +3930,7 @@ typedef struct Player {
     /* 0x01AC */ u8 pad1AC[0x288 - 0x1AC];
     /* 0x0288 */ u8 emitter[4];
     /* 0x028C */ CVector3 emitterPos;
-    /* 0x0298 */ Model *emitterModel;
+    /* 0x0298 */ CGameRegion *emitterModel;
     /* 0x029C */ u8 pad29C[0x2C8 - 0x29C];
     /* 0x02C8 */ Quad emitter40;
     /* 0x02D8 */ f32 emitterYaw;
@@ -4059,7 +4055,7 @@ static __inline__ s32 not_flagged(u32 flags, u32 bit) {
 /* Entering a surface that changes the player's state (flags 0x40000): through
  * a 0x200000 surface only from one without the flag, otherwise only from
  * above the floor. */
-static __inline__ void enter_surface(Player *p, Player *actor, Surface *before, Surface *after, Model *model) {
+static __inline__ void enter_surface(Player *p, Player *actor, Surface *before, Surface *after, CGameRegion *model) {
     s32 ok = 0;     /* dead store, but it keeps the 2.5f of the shake out of the loop's hoisted invariants */
 
     if (p->stateFlags & 0x8000) {
@@ -4098,8 +4094,8 @@ void CPlayer__Update(Player *p) {
     Player *actor;
     GameSettings *game;
     s32 enable;
-    Model *oldModel;
-    Model *model;
+    CGameRegion *oldModel;
+    CGameRegion *model;
     Surface *material;
     Surface *before;
     Surface *under;
@@ -4220,7 +4216,7 @@ void CPlayer__Update(Player *p) {
         if (gEngineApp_m_Settings.multiplayer == 0) {
             CVector3 *pos = &p->pos;
 
-            if (model != NULL && pos != NULL && (model->flags & 0x40)) {
+            if (model != NULL && pos != NULL && (model->m_wFlags & 0x40)) {
                 f32 amount = (s32) (CGameRegion__GetCeilingHeight(model, p->pos.x, pos->z) - CGameRegion__GetHeight(model, p->pos.x, pos->z));
 
                 if (amount < 1024.0f) {
@@ -4357,7 +4353,7 @@ void CPlayer__Update(Player *p) {
                 GameObject_FireTriggers((u8 *)gCollisionResults.m_pInstance, soundFlags | 2, actor);
             }
             if (gCollisionResults.m_pWallRegion != NULL) {
-                CGameRegion__FireTriggers((Model *)gCollisionResults.m_pWallRegion, linkFlags | 4, actor);
+                CGameRegion__FireTriggers((CGameRegion *)gCollisionResults.m_pWallRegion, linkFlags | 4, actor);
             }
             CPlayer__RamWithMount(p, actor, stateFlags);
             landed = CPlayer__TryMount(p, actor, stateFlags);
