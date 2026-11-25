@@ -23,7 +23,7 @@ different scan, said 717 of 1,699); after the first pass, 612 of 1,557;
 after the second, 534 of 1,416; after the third, 431 of 1,192; after the
 fourth, 291 of 1,013; after round L, 229 of 889 (228 of 863 by the census at
 7340fcdd); after round 21 j3, 174 of 803; after round 22 k3, 148 of 723 (142 of 698 on the
-merged tree); after round 24 m1, 115 of 669; after the round-24 module merges (same-module copies folded), 112 of 665; after round 25 n1, 110 of 657; after round 26 o1, 113 of 624 (the vm1/vm2 twin copies with one layout hoisted, below); after the round-26 merge, 110 of 624 (the `Video` and `AutomapDraw` merges fold their same-module copies); after the round-27 merge, 91 of 629 (the 23 directories merged fold their same-module copies; p1 hoisted `structs/hud.h`, `weapon_node.h`); after the round-28 merge, 84 of 596 (the 12 directories merged fold their same-module copies; q1/q2 put the scheduler, CCache, CGameRegion and CAudioWorld views on their engine types); after the round-29 merge, **74 of 576** (the 14 directories merged fold their same-module copies; every module is one C file now, so a name left in two files is in two modules); on the round-25 merged tree, 144 of 656: part n3 wrote the 100 vm2 functions that were asm as C copies of their vm1 twins, each with its twin's local structs (146 of 666 on n3 alone), so most of the increase is VM-copy pairs, which the census counts as two files. The vector,
+merged tree); after round 24 m1, 115 of 669; after the round-24 module merges (same-module copies folded), 112 of 665; after round 25 n1, 110 of 657; after round 26 o1, 113 of 624 (the vm1/vm2 twin copies with one layout hoisted, below); after the round-26 merge, 110 of 624 (the `Video` and `AutomapDraw` merges fold their same-module copies); after the round-27 merge, 91 of 629 (the 23 directories merged fold their same-module copies; p1 hoisted `structs/hud.h`, `weapon_node.h`); after the round-28 merge, 84 of 596 (the 12 directories merged fold their same-module copies; q1/q2 put the scheduler, CCache, CGameRegion and CAudioWorld views on their engine types); after the round-29 merge, 74 of 576 (the 14 directories merged fold their same-module copies; every module is one C file now, so a name left in two files is in two modules); after round 30 (s1, then the merge typed the three md5-only views), **7 of 508**: every name left is a different object under a generic name (below); on the round-25 merged tree, 144 of 656: part n3 wrote the 100 vm2 functions that were asm as C copies of their vm1 twins, each with its twin's local structs (146 of 666 on n3 alone), so most of the increase is VM-copy pairs, which the census counts as two files. The vector,
 intelligence, libultra, Gfx, sound, libaudio, AI state (CAI and its
 var-buffer views), controller, game and engine, weapon, pak, list, cache,
 boss, particle, collision, save, demo, pager, menu, player / owner /
@@ -950,7 +950,7 @@ mechanical hoist.
 
 ## Round 30, part s1: the repeated names to the end (done)
 
-Census **74 of 576 -> 10 of 510** local names in 2+ files (`tools/struct_census.py`; the tables at
+Census **74 of 576 -> 10 of 510** on s1, **7 of 508** after the round-30 merge typed the views s1 kept for the md5 (below), local names in 2+ files (`tools/struct_census.py`; the tables at
 the end of this file). `asm_diff --base a51f830f` 0 over the tree after each batch.
 
 **Hoisted or merged into headers (one object):**
@@ -1001,7 +1001,7 @@ Tried and left: `CScene__GetRegion`'s N64 view (`Arg0`, now the only one of its 
 port's CGameRegion arithmetic (a different multiply), the CParticle `ShadowActor` through
 `tools/unview.py` (the N64 code changes: KEPT).
 
-**What the 10 names left are**: seven are different objects under a generic name (two of them libultra's own), three keep an N64-offset view the port's default run depends on (below):
+**What the 7 names left are** (after the round-30 merge): different objects under one generic name, two of them libultra's own (the one view among them, CParticle's ShadowActor in the FAKEMATCH shadow-sprite code, changes the N64 code when typed):
 
 | Name | Files | Why it stays |
 |---|---|---|
@@ -1011,31 +1011,28 @@ port's CGameRegion arithmetic (a different multiply), the CParticle `ShadowActor
 | Reader | seq (libultra), MantidQueen | libultra's sequence reader (kept as ultralib has it); the Mantid Queen's chunk reader at 0x214 of its boss block. |
 | S | AI, Anim | AI: the cycle cursor `{s16 *base, *p}`; Anim: the by-value `{s32, CVector3, s32}` argument of its setters. |
 | ShadowActor | CLevelActor, CParticle | CLevelActor: the argument of Actor_DrawGroundShadow (only reached through a pointer table): position at 0x04, region at 0x10, four shadow matrices at 0xB8, which no known struct has there (not CLevelActor: m_Matrices at 0x38; not CGameObjectInstance: 0xB8 is m_pLeashRegion). CParticle: a CParticle view in the FAKEMATCH shadow-sprite code; replacing it changes the N64 code (unview.py: KEPT). |
-| Arg0 | CCache, CScene | CCache: CMemEntry__Unlock's CMemEntry (lockCount 0x8, flags 0xC), kept (below); CScene: CScene__GetRegion's N64 view of m_pRegionData (the port's copy reads the member; one body over both changes the multiply). Two objects. |
-| SortItem | CScene, Sweep | CScene: SortRecord_Compare's view of CScene__DrawSortedList's SortEntry, kept (below); Sweep: Collision_CompareInstanceHits' `{void *, f32}` hit record (HitSortRecord). Two objects. |
-| Sound | EnemyAI, SpeechPlayer | EnemyAI: the attached looping sound (a SndSource), kept (below); SpeechPlayer: the speech player's channel (N64 only; the port has its own). Two objects. |
 | TimedNode | CScene, synthesizer (libultra) | CScene's timed-item list node `{prev, next, item, timer}`; libultra's synthesizer node `{next, .., time}`. |
 
-**Views kept because the port's default run depends on their host reading.** Typed as the real
-struct (asm_diff 0) the five below read the right member on the host where the view reads the N64
-offset, and the default whole-game run's det md5 changed (b0d4a8ed for af8bd840: the first
-divergence is level 133, frame 40195, an actor hash; the R30 s2 run is the reference). They are
-back as views, in one commit, so the fix is one revert when the md5 reference may move:
+**The five views s1 kept for the md5, typed at the round-30 merge.** s1 put five N64-offset views
+back in one commit (c1095952) only so that the port's default det md5 would not move. The project
+rule is that a player gets the N64 behaviour and host-bug fixes are kept, so the round-30 merge
+reverted that commit. Typed as the real structs the N64 code is identical (`asm_diff` 0, `make
+verify`), and on the host:
 
-- CScene `SortItem` / `SortRecord_Swap(RenderSortRecord *)`: the translucent list's SortEntry is 16
-  bytes on the host; the comparator reads the key at 0x4 (inside the item pointer) and the swap
-  moves 8 bytes. As SortEntry: sorted by `dist`, whole entries swapped.
-- CCache `Arg0` (CMemEntry__Unlock): on the host 0x8 is CMemEntry.size and 0xC lockCount, so the
-  unlock decrements the size and clears the lock bit in the count. As CMemEntry: lockCount, flags.
-- CCamera `ListOwner` (CCameraPool__ReleaseCameraTexts): 0xE28 is not m_ActiveTextList in the host
-  CCamera. As CCamera: m_ActiveTextList.
-- EnemyAI `Sound`: the looping sound's id read at 0xC (the high half of SndSource.next on the
-  host). As SndSource: `sound.w`.
-- StatsMenu_2 `Target` (StatsMenu_ShowTagsRow_2): item 7's flags at the N64 0x120. As MenuItem
-  (`items[7].flags`), like the vm1 copy.
+- CScene `SortItem` / `SortRecord_Swap(RenderSortRecord *)` -> SortEntry: the translucent list is
+  sorted by `dist` and whole 16-byte entries are swapped (the view read the key at 0x4, inside the
+  item pointer, and swapped half of each entry).
+- CCache `Arg0` (CMemEntry__Unlock) -> CMemEntry: the unlock decrements `lockCount` and clears the
+  lock bit in `flags` (the view decremented `size` and cleared the bit in the lock count).
+- CCamera `ListOwner` (CCameraPool__ReleaseCameraTexts) -> CCamera: it walks `m_ActiveTextList`
+  (0xE28 is another member in the host CCamera).
+- EnemyAI `Sound` -> SndSource: the looping sound's id is `sound.w` (the view read the high half of
+  `next`, so the looping sound was stopped and restarted every frame).
+- StatsMenu_2 `Target` (StatsMenu_ShowTagsRow_2) -> MenuItem: `items[7].flags`, as the vm1 copy.
 
-Which of them moves the md5 was not bisected (the first two touch the draw order and the cache; the
-EnemyAI one stops and restarts the looping sound every frame on the host today).
+The port's reference md5s moved with them (docs/port/STATUS.md, round 30). With the views gone,
+`Arg0` (CScene__GetRegion's N64 view), `SortItem` (Sweep's hit record) and `Sound` (the speech
+player's channel) are each left in one file and no longer repeat.
 
 ## The families to merge next
 
@@ -1121,7 +1118,7 @@ their own (top 0 of 0).
 
 ## Every local struct name defined in 2 or more files
 
-10 of the 510 local typedef names. "Fields" are the named offsets of the
+7 of the 508 local typedef names. "Fields" are the named offsets of the
 most common layout (pads left out); a body without offset comments is shown
 as written.
 
@@ -1129,13 +1126,10 @@ as written.
 |---|---|---|---|---|
 | Entry | 3 | 3 | 0x0C unkC | Anim, CMtxF, CParticle |
 | AnimHeader | 2 | 2 | 0x00 radius, 0x04 frames, 0x08 encoding, 0x0C fC, 0x10 rotTracks, 0x14 posTracks, 0x18 frameCount, 0x1C frameStep | Anim, func_00218B10 |
-| Arg0 | 2 | 2 | 0x8 refCount, 0xC flags | CCache, CScene |
 | Attachment | 2 | 2 | 0x00 field0, 0x02 type, 0x04 field4, 0x08 offset, 0x14 params | CStaticObject, DList |
 | Reader | 2 | 2 | 0x8 *p | seq, MantidQueen |
 | S | 2 | 2 | `s16 *base; s16 *p;` | AI, Anim |
 | ShadowActor | 2 | 2 | 0x04 x, 0x08 y, 0x0C z, 0x10 region, 0xB8 shadowMatrices[4] | CLevelActor, CParticle |
-| SortItem | 2 | 2 | 0x4 key | CScene, Sweep |
-| Sound | 2 | 2 | 0x0C id | EnemyAI, SpeechPlayer |
 | TimedNode | 2 | 2 | 0x00 *prev, 0x04 *next, 0x08 *item, 0x0C timer | CScene, synthesizer |
 
 ## Files that are readable only on paper
