@@ -1158,15 +1158,12 @@ DEFERRED s32 MantidQueen_GetTurnSide(s32 a0, s32 a1, s32 a2) {
     return result;
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x40];
-} Path;
-extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, Path *path);
+extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, CAIFrameMotion *path);
 extern f32 func_00298470(f32); /* sqrtf */
 
 void MantidQueen_ChooseAttack(CGameObjectInstance *actor, CAI *ai) {
     CAITargets t;
-    Path path;
+    CAIFrameMotion path;
     CVector3 v;
     WaveBossStep *step;
     WaveBossState *boss = &gMantidQueen;
