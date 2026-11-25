@@ -102,15 +102,6 @@ void *CDLightSet__Alloc(CDLightSet *arg0, void *arg1) {
 
 #include "structs/camera.h"
 
-/* An element going back on its owner's list at 0x14. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x16];
-    /* 0x16 */ s16 unk16;
-} DLightListElem;
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ CList m_List;
-} ListOwner;
 void CList__AddHead(CList *, void *);               /* extern */
 void CList__Remove();                               /* extern */
 
