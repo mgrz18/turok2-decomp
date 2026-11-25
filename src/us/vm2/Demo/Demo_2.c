@@ -292,13 +292,9 @@ void func_00468520(DemoStream *t, sptr bits, s32 pos, s32 player, void (*decode)
     t->unk1C = unk1C;
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 (*callback)();
-} Arg0;
-
-void DemoStream_Decode_2(Arg0 *arg0) {
-    arg0->callback();
+/* Reads the stream's next value: its decode callback. */
+void DemoStream_Decode_2(DemoStream *arg0) {
+    arg0->decode(arg0);
 }
 
 

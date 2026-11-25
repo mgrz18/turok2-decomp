@@ -362,14 +362,9 @@ VM_TEXT void DemoStream_Init(DemoStream *t, sptr bits, s32 pos, s32 player, void
     t->unk1C = unk1C;
 }
 
-/* Something with a handler at 0x14 that this calls. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 (*handler)();
-} HandlerHolder;
-
-VM_TEXT void DemoStream_Decode(HandlerHolder *arg0) {
-    arg0->handler();
+/* Reads the stream's next value: its decode callback. */
+VM_TEXT void DemoStream_Decode(DemoStream *arg0) {
+    arg0->decode(arg0);
 }
 
 typedef struct {
