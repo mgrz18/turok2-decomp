@@ -508,10 +508,9 @@ s32 Cinema_OverridesMusic1(void) {
     return gCinemaPlayerP->spec.unk40;
 }
 
-extern s32 D_800C1BC4;
 
 void Cinema_SetHoldFade(s32 arg0) {
-    D_800C1BC4 = arg0;
+    gCinemaHoldFade = arg0;
 }
 
 f32 Cinema_GetFOV(f32);

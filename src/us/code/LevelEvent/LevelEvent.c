@@ -160,18 +160,15 @@ void Event_PlayCinemaRemote(sptr arg0) {
     }
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[6];
-    /* 0x06 */ u16 sound;
-} SoundEvent;
 void Music_SetTrack(s32 arg0);
 
-void Event_PlaySoundOrMusic(s32 arg0, s32 arg1, SoundEvent *arg2) {
-    if ((u16) arg2->sound >= 0x100U) {
-        Sound__PlaySpeech(arg2->sound);
+/* The event's param: a speech (0x100 on) or a music track. */
+void Event_PlaySoundOrMusic(s32 arg0, s32 arg1, LevelEvent *arg2) {
+    if ((u16) arg2->param >= 0x100U) {
+        Sound__PlaySpeech(arg2->param);
         return;
     }
-    Music_SetTrack((s32) arg2->sound);
+    Music_SetTrack((s32) arg2->param);
 }
 
 /* A key event fired by an animation or a script: its handler gets (object, AI, event). */

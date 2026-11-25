@@ -9,4 +9,7 @@ extern f32 gQuaternionSin;  /* the inlined axis-angle quaternion builder's sin o
 
 extern f32 gAcosTable[1024];    /* Math_AcosLookup, interpolated */
 
+/* Round 30 s2: CMtxF's data defined in place (asm labels) */
+extern char sLitVerticesName[];     /* "Lit Vertices": the cache description of the lit vertex blocks */
+
 #endif

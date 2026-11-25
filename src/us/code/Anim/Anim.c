@@ -178,7 +178,7 @@ void CAnimationState__GetBonePosition(R05Anim *a, s32 idx, f32 time, f32 *out)
     } while (k < 3);
 }
 
-/* 1/32767: a quaternion component from its s16 (D_800A58F4) */
+/* 1/32767: a quaternion component from its s16 (the literal at 0x800A58F4) */
 void CQuaternion__Slerp(f32 *out, f32 t, void *a, void *b);
 
 void CAnimationState__GetBoneRotation(R05Anim *a, s32 idx, f32 time, f32 *out)
@@ -425,7 +425,6 @@ s32 Anim_DecodeTracks(sptr source, TrackTable *table, s32 tracks, s32 channels, 
     return 1;
 }
 
-extern f32 D_800ACB50; /* 90.0f: the largest value accepted */
 /* r = ceil(x), through an int. */
 #define CEILF(r, x)                     \
     if ((x) <= 0.0f) {                  \
@@ -451,11 +450,11 @@ f32 Anim_CalcKeyCount(f32 a, f32 b) {
         return 1.0f;
     }
     CEILF(r, a / b * 30.0f)
-    if (r < D_800ACB50) {
+    if (r < sAnimMaxKeyCount) {
         return r;
     }
     CEILF(r, a / b * 15.0f)
-    if (r < D_800ACB50) {
+    if (r < sAnimMaxKeyCount) {
         return r;
     }
     return a;
@@ -481,11 +480,8 @@ typedef struct AnimHeader {
     /* 0x18 */ f32 frameCount;
     /* 0x1C */ f32 frameStep;
 } AnimHeader;
-typedef struct Resource {
-    /* 0x0 */ s32 *file;
-    /* 0x4 */ s32 size;
-} Resource;
-s32 ProPackDecompress(Resource **res, s32 arg1);
+#include "structs/cache.h"
+s32 ProPackDecompress(CMemEntry **res, s32 arg1);
 void func_0029E460(void *dst, void *src, s32 size);
 
 static __inline__ void packInit(AnimPack *pack, s32 count) {
@@ -551,7 +547,8 @@ static __inline__ s32 decodeAnim(void *src, void *dst) {
     return ok;
 }
 
-void Anim_Decompress(s32 arg0, Resource **res) {
+/* the cache block (CMemEntry) the animation was read into */
+void Anim_Decompress(s32 arg0, CMemEntry **res) {
     s32 size0;
     s32 size1;
     s32 size2;
@@ -580,7 +577,7 @@ void Anim_Decompress(s32 arg0, Resource **res) {
     if (ProPackDecompress(res, 1) == 0) {
         return;
     }
-    file = (*res)->file;
+    file = (*res)->data;
     oldSize = (*res)->size;
     chunk0 = CISet__GetBlockAndSize(file, 0, &size0);
     chunk1 = CISet__GetBlockAndSize(file, 1, &size1);

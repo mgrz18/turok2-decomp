@@ -8,14 +8,9 @@
 #include "globals/engine.h"
 #include "protos/cache.h"
 
-typedef struct AnimationInfo {
-    /* 0x0 */ s32 frameCount;
-    /* 0x4 */ s32 unk4;
-    /* 0x8 */ u8 *frame;            /* format, rate, log2 width, log2 height */
-    /* 0xC */ u8 padC[4];
-} AnimationInfo;
+#include "structs/texture.h"
 extern void *Texture_Request(void *texture);
-extern void Texture_GetInfo(void *resource, AnimationInfo *info);
+extern void Texture_GetInfo(void *resource, TextureInfo *info);
 extern void Texture_Load(void *texture, void *resource, s32 frame, s32, s32 scaleS, s32 scaleT, s32, s32, s32);
 extern void Render_SetCombineMode(s32 mode);
 extern f32 Plane_SegmentFraction(f32 *plane, CVector3 *from, CVector3 *to);
@@ -24,7 +19,7 @@ extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out =
 
 /* Clips and draws an emitter as a textured translucent fan at its depth. */
 void CEmitter__Draw(CEmitter *object, CCamera *view) {
-    AnimationInfo animation;
+    TextureInfo animation;
     CVector3 points[5];
     f32 red[5], green[5], blue[5], alpha[5];
     CVector3 triangle[3];
@@ -36,7 +31,7 @@ void CEmitter__Draw(CEmitter *object, CCamera *view) {
     void *resource;
     CEmitterDef *descriptor;
     s32 frameIndex, scaleS, scaleT;
-    u8 *frame;
+    TextureFrame *frame;
     f32 phase, fadeRange, fadeOffset;
     s32 format;
     s32 i, face, first, second, third;
@@ -47,24 +42,24 @@ void CEmitter__Draw(CEmitter *object, CCamera *view) {
     resource = Texture_Request(object->m_Texture);
     if (resource != NULL) {
         Texture_GetInfo(resource, &animation);
-        if (animation.frameCount != 0) {
+        if (animation.count != 0) {
             descriptor = object->m_pDef;
             frame = animation.frame;
-            phase = object->m_Phase / frame[1];
+            phase = object->m_Phase / frame->speed;
             scale = descriptor->m_TextureScale * (object->m_TextureScale * 768.0f);
-            scaleS = (s32)((1 << frame[2]) * scale);
-            scaleT = (s32)((1 << frame[3]) * scale);
+            scaleS = (s32)((1 << frame->shiftS) * scale);
+            scaleT = (s32)((1 << frame->shiftT) * scale);
             {
                 Gfx *g = gDList++;
                 g->w0 = 0xE7000000;     /* gDPPipeSync */
                 g->w1 = 0;
             }
-            frameIndex = (s32)phase % animation.frameCount;
+            frameIndex = (s32)phase % animation.count;
             Texture_Load(object->m_Texture, resource, frameIndex, 0, scaleS, scaleT, 0, 0, 15);
             texturePeriod = 5120.0f;
             wrapPeriod = 10240.0f;
             frame = animation.frame;
-            format = frame[0];
+            format = frame->format;
             switch (format) {
             case 2:
             default:

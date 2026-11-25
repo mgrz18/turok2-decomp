@@ -700,14 +700,13 @@ extern s32 Menu_StepValueLR_2(Menu *a, s32 cur, s32 step, s32 lo, s32 hi, s32 wr
 extern void CPlayer__SetCharacter_2(CPlayer *player, s32 v);
 extern void MenuItem_SetModel_2(void *a, s32 b, s32 c);
 extern void Sound__Play2D(s32 a);
-extern s16 D_800C1E7A[][2];     /* 2 bytes into the module copy of gCharacterSelectSounds: [i][0] is the sound */
 
 s32 CharacterMenu_SelectCharacter_2(void *x, Menu *m, void *y) {
     CPlayer *player = m->player;
     CPlayerOptions *options = player->m_pOptions;
     if (Controller_ConfirmPressed(m->controller)) {
         CPlayer__SetCharacter_2(player, options->m_nCharacter);
-        Sound__Play2D(D_800C1E7A[player->m_Data.m_nDeathmatchCharacter][0]);
+        Sound__Play2D(gCharacterSelectSounds[player->m_Data.m_nDeathmatchCharacter].sound);
         MenuPool_OpenChildMenu_2((sptr)y, (sptr)m, &gPlayerSetupMenuDesc_2);
         return 1;
     } else {

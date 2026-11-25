@@ -6,7 +6,7 @@
 
 /* ultralib's float matrix (not rw/abu_types.h's struct Matrix) */
 typedef float GuMatrix[4][4];
-typedef struct { long m[4][4]; } Mtx;
+#include "structs/gu.h"
 void guMtxIdentF(float mf[4][4]);          /* guMtxIdentF */
 void guMtxF2L(float mf[4][4], Mtx *m);  /* guMtxF2L */
 float func_00298470(float x);                /* sqrtf */

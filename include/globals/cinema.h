@@ -9,4 +9,8 @@ extern s32 gCinemaEnabled;          /* Cinema_Enable / Cinema_Disable */
 
 extern s32 sCinemaLastFrame; /* gFrameCount when Cinema_Update last ran (-1) */
 
+/* Round 30 s2: two words of the VM data blob (C24E0), named by their users */
+extern s32 gCinemaHoldFade;         /* Cinema_SetHoldFade: the cinema draw keeps the fade while it is set */
+extern f32 gCinemaFadeBias;         /* Cinema_GetFadeAlpha stretches the fade value by it */
+
 #endif

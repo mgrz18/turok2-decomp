@@ -4,17 +4,10 @@
 #include "globals/menu.h"
 #include "globals/game.h"
 
-typedef struct Layer {
-    /* 0x000 */ u8 pad0[0x2D8];
-    /* 0x2D8 */ s32 flags;
-} Layer;
-typedef struct Screen {
-    /* 0x0 */ u8 pad0[0xC];
-    /* 0xC */ Layer *layer;
-} Screen;
+#include "structs/menu.h"
 
 /* Picks the first of the 11 options whose flag is set in the settings (-1 if none). */
-void CheatsMenu_Init_2(Screen *screen) {
+void CheatsMenu_Init_2(Menu *menu) {
     s32 index = 0;
     s32 n;
     u32 bit;
@@ -70,9 +63,9 @@ void CheatsMenu_Init_2(Screen *screen) {
 found:
     sCheatsMenuSelection = index;
     if (index != -1) {
-        screen->layer->flags |= 0x1800000;
+        menu->items[18].flags |= 0x1800000;
     } else {
-        screen->layer->flags &= ~0x1800000;
+        menu->items[18].flags &= ~0x1800000;
     }
 }
 

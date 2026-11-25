@@ -33,27 +33,17 @@ s32 StatsMenu_ContinueYes_2(s32 menu, Menu *c) {
     return 1;
 }
 
-typedef struct RenderCounters {
-    u8 pad0[0x34];
-    s32 option34;                /* 0x34 (0x54) */
-    u8 pad38[8];
-    s32 unk40;                   /* 0x40 (0x74) */
-} RenderCounters;
-typedef struct Shared_Game {
-    u8 pad0[0x5D8];
-    RenderCounters counters;     /* 0x5D8 */
-} Shared_Game;
 typedef struct GameSession GameSession;
 extern int gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern void CEngineApp__QuitToLegal_2(GameSession *);
 
 int StatsMenu_ContinueNo_2(int unused, Menu *menu) {
-    RenderCounters *sync = (RenderCounters *) &gEngineApp_m_Settings.match;
+    GameMatch *sync = &gEngineApp_m_Settings.match;
     int team;
-    if (sync->option34 != 0) {
+    if (sync->tag != 0) {
         team = menu->player->m_pOptions->m_TagMode;
         if (team == 1) {
-            sync->unk40 = team;
+            sync->tagPhase = team;
         }
     }
     if (gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount == 1) {
@@ -154,22 +144,18 @@ s32 StatsMenu_PlayerRowText_2(MenuItem *item, Menu *event) {
     return 0;
 }
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x120];
-    /* 0x120 */ s32 flags;
-} Target;
 
 void StatsMenu_ShowTagsRow_2(Menu *arg0) {
-    Target *temp_a0;
-    Target *temp_v0;
+    MenuItem *temp_a0;
+    MenuItem *temp_v0;
 
     if (gEngineApp_m_Settings.match.tag != 0) {
-        temp_v0 = (Target *) arg0->items;
-        temp_v0->flags = (s32) (temp_v0->flags | 0x01000000);
+        temp_v0 = arg0->items;
+        temp_v0[7].flags = (s32) (temp_v0[7].flags | 0x01000000);
         return;
     }
-    temp_a0 = (Target *) arg0->items;
-    temp_a0->flags = (s32) (temp_a0->flags & 0xFEFFFFFF);
+    temp_a0 = arg0->items;
+    temp_a0[7].flags = (s32) (temp_a0[7].flags & 0xFEFFFFFF);
 }
 
 /* The window's item records are 0x28 bytes apart, item i's flags word at

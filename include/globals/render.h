@@ -13,6 +13,13 @@
 extern s32 gScreenWidth;            /* Turok 3's screen_width */
 extern s32 gScreenHeight;           /* Turok 3's screen_height */
 extern s32 gResolution;             /* the resolution set, index in gVideoModes */
+/* Its low byte, which OptionsMenu_ToggleResolution reads with a byte load at gResolution + 3
+ * (0x800C203B); the host is little-endian, so it takes the value's low byte. */
+#ifdef TARGET_PORT
+#define RESOLUTION_LOW_BYTE ((u8) gResolution)
+#else
+#define RESOLUTION_LOW_BYTE (((u8 *) &gResolution)[3])
+#endif
 extern s32 gAppliedResolution;      /* the resolution last applied */
 extern s32 gVideoClearFrames;       /* frames left to clear the screen around a mode change */
 extern s32 gVideoDitherFilter;      /* the mode's antialias flag: OS_VI_DITHER_FILTER_ON/OFF (Video_ApplyResolution) */
@@ -92,6 +99,13 @@ extern Vtx_t gUnitQuadVtx[4];        /* the unit quad Render_InitUnitQuad builds
 
 /* The VI mode: the selected mode index */
 extern s16 sViModeIndex;            /* the selected VI mode (osViModeTable index) */
+/* Video_SetMode's VI mode table: by TV region (0 NTSC, 1 PAL, 2 MPAL) and flags (1 and 4: wider than 320,
+ * 2: anti-aliased), a word whose low half is the osViModeTable index (read as a halfword). */
+typedef struct ViModeChoice {
+    /* 0x0 */ u16 pad0;
+    /* 0x2 */ u16 index;
+} ViModeChoice;
+extern ViModeChoice gViModeChoices[3][8];
 
 /* Round 24 (m2): BSS words named (versions/names/data_g6.us.txt) */
 

@@ -105,7 +105,7 @@ def compile_one(tree, rel, out_dir):
         r = subprocess.run([str(CC1), *flags, "-o", str(out), str(i)], capture_output=True, text=True)
         if r.returncode:
             out.unlink(missing_ok=True)
-            return "cc1: " + "\n".join(l for l in r.stderr.splitlines() if "warning" not in l)[:2000]
+            return "cc1: " + "\n".join(l for l in r.stderr.splitlines() if "warning" not in l and "In function" not in l)[:2000]
     return None
 
 

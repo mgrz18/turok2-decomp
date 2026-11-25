@@ -782,10 +782,7 @@ void EnemyAI_AttackWait(CGameObjectInstance *actor, CAI *ai) {
  * the behaviour index at 0x133 was m_Enemy.m_BehaviorIndex, the current mode row at 0x30). */
 
 /* The attached looping sound (only its id). */
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 id;
-} Sound;
+#include "structs/sound.h" /* SndSource: the looping sound (LoopSounds_Start's record) */
 void *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
 
 /* AI update: age, scale the frame time, run the current mode handler (its
@@ -894,7 +891,7 @@ void EnemyAI_Update(CGameObjectInstance *obj, CAI *ai) {
         Sound__Play(0x3D1, obj->header.m_vPos, 0, -1);
         if (ai->m_Health) {
             AI_StartSound(obj, ai, 0x3D2);
-        } else if (ai->m_pAttachedLoopingSound != NULL && ((Sound *) ai->m_pAttachedLoopingSound)->id != 0x3D2) {
+        } else if (ai->m_pAttachedLoopingSound != NULL && ((SndSource *) ai->m_pAttachedLoopingSound)->sound.w != 0x3D2) {
             AI_StopSound(obj, ai);
         }
     } else {

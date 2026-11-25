@@ -4,7 +4,7 @@
 #include "structs/collision.h"
 #include "globals/collision.h"
 
-extern u8 D_800C894C;                   /* bottom of the stack */
+#include "globals/frame.h"     /* MAIN_STACK_GUARD */
 #ifdef TARGET_PORT
 /* the N64 compares the stack pointer with its main stack's bottom; the host asks its own thread's
  * stack (t2os_stack_low, port/runtime/t2os.c: the address comparison depended on the layout) */
@@ -26,7 +26,7 @@ void Collision_SweepRegionWalls(CGameRegion *region) {
     u8 cornerDone[3];
     s32 i;
 
-    if (T2_STACK_LOW(&region, &D_800C894C)) {
+    if (T2_STACK_LOW(&region, MAIN_STACK_GUARD)) {
         return;
     }
     i = 0;

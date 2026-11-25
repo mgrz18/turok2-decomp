@@ -96,38 +96,24 @@ void TotemDefense_InitFight_2(ObjState *arg0, CGameObjectInstance *arg1)
   COnScreen__SetBoss2(&gEngineApp_m_OnScreen, arg1, sTotemDefenseText_Time);
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x46];
-    /* 0x46 */ s16 total;
-} Info;
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Info *info;
-    /* 0x08 */ u8 pad8[0x10 - 0x8];
-    /* 0x10 */ s32 used;
-} Arg0;
+#include "structs/boss.h"
 
-/* What is left: info->total - used. */
-s32 TotemDefense_KillsLeft_2(Arg0 *arg0) {
-    return arg0->info->total - arg0->used;
+/* The kills still wanted to save the totem. */
+s32 TotemDefense_KillsLeft_2(TotemDefenseState *state) {
+    return ((CDestructibleIntelligence *) state->def)->m_EnemiesToKillToSaveTotem - state->kills;
 }
 
 #include "globals/game.h"
 #include "structs/twin_totemdefense.h"
 
-typedef struct {
-    /* 0x0 */ void *target;
-    /* 0x4 */ TargetDef *def;
-    /* 0x8 */ s32 mode;
-} TargetInfo;
 
 /* Point the player actors at a target (mode 0), or back at the player. */
-void TotemDefense_RetargetEnemies_2(TargetInfo *info, s32 force) {
+void TotemDefense_RetargetEnemies_2(TotemDefenseState *state, s32 force) {
     CListedInstance *actor;
     void *player;
     s32 count;
 
-    if (info->mode == 1) {
+    if (state->state == 1) {
         return;
     }
     actor = gScene.m_InstancePool.m_ActiveList.m_pHead;
@@ -137,20 +123,20 @@ void TotemDefense_RetargetEnemies_2(TargetInfo *info, s32 force) {
         if (actor->m_Instance.header.m_pIntelligence->m_Type != 1 || actor->m_Instance.m_AI.m_pTargetOverride != 0) {
             continue;
         }
-        if (info->mode == 0) {
-            if (count < info->def->limit || force) {
+        if (state->state == 0) {
+            if (count < ((CDestructibleIntelligence *) state->def)->m_EnemiesAttackingTurok || force) {
                 count++;
                 actor->m_Instance.m_AI.m_pPathTarget = player;
                 actor->m_Instance.m_AI.m_pSightTarget = player;
                 actor->m_Instance.m_AI.m_dwFlags |= 0x20000000;
                 actor->m_Instance.m_AI.m_dwFlags |= 0x40000000;
             } else {
-                actor->m_Instance.m_AI.m_pSightTarget = info->target;
-                actor->m_Instance.m_AI.m_pPathTarget = info->target;
+                actor->m_Instance.m_AI.m_pSightTarget = state->obj;
+                actor->m_Instance.m_AI.m_pPathTarget = state->obj;
                 actor->m_Instance.m_AI.m_dwFlags |= 0x20000000;
                 actor->m_Instance.m_AI.m_dwFlags |= 0x40000000;
             }
-        } else if (actor->m_Instance.m_AI.m_pSightTarget == info->target) {
+        } else if (actor->m_Instance.m_AI.m_pSightTarget == state->obj) {
             actor->m_Instance.m_AI.m_pPathTarget = player;
             actor->m_Instance.m_AI.m_pSightTarget = player;
             actor->m_Instance.m_AI.m_dwFlags |= 0x20000000;

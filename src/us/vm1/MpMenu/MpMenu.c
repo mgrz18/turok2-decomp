@@ -12,8 +12,8 @@ extern void CEngineApp__StartGame(void *a, s32 level);
  * definition emitted them: the original's inline label helpers or its menu tables, whose items point
  * at " "). Here they are data in that place, and the label functions read them by name. */
 const char sFinalScoreMenuFmt_04d_def[] __asm__("sFinalScoreMenuFmt_04d") = "%04d";
-const char sMpMenuText_Space_def[] __asm__("D_800C0E78") = " "; /* the vm1 menu tables' blank items */
-const char sMpMenuFmt_02d_def[] __asm__("D_800C0E7C") = "%02d";
+const char sMpMenuText_Space_def[] __asm__("sMpMenuText_Space") = " "; /* the vm1 menu tables' blank items */
+const char sMpMenuFmt_02d_def[] __asm__("sMpMenuFmt_02d") = "%02d";
 const char sLimitLabelFmt_02d_def[] __asm__("sLimitLabelFmt_02d") = "  %02d";
 const char sLimitLabelText_None_def[] __asm__("sLimitLabelText_None") = "none";
 #define MPMENU_FMT_02D sMpMenuFmt_02d_def

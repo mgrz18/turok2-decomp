@@ -276,8 +276,7 @@ playing:
 extern f32 Math_AcosLookup(f32);                              /* acosf */
 extern void CPlayer__TransformByView(CPlayer *player, CVector3 *pos);      /* player-relative point to world */
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *a);
-extern f32 D_800ACE68; /* speed above which it flies home (15) */
-extern f32 D_800ACE6C; /* catch radius (512) */
+#include "globals/particle.h"   /* sReturningHomeFrame, sReturningCatchRadius */
 
 void CParticle__UpdateReturning(CParticle *obj) {
     CVector3 aim;
@@ -298,7 +297,7 @@ void CParticle__UpdateReturning(CParticle *obj) {
     f32 angle;
     s32 sound;
 
-    if (obj->m_cFrame > D_800ACE68) {
+    if (obj->m_cFrame > sReturningHomeFrame) {
         CQuaternion__FromDirection(&cur, &obj->m_vDirection);
         speed = func_00298470(obj->m_vVelocity.x * obj->m_vVelocity.x + obj->m_vVelocity.y * obj->m_vVelocity.y + obj->m_vVelocity.z * obj->m_vVelocity.z);
         player = (CPlayer *) obj->m_pOwner->m_AI.m_pParent;
@@ -308,8 +307,8 @@ void CParticle__UpdateReturning(CParticle *obj) {
         CPlayer__TransformByView(player, &home);
         CVector3__Subtract(&toCatch, &home, &obj->header.m_vPos);
         dist = func_00298470(toCatch.x * toCatch.x + toCatch.y * toCatch.y + toCatch.z * toCatch.z);
-        if (dist <= D_800ACE6C + 30.72f) {
-            if (dist < D_800ACE6C * (1.0f / 3) || obj->m_cFrame >= 65.0f) {
+        if (dist <= sReturningCatchRadius + 30.72f) {
+            if (dist < sReturningCatchRadius * (1.0f / 3) || obj->m_cFrame >= 65.0f) {
                 obj->header.m_vPos = home;
                 obj->m_nFrames = 1;
                 if (player->m_Data.m_CurrentWeapon == 0x15) {
@@ -321,7 +320,7 @@ void CParticle__UpdateReturning(CParticle *obj) {
         } else {
             aim.x = -102.399994f;
             aim.y = GameObject_GetCollisionHeight(obj->m_pOwner) * 0.5f;
-            aim.z = -D_800ACE6C;
+            aim.z = -sReturningCatchRadius;
             CPlayer__TransformByView(player, &aim);
             CVector3__Subtract(&toHome, &aim, &obj->header.m_vPos);
             func_00298470(toHome.x * toHome.x + toHome.y * toHome.y + toHome.z * toHome.z);
@@ -2309,9 +2308,7 @@ void CParticle__DrawShadow(ShadowActor *actor, void *view) { /* view: unused (CP
  * emits the colour and draw commands. */
 
 
-#ifndef STRUCTS_GBI_H /* the port includes structs/gbi.h through structs/game.h */
-typedef struct { u8 pad0[0x40]; } Mtx;
-#endif
+#include "structs/gbi.h"
 /* The leading 0x34 bytes of a game object, as the collision test reads them. */
 #ifdef TARGET_PORT
 typedef struct ParticleHead {
@@ -2333,17 +2330,7 @@ typedef struct {
 } ParticleHead;
 #endif /* size 0x34 */
 
-typedef struct {
-    /* 0x0 */ u8 kind;
-    /* 0x1 */ u8 pad1;
-    /* 0x2 */ u8 shiftS;
-    /* 0x3 */ u8 shiftT;
-} AnimFrame;
-typedef struct {
-    /* 0x0 */ s32 count;
-    /* 0x4 */ s32 unk4;
-    /* 0x8 */ AnimFrame *frame;
-} AnimInfo;
+#include "structs/texture.h"
 typedef struct {
     /* 0x0 */ u8 pad0[0x6];
     /* 0x6 */ u8 prim[3];
@@ -2459,7 +2446,7 @@ extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: 
 extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* the current view */
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
 extern void *Texture_Request(s32 *ref);
-extern void Texture_GetInfo(void *model, AnimInfo *info);
+extern void Texture_GetInfo(void *model, TextureInfo *info);
 extern void Texture_Load(s32 *ref, void *model, s32 frame, s32 a3, s32 shiftS, s32 shiftT, s32 a6, s32 a7, s32 a8);
 void *CCamera__GetPlayer(void *cam);
 extern void *MtxPool_Alloc(void *pool, s32 count);
@@ -2508,7 +2495,7 @@ static __inline__ s32 Particle_Scale(f32 value, f32 div) {
 #define LERP(to, from, t) (((to) - (from)) * (t) + (from))
 
 void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
-    AnimInfo info;
+    TextureInfo info;
     u8 env[3];
     u8 prim[3];
     CVector3 viewPos;
@@ -2655,7 +2642,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     shiftS = 1 << (((desc->flags & 0x100) ? 7 : 6) + info.frame->shiftS);
     shiftT = 1 << (((desc->flags & 0x200) ? 7 : 6) + info.frame->shiftT);
     Texture_Load(&particle->model, model, frame, 0, shiftS, shiftT, 1, 1, 0);
-    switch (info.frame->kind) {
+    switch (info.frame->format) {
         case 0:
         case 1:
             Render_SetCombineMode(0x18);
@@ -2708,7 +2695,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
         }
     }
 
-    if (info.frame->kind == 3) {
+    if (info.frame->format == 3) {
         switch (mode) {
             case 0:
             default:
@@ -4020,48 +4007,24 @@ void CParticle__AddDrawModeBits(CParticle *arg0, s32 *arg1) {
     *arg1 |= var_a2 << 0x1E;
 }
 
-typedef struct Node {
-    u8 pad0[0x1C8];
-    struct Node *next;    /* 0x1C8 */
-} Node;
-typedef struct Bucket {
-    Node *head;
-    u8 pad4[0x10];
-} Bucket;
-#ifdef TARGET_PORT
 #include "structs/particle.h"
-/* the host CParticleSystem by member (the views are at N64 offsets) */
+/* Frees every active particle: the three active lists of the CParticleSystem (round 30: one copy,
+ * the Node/Bucket views of the N64 one gone; the port's had read them by member since round 9). */
 void CParticleSystem__FreeAll(u8 *arg0) {
-    CParticleSystem *sys = (CParticleSystem *) arg0;
     CParticle *node;
     CParticle *cur;
     s32 i;
 
     for (i = 0; i < 3; i++) {
-        node = (CParticle *) sys->m_ActiveList[i].m_pHead;
+        /* m_ActiveList[i] from the byte pointer (the ROM adds its offset to arg0 first) */
+        node = ((CList *) (arg0 + T2_OFFSETOF(CParticleSystem, m_ActiveList)))[i].m_pHead;
         while (node != NULL) {
             cur = node;
             node = node->m_pNext;
-            CParticleSystem__Free(arg0, (Node *) cur);
+            CParticleSystem__Free(arg0, (EffectActor *) cur);
         }
     }
 }
-#else
-void CParticleSystem__FreeAll(u8 *arg0) {
-    s32 i;
-    Node *node;
-    Node *cur;
-
-    for (i = 0; i < 3; i++) {
-        node = ((Bucket *)(arg0 + 0xEC28))[i].head;
-        while (node != NULL) {
-            cur = node;
-            node = node->next;
-            CParticleSystem__Free(arg0, cur);
-        }
-    }
-}
-#endif
 
 s32 CParticle__GetDrawMode(CParticle *arg0) {
     s32 var_a1;
@@ -4469,39 +4432,30 @@ typedef struct B19Q2 {
 
 #ifndef TARGET_PORT
 /* CParticle__GetDistanceScale's constants, which it reads by name (the FAKEMATCH body keeps its
- * register pins): in the ROM's .rodata between func_00232044's literal and func_00232934's, so
+ * register pins): in the ROM's .rodata between CParticle__PlaceAtInstanceHit's literal and CParticle__SpawnAlongPath's, so
  * defined here (the port keeps the generated copies). 0.000492125982 = 1/2032. */
-const f32 sDistanceScale_6404_def __asm__("D_800A6404") = 16.0f;
-const f32 sDistanceScale_6408_def __asm__("D_800A6408") = 0.000492125982f;
-const f32 sDistanceScale_640C_def __asm__("D_800A640C") = 1.0f;
-const f32 sDistanceScale_6410_def __asm__("D_800A6410") = 0.000492125982f;
-const f32 sDistanceScale_6414_def __asm__("D_800A6414") = 0.00100000005f;
-const f32 sDistanceScale_6418_def __asm__("D_800A6418") = 1.0f;
-const f32 sDistanceScale_641C_def __asm__("D_800A641C") = 47.5f;
-const f32 sDistanceScale_6420_def __asm__("D_800A6420") = 0.25f;
-const f32 sDistanceScale_6424_def __asm__("D_800A6424") = 0.0210526325f;
+const f32 sDistanceScaleNear_def __asm__("sDistanceScaleNear") = 16.0f;
+const f32 sDistanceScaleInvRange_def __asm__("sDistanceScaleInvRange") = 0.000492125982f;
+const f32 sDistanceScaleRampMax_def __asm__("sDistanceScaleRampMax") = 1.0f;
+const f32 sDistanceScaleInvRange2_def __asm__("sDistanceScaleInvRange2") = 0.000492125982f;
+const f32 sDistanceScaleUnit_def __asm__("sDistanceScaleUnit") = 0.00100000005f;
+const f32 sDistanceScaleDefault_def __asm__("sDistanceScaleDefault") = 1.0f;
+const f32 sDistanceScaleFovRef_def __asm__("sDistanceScaleFovRef") = 47.5f;
+const f32 sDistanceScaleFovBlend_def __asm__("sDistanceScaleFovBlend") = 0.25f;
+const f32 sDistanceScaleInvFovRef_def __asm__("sDistanceScaleInvFovRef") = 0.0210526325f;
 #endif
-extern f32 D_800A6404;
-extern f32 D_800A6408;
-extern f32 D_800A640C;
-extern f32 D_800A6410;
-extern f32 D_800A6414;
-extern f32 D_800A6418;
-extern f32 D_800A641C;
-extern f32 D_800A6420;
-extern f32 D_800A6424;
 
 /* Static inline in the Rage Wars source file (dropped by the importer). */
 static inline f32 Ramp2(CROMParticleEffect *par, f32 xin) {
     register f32 x asm("$f4") = xin;
     f32 d;
     f32 k;
-    d = x - D_800A6404;
-    k = !(d < 0.0f) ? (!(D_800A640C < d * D_800A6408) ? (!(d < 0.0f) ? d * D_800A6410 : 0.0f) : D_800A640C) : 0.0f;
+    d = x - sDistanceScaleNear;
+    k = !(d < 0.0f) ? (!(sDistanceScaleRampMax < d * sDistanceScaleInvRange) ? (!(d < 0.0f) ? d * sDistanceScaleInvRange2 : 0.0f) : sDistanceScaleRampMax) : 0.0f;
     {
         register f32 fb asm("$f2") = par->m_pDistanceRange->m_FarScale;
         register f32 fa asm("$f3") = par->m_pDistanceRange->m_NearScale;
-        x = x * (fa + (fb - fa) * k) * D_800A6414;
+        x = x * (fa + (fb - fa) * k) * sDistanceScaleUnit;
     }
     return x;
 }
@@ -4513,11 +4467,11 @@ f32 CParticle__GetDistanceScale(CParticle *o, f32 px, B19Q2 *q) {
     if (par->m_dwFlags & 4) {
         t = Ramp2(par, x);
     } else {
-        t = D_800A6418;
+        t = sDistanceScaleDefault;
     }
     {
         f32 m = q->f6C;
-        return t * D_800A6424 * (m + (D_800A641C - m) * D_800A6420);
+        return t * sDistanceScaleInvFovRef * (m + (sDistanceScaleFovRef - m) * sDistanceScaleFovBlend);
     }
 }
 

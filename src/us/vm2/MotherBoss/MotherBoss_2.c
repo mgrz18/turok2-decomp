@@ -493,11 +493,6 @@ void MotherBoss_UpdateSpotsAndPickups_2(MotherBossState *state) {
     }
 }
 
-typedef struct {
-    s16 a;
-    s16 b;
-    u8 c[4];
-} __attribute__((aligned(4))) Part;
 extern void AI_UpdateTargets(void *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
 
 static __inline__ void FindTarget(CListedInstance *obj, CListedInstance **target) {
@@ -761,35 +756,6 @@ s16 MotherBoss_PickPhaseAnim_2(void *obj, CAI *ai) {
  * object's anim state (9: first value up to 1; 0x13: after a delay, second value up to 3 then back down to 1;
  * from 30 on: second value 1); the other parts apply one of the values to the part. */
 
-#ifdef TARGET_PORT
-#include "structs/pose_host.h"
-
-/* the host layouts (round 9 x2): the boss's m_AI.m_Mode (N64 0x174) and the bone-posing context
- * (structs/pose_host.h: the actor at 0, the bone at N64 0x90). The N64 views read other bytes on
- * the host: the parts never grew in after phase 0 nor pulsed in the phase 1 cinema. */
-typedef struct {
-    u8 pad0[__builtin_offsetof(CGameObjectInstance, m_AI.m_Mode)];
-    s8 animState;
-} ModuleObj;
-
-typedef struct {
-    CGameObjectInstance *actor;
-    u8 pad4[__builtin_offsetof(T2PoseContext, bone) - sizeof(CGameObjectInstance *)];
-    u32 part;
-} PartInfo;
-_Static_assert(__builtin_offsetof(PartInfo, part) == __builtin_offsetof(T2PoseContext, bone), "PartInfo");
-#else
-typedef struct {
-    /* 0x000 */ u8 pad0[0x174];
-    /* 0x174 */ s8 animState;
-} ModuleObj;
-
-typedef struct {
-    /* 0x00 */ CGameObjectInstance *actor;
-    /* 0x04 */ u8 pad4[0x90 - 0x4];
-    /* 0x90 */ u32 part;
-} PartInfo;
-#endif
 extern void CMtxF__ScaleAxes(void *arg0, f32 r, f32 g, f32 b);
 
 void MotherBoss_PartEffects_2(void *arg0, PartInfo *info) {
@@ -1784,11 +1750,6 @@ s32 MotherBoss_FewerActorsThan_2(s32 max) {
 
 /* Spawns effect 3 from obj at other's position, with params (0xA00, value << 8). */
 
-typedef struct {
-    /* 0x00 */ s16 upper;
-    /* 0x02 */ s16 lower;
-    /* 0x04 */ u8 extra[4];
-} __attribute__((aligned(4))) ActionParams;
 extern void ImpactEvent_Send(); /* (src, dst, kind, id, CVector3 pos, 8-byte params): MotherBoss_TeleportTarget_2's file names the params Part */
 typedef void (*ImpactSendFn)(void *source, void *p, s32 effect, s32 arg3, CVector3 pos, ActionParams params);
 

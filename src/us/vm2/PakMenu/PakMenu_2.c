@@ -386,7 +386,7 @@ void *PakMenu_GetReturnMenu_2(Menu *c) {
 
 /* Checks the controller pak in the given slot before a save/load menu:
  * returns the pak status, or -1 after opening the "pak full" dialog; opens the
- * matching warning dialog (templates D_0043xxxx) when the pak is missing,
+ * matching warning dialog (templates in module 1's data, 0x0043xxxx) when the pak is missing,
  * damaged or unformatted. */
 
 
@@ -1938,21 +1938,6 @@ s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
 /* Menu item handler: depending on the menu state, checks the item (PakMenu_CheckPak_2) and prints its text, or (states 1
  * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ s8 id;
-} ItemData;
-typedef struct {
-    /* the host Menu's leading fields (structs/menu.h: cursor .. param), pointers 8 bytes wide */
-    s16 cursor, offsetX, offsetY;
-    u8 _pad6[2];
-    void *block, *items;
-    s32 count;
-    void *desc, *param;
-    /* 0x1C */ CPlayer *owner;
-    /* 0x20 */ ItemData *data;
-    /* 0x24 */ void *string;
-} Item;
 
 static __inline__ s32 ItemId(Item *item) {
     s32 id;
@@ -2068,10 +2053,6 @@ char *Pak_GetBufferSize_2(s32 block) {
     return (char *) (block << 8);
 }
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x684];
-    /* 0x684 */ s32 unk684;
-} Entry;
 
 void Pak_SetBufferSize_2(s32 arg0, s32 arg1) {
     ((Entry *) (gScene.unk_30 + arg0))->unk684 = arg1;
@@ -3343,10 +3324,6 @@ s32 SavePortalMenu_Poll_2(Menu *event) {
 }
 
 /* Only the field read here. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ u32 unk10;
-} CallbackArg;
 
 void SavePortalMenu_Close_2(s32 arg0, CallbackArg *arg1) {
     if ((sSavePortalDone == 0) && (gSavePortalActive != 0) && (arg1->unk10 < 2U)) {

@@ -44,6 +44,9 @@ extern u64 gGfxYieldBuffer[];            /* the RSP yield buffer (the start of t
 extern u8 gThreadStackAudio[0x2800];
 extern u8 gThreadStackIdle[0x80];
 extern u8 gThreadStackMain[0x8000];
+/* The recursion guards (Path_ExpandNode, the collision region walk, the automap reveal) stop when
+ * the stack pointer goes below this mark, 0xCCC bytes above the bottom of the main stack (0x800C894C). */
+#define MAIN_STACK_GUARD (&gThreadStackMain[0xCCC])
 extern u8 gSchedulerStack[0x2000];
 extern OSThread gThreadIdle;
 extern OSThread gThreadMain;

@@ -48,6 +48,9 @@ extern s32 sSchedGfxWatchdog;          /* retraces since the last gfx task finis
 extern s32 gDecompressorBoostRetraces; /* retraces left at gThreadPriorityDecompressorHigh */
 extern s32 sSchedResetPressed;         /* the pre-NMI message came */
 extern s32 sSchedResetBlankRetraces;   /* retraces after reset before the screen is blanked (20) */
+extern s32 sSchedRdpTaskStarted;       /* __scExec sets it to 1 when it hands the RDP a new task (nothing reads it) */
+extern s32 sSchedRdpTaskCounter;       /* __scExec clears it at the same time (nothing reads it) */
+extern u8 gImageEnd[];                 /* absolute symbol: the end of the loaded image and its BSS (Boot clears up to it, InitializeSystemResources starts the heap there) */
 
 /* Thread priorities (Turok 3's PRIORITY_*). */
 extern s32 gThreadPriorityIdle;

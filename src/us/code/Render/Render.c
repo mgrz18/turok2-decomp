@@ -72,19 +72,7 @@ void Render_SetCombineMode(u32 mode) {
 #include "protos/cache.h"
 #include "structs/batch.h"
 
-typedef struct TextureFrame {
-    /* 0x0 */ u8 unk0;
-    /* 0x1 */ u8 speed;
-    /* 0x2 */ u8 shiftS;
-    /* 0x3 */ u8 shiftT;
-    /* 0x4 */ u8 lod;
-    /* 0x5 */ u8 kind;
-} TextureFrame;
-typedef struct TextureInfo {
-    /* 0x0 */ s32 count;
-    /* 0x4 */ s32 palettes;
-    /* 0x8 */ TextureFrame *frame;
-} TextureInfo;
+#include "structs/texture.h"
 void Texture_InvalidateCache(void);
 
 /* Switches the RDP render mode; returns 0 when it was already active. */

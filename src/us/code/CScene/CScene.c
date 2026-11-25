@@ -23,7 +23,7 @@
 #include "common.h"
 #include "structs/light.h"
 /* the real function is 0x0042AC0C-0x0042B3E4 (size 0x7D8, 502 words); splat cut it into CScene__LoadLevel +
- * D_0042B304. All 502 words match (checked over the real extent). Reusing one scratch pointer for the
+ * a label at 0x0042B304. All 502 words match (checked over the real extent). Reusing one scratch pointer for the
  * CPlayerPool__GetFirstActive result and the actor array keeps the last loop's load in $v0, `actor += 0x288` gives the player
  * loop its register order, and the sound switch with one shared call keeps w in $s3. */
 #include "common.h"
@@ -357,20 +357,6 @@ void CScene__SetupLighting(CScene *menu);
 void CScene__RestoreFiredEvents(CScene *w);
 void CScene__ReapplyFiredEvents(CScene *w);
 void CScene__FlushDelayedEvents(CScene *scene);
-typedef struct LevelState {
-    /* 0x00 */ u8 pad0[0x98];
-    /* 0x98 */ void *handle98;
-    /* 0x9C */ void *handle9C;
-    /* 0xA0 */ void *handleA0;
-    /* 0xA4 */ void *handleA4;
-    /* 0xA8 */ void *handleA8;
-    /* 0xAC */ void *handleAC;
-    /* 0xB0 */ void *handleB0;
-    /* 0xB4 */ void *handleB4;
-    /* 0xB8 */ u8 padB8[0x10];
-    /* 0xC8 */ void *handleC8;
-    /* 0xCC */ void *handleCC;
-} LevelState;
 void CScene__UnloadLevel(LevelState *level);
 void CScene__DecompressParticles(sptr arg0, void ***arg1);
 s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt);
@@ -753,22 +739,18 @@ typedef struct {
 s32 CScene__IsLevelActorKilledInLevel(Unk00226B34 *arg0, s32 arg1, s32 arg2);
 s32 CScene__IsEventFiredInLevel(CScene *arg0, s32 arg1, s32 arg2);
 sptr CScene__GetLinkGroupCountPtr(CScene *arg0, s32 arg1);
-void SortRecord_Swap(RenderSortRecord *left, RenderSortRecord *right);
+void SortRecord_Swap(SortEntry *left, SortEntry *right);
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
 void CStaticObject__Draw(void *object, void *camera);
 void CGameObjectInstance__Draw(void *actor, void *camera);
 void CLevelActor__Draw(void *actor);
 typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ f32 key;
-} SortItem;
-typedef struct {
     /* 0x0 */ s32 unk0;
     /* 0x4 */ f32 key;
 } SortEntry_00226D0C;
 s32 SortRecord_CompareDescending(SortEntry_00226D0C *arg0, SortEntry_00226D0C *arg1);
-s32 SortRecord_Compare(SortItem *arg0, SortItem *arg1);
+s32 SortRecord_Compare(SortEntry *arg0, SortEntry *arg1);
 
 /* Sorts the list by distance from the camera, then draws it. */
 void CScene__DrawSortedList(DrawList *list, void *cam) {
@@ -1611,9 +1593,6 @@ VM_TEXT void CScene__DecompressCollision(CollisionBuildWorld *world, CollisionBu
     }
 }
 
-typedef struct Handle {
-    void *data;
-} Handle;
 extern sptr CScene__GetRegion(CScene *world, s32);
 /* called with the record's u16 id and its result read as a pointer, as the ROM's code has it */
 #define CScene__GetIntelligence_u16 ((s32 *(*)(CScene *, u16)) CScene__GetIntelligence)
@@ -1633,11 +1612,6 @@ extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
    memcpy (as in Rage Wars): both set loop.c's insn count and giv benefits, which decide the ROM's
    hoisting of the spawns base and of the angle constants. */
 #define handle ((Handle **) handleArg)
-typedef struct Placed {
-    /* 0x00 */ s32 data[4];
-    /* 0x10 */ s16 kind;
-    /* 0x12 */ s16 unk12;
-} Placed; /* 0x14 */
 s32 CScene__FindWarpDests(void *world, s32 kind, s32 key, Placed *out, s32 max);
 typedef CGameRegion Floor;
 Floor *CScene__FindRegionAt(CScene *world, f32 *pos);
@@ -2159,34 +2133,6 @@ void CScene__DecompressGridSection(CScene *world, s32 ***file) {
     }
 }
 
-#ifdef TARGET_PORT
-/* The port: the grid sections hold their static objects and level actors at the host sizes
- * (CScene__DecompressGridSection), so these views are host twins of CStaticObject (block =
- * m_pOwner) and CLevelActor. With the N64 stride and offset the third attract demo's level load
- * (level 109) wrote the handle into the wrong objects and passed a garbage m_pOwner to
- * CCache__RequestDecompression. */
-#include "structs/level_actor.h"
-typedef struct ObjA {
-    u8 pad0[__builtin_offsetof(CStaticObject, m_pOwner)];
-    void **block;
-    u8 pad28[sizeof(CStaticObject) - __builtin_offsetof(CStaticObject, m_pOwner) - sizeof(void **)];
-} ObjA;
-_Static_assert(sizeof(ObjA) == sizeof(CStaticObject), "ObjA size");
-
-typedef struct ObjB {
-    u8 pad0[sizeof(CLevelActor)];
-} ObjB;
-#else
-typedef struct ObjA {
-    /* 0x00 */ u8 pad0[0x24];
-    /* 0x24 */ void **block;
-    /* 0x28 */ u8 pad28[0x68];
-} ObjA; /* 0x90 */
-
-typedef struct ObjB {
-    /* 0x000 */ u8 pad0[0x198];
-} ObjB; /* 0x198 */
-#endif
 
 void CStaticObject__RequestLitVertices(void *object, void *camera);
 extern void *CStaticObject__LoadGeometry(ObjA *a);
@@ -3304,11 +3250,6 @@ void CScene__ComputeLights(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
     out[0x12] = (s32)(a.z * 127.0f);
 }
 
-typedef struct Node {
-    /* 0x00 */ s32 index;
-    /* 0x04 */ void *prev;
-    /* 0x08 */ void *next;
-} Node;
 s32 BinaryRange(void *array, s32 count, u32 key, s32 *first, s32 *last);
 
 /* Copies up to max placed objects of the given kind (-1: any) whose key matches into out; returns how many. */
@@ -3607,7 +3548,7 @@ void *func_0029E460(void *, void *, s32);           /* memcpy */
 /* Copies the level's name (sub-block 8 of its level file, a handle: data then size) into
  * arg2, at most arg3 bytes. The level file stays loaded when it is the current level. */
 /* The one object's literals: "level index" is CScene__LoadLevel's (pooled), "level name" is output here,
- * between func_0042C194's and func_00223A94's .rodata (0xA6BD0, sCSceneCacheDesc_LevelName). */
+ * between CScene__FindWarpDests's and CScene__Blast's .rodata (0xA6BD0, sCSceneCacheDesc_LevelName). */
 DEFERRED void CScene__GetLevelName(struct CScene *arg0, s32 arg1, void *arg2, s32 arg3) {
     sptr sp20;
     sptr temp_s2;
@@ -5567,26 +5508,12 @@ DEFERRED void CScene__StartRumbles(CScene *lv, sptr a1, s32 id, CVector3 v, f32 
     }
 }
 
-#ifdef TARGET_PORT /* the scene (CScene, structs/world.h) at its host layout: m_pIntelligence */
-#define RESOURCE_FILE_AT __builtin_offsetof(CScene, m_pIntelligence)
-#else
-#define RESOURCE_FILE_AT 0x64
-#endif
-
-/* (one conditional block of its own: tools/merge_module.py reads the definition below as a function) */
-typedef struct {
-    /* 0x00 */ u8 pad0[RESOURCE_FILE_AT];
-    void *file;
-} Resource;
-
-/* the definition takes the callers' type (one prototype for the merged object); the view reads it */
+/* The level's intelligence descriptor arg1 (a block of m_pIntelligence), 0 for -1. */
 DEFERRED sptr CScene__GetIntelligence(CScene *scene, s32 arg1) {
-#define arg0 ((Resource *) scene)
     if (arg1 == -1) {
         return 0;
     }
-    return CISet__GetBlock(arg0->file, arg1);
-#undef arg0
+    return CISet__GetBlock(scene->m_pIntelligence, arg1);
 }
 
 DEFERRED Ent *CScene__FindIntelligence(CScene *lv, s32 a, s32 b) {
@@ -6057,18 +5984,6 @@ DEFERRED s32 CScene__FindNearestPathPoint(CScene *lv, s32 unused, CVector3 *pt) 
     return (s32)bestIdx;
 }
 
-typedef struct {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ u8 pad4[0x24];
-    /* 0x28 */ f32 x;
-    /* 0x2C */ f32 y;
-    /* 0x30 */ f32 z30;
-    /* 0x34 */ f32 z34;
-    /* 0x38 */ u8 pad38[0x14];
-    /* 0x4C */ f32 x2;
-    /* 0x50 */ f32 y2;
-    /* 0x54 */ f32 z2;
-} Element;
 #ifdef TARGET_PORT
 int T2Port_LegacyIntel9(void); /* port/game/t2debug.c */
 #endif
@@ -6510,8 +6425,10 @@ DEFERRED sptr CScene__GetLinkGroupCountPtr(CScene *arg0, s32 arg1) {
     return CISet__GetBlock(temp_v0, 1) + arg1;
 }
 
-DEFERRED void SortRecord_Swap(RenderSortRecord *left, RenderSortRecord *right) {
-    RenderSortRecord temporary = *left;
+/* Sort_Quick's swap for CScene__DrawSortedList's SortEntry (round 30: typed as the entry; the
+ * RenderSortRecord it was typed with is the same 8 bytes on the N64 but half the host entry). */
+DEFERRED void SortRecord_Swap(SortEntry *left, SortEntry *right) {
+    SortEntry temporary = *left;
     *left = *right;
     *right = temporary;
 }
@@ -6527,11 +6444,12 @@ DEFERRED s32 SortRecord_CompareDescending(SortEntry_00226D0C *arg0, SortEntry_00
     return var_v0;
 }
 
-/* qsort-style comparator on the f32 key at 0x4. */
-DEFERRED s32 SortRecord_Compare(SortItem *arg0, SortItem *arg1) {
+/* Sort_Quick's comparator for the SortEntry: the farthest first (round 30: typed as the entry;
+ * the SortItem view read the key at 0x4, inside the host entry's item pointer). */
+DEFERRED s32 SortRecord_Compare(SortEntry *arg0, SortEntry *arg1) {
     s32 r = 1;
 
-    if (arg0->key > arg1->key) {
+    if (arg0->dist > arg1->dist) {
         r = -1;
     }
     return r;
@@ -6621,14 +6539,6 @@ DEFERRED s32 Blast_GetStrength(CGameObjectInstance *e, CVector3 *target) {
     return 0;
 }
 void CScene__LoadBitSections2(CScene *menu);
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s32 done;
-    /* 0x08 */ u8 pad8[0x28 - 0x8];
-    /* 0x28 */ s32 unk28;
-    /* 0x2C */ u8 pad2C[4];
-    /* 0x30 */ s32 unk30;
-} Arg0_0042C418;
 void CScene__LoadBitSections(Arg0_0042C418 *arg0);
 
 VM_TEXT void CScene__InitPersistentData(CScene *menu) {
@@ -6685,9 +6595,6 @@ VM_TEXT void CScene__ConstructWarp(CScene *arg0) {
     arg0->m_PendingWarpID = 0;
 }
 
-typedef struct Entry {
-    u8 data[0x20];
-} Entry;
 
 /* Resolves the references of every item of every group of the loaded resource and keeps it in the
  * level (CScene.unk_68; the references point into block 2 of m_pRegionData). Typed on CScene: the

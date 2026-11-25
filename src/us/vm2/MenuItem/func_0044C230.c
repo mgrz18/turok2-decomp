@@ -448,7 +448,7 @@ void MenuItem_DrawString_2(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, M
  * address of the part that matched them. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0044044C.c, func_0044044C, with Turok 2's layouts. */
 
-extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
+extern s32 gMenuCurrentFont_view __asm__("gMenuCurrentFont"); /* current draw mode */
 
 extern s32 GetMemSize(void);
 extern void Hud_SetupFillMode(); /* called with and without an argument */
@@ -467,8 +467,8 @@ void MenuItem_DrawImage_2(MenuItem *item, MenuItemLayout *box, MenuItemLayout *a
     if ((gEngineApp_m_Settings.mode == 13 && (item->flags & 0x40000000)) ||
         (gEngineApp_m_Settings.multiplayer != 0 && (s32) item->flags < 0 && GetMemSize() == 0x400000)) {
         window->highlighted = 1;
-        if (D_800C1BD0_4143DC != 3) {
-            D_800C1BD0_4143DC = 3;
+        if (gMenuCurrentFont_view != 3) {
+            gMenuCurrentFont_view = 3;
         }
         Hud_SetupFillMode();
         t1 = (f32) box->width * box->scaleX;
@@ -492,8 +492,8 @@ void MenuItem_DrawImage_2(MenuItem *item, MenuItemLayout *box, MenuItemLayout *a
         }
         Hud_DrawBevelBox(box->left, box->top, (s32) fx, (s32) fy, 1, 0, 0, 0, 0, alpha);
     } else {
-        if (D_800C1BD0_4143DC != 3) {
-            D_800C1BD0_4143DC = 3;
+        if (gMenuCurrentFont_view != 3) {
+            gMenuCurrentFont_view = 3;
             Hud_SetupTextureMode((s32) (window->fade * (window->alpha * 255.0f)));
         }
         Hud_DrawSprite(item->image, 0, (s16) box->left, (s16) box->top, box->scaleX, box->scaleY, 1);
@@ -553,7 +553,7 @@ void MenuItem_DrawSlider_2(MenuItem *it, MenuItemLayout *box, MenuItemLayout *co
 
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004409A8.c, func_004409A8, with Turok 2's layouts. */
 
-extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
+extern s32 gMenuCurrentFont_view __asm__("gMenuCurrentFont"); /* current draw mode */
 
 extern void memset(void *p, s32 c, sptr n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
@@ -653,8 +653,8 @@ void MenuItem_DrawModel_2(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unus
             if (x->intelType == INTELLIGENCE_PLAYER) {
                 CScene__SetInstanceObjectType(&gScene, fx, gCharacterModels[fx->header.m_pIntelligence->m_Id], 1);
             }
-            if (D_800C1BD0_4143DC != 4) {
-                D_800C1BD0_4143DC = 4;
+            if (gMenuCurrentFont_view != 4) {
+                gMenuCurrentFont_view = 4;
                 {
                     Gfx **pp = &gDList;
                     Gfx *q = (*pp)++;
@@ -704,11 +704,6 @@ void MenuItem_DrawModel_2(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unus
 extern void *func_00416B28_4143DC() __asm__("MenuPool_GetCamera_2");
 extern void func_00416C00_4143DC() __asm__("Menu_ResetFlash_2");
 extern void func_00416C0C_4143DC(void *p) __asm__("Menu_StartFlash_2");
-/* The colour records a window starts with (Menu colors): 8 records of
- * 0x18 bytes, read as halfwords at 0, 4, 8 and bytes at 0xD, 0x11, 0x15 (the
- * low parts of six words: the symbol sits 2 bytes into the table). */
-typedef struct { u16 a; u8 pad2[2]; u16 b; u8 pad6[2]; u16 c; u8 padA[3]; u8 d; u8 pad0E[3]; u8 e; u8 pad12[3]; u8 f; u8 pad16[2]; } MenuColorInit;
-extern MenuColorInit D_800C1CD2[];
 /* Builds a window in its block: the items from the desc's table, the
  * extras after them, the colours, then the desc's init and the items' select
  * callbacks flagged 0x04000000. */
@@ -797,12 +792,12 @@ void Menu_Construct_2(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4
       /* rb + 0x48 is p->colors[j][i] (MenuColor w0..bF); written through
        * the byte offsets, as the struct's fields schedule differently */
       u8 *rb = ((u8 *)p) + ((j << 7) + i * 16);
-      *((u16 *) (rb + 0x48)) = D_800C1CD2[i].a;
-      *((u16 *) (rb + 0x4A)) = D_800C1CD2[i].b;
-      *((u16 *) (rb + 0x4C)) = D_800C1CD2[i].c;
-      *((u8 *) (rb + 0x54)) = D_800C1CD2[i].d;
-      *((u8 *) (rb + 0x55)) = D_800C1CD2[i].e;
-      new_var = D_800C1CD2[i].f;
+      *((u16 *) (rb + 0x48)) = gMenuColorDefaults[i].a;
+      *((u16 *) (rb + 0x4A)) = gMenuColorDefaults[i].b;
+      *((u16 *) (rb + 0x4C)) = gMenuColorDefaults[i].c;
+      *((u8 *) (rb + 0x54)) = gMenuColorDefaults[i].d;
+      *((u8 *) (rb + 0x55)) = gMenuColorDefaults[i].e;
+      new_var = gMenuColorDefaults[i].f;
       *((u8 *) (rb + 0x57)) = 0xFF;
       *((u16 *) (rb + 0x50)) = 0;
       *((u16 *) (rb + 0x52)) = 0;
@@ -1019,7 +1014,7 @@ s32 Menu_Update_2(Menu *menu, void *arg) {
 f32 func_002982F0(f32 x);
 extern void Hud_DrawBevelBox(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);
 extern f32 func_002982F0(f32 x);
-extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont");
+extern s32 gMenuCurrentFont_view __asm__("gMenuCurrentFont");
 /* Draws a window's items: lays them all out, centres the box around them
  * (the area) on the camera's viewport and the window's offset, highlights
  * the cursor's and calls each item's draw callback. */
@@ -1064,7 +1059,7 @@ void Menu_Draw_2(Menu *p, void *a1) {
         area.right = (s32)(cx + hw);
         area.top = (s32)(cy - hh);
         area.bottom = (s32)(cy + hh);
-        D_800C1BD0_4143DC = -1;
+        gMenuCurrentFont_view = -1;
         for (i = 0; i < p->count; i++) {
             it = &p->items[i];
             if (it->flags & 0x800000) {
@@ -1112,7 +1107,7 @@ void Menu_Draw_2(Menu *p, void *a1) {
                             } else {
                                 Hud_DrawBevelBox(cp.left - 4, (s32)fb, cp.right + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
                             }
-                            D_800C1BD0_4143DC = -1;
+                            gMenuCurrentFont_view = -1;
                         }
                     }
                     it->def->draw(it, &cp, &area, p);

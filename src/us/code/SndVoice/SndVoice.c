@@ -1137,14 +1137,10 @@ void SndVoice_SetPosition(SndVoice *arg0, CVector3 *arg1, sptr arg2) {
 }
 #endif
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xA8];
-    /* 0xA8 */ s32 unkA8;
-} Owner;
 
 #ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndVoice_SetSoundId) */
-void SndVoice_SetSoundId(Owner *arg0, s32 arg1) {
-    arg0->unkA8 = arg1;
+void SndVoice_SetSoundId(SndVoice *arg0, s32 arg1) {
+    arg0->soundId = arg1;
 }
 #endif
 
@@ -1437,20 +1433,15 @@ void SndVoice_SetPitch(void *arg0, f32 arg1) {
 }
 #endif
 
-typedef struct {
-    /* 0x00 */ s32 index;
-    /* 0x04 */ u8 pad4[0xB0 - 0x4];
-    /* 0xB0 */ s32 header;
-} Model;
 
 #ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndVoice_SetPan) */
-void SndVoice_SetPan(Model *arg0, s32 arg1) {
+void SndVoice_SetPan(SndVoice *arg0, s32 arg1) {
     sptr var_s0;
     s32 var_s1;
     s16 *temp_v0;
 
     var_s1 = arg1;
-    var_s0 = arg0->header;
+    var_s0 = (sptr) arg0->mgr;
     temp_v0 = (s16 *) (var_s0 + (arg0->index * 2));
     var_s0 += 0x84;
     alSndpSetSound(var_s0, temp_v0[0xDC / 2]);
@@ -1459,11 +1450,11 @@ void SndVoice_SetPan(Model *arg0, s32 arg1) {
 #endif
 
 #ifndef TARGET_PORT /* the port's in port/ (port/cmake: SndVoice_GetState) */
-void SndVoice_GetState(Model *arg0) {
+void SndVoice_GetState(SndVoice *arg0) {
     sptr temp_s0;
     sptr temp_v1;
 
-    temp_v1 = arg0->header;
+    temp_v1 = (sptr) arg0->mgr;
     temp_s0 = temp_v1 + 0x84;
     alSndpSetSound(temp_s0, ((s16 *) (temp_v1 + (arg0->index << 1)))[0xDC / 2]);
     alSndpGetState(temp_s0);

@@ -2697,12 +2697,12 @@ struct PositionKey {
     f32 pad;
     f32 time;
 };
-struct D_800C7470_Pair;
-struct D_800C7470_Pair {
+struct CinemaKeyPair;
+struct CinemaKeyPair {
     f32 first;
     f32 second;
 };
-typedef struct D_800C7470_Pair D_800C7470_Pair;
+typedef struct CinemaKeyPair CinemaKeyPair;
 struct State_func_8040385C_de;
 typedef struct State_func_8040385C_de State_func_8040385C_de;
 struct State_func_8040385C_de {

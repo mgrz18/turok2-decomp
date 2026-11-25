@@ -3,17 +3,8 @@
 #include "globals/text.h"
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x16];
-    /* 0x16 */ s16 item;    /* item given on pickup, 0: none */
-    /* 0x18 */ s16 message; /* index in gLevelMessages when it cannot be taken */
-} PickupInfo;
-typedef struct {
     /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ PickupInfo info;
-} PickupDef;
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ PickupDef *def;
+    /* 0x14 */ struct CIntelligence *def;
 } Pickup;
 typedef struct {
     /* 0x00 */ u8 pad0[0x34];
@@ -38,25 +29,25 @@ extern void Sound__PlaySpeech(s32 sound);
 
 /* The port: the pickup, its AI and the toucher by member of CGameObjectInstance/CAI (N64: the
  * definition 0x14, the AI's m_Mode 0x34, the toucher's type 0, flags 0xD4, its AI's m_pParent
- * 0x1A8 = the player); the definition's body (asset data) keeps PickupDef's byte layout; the
+ * 0x1A8 = the player); the definition's action body (CActionIntelligence: the item it needs, the message without it); the
  * fallback camera by member of the camera pool (the N64 symbol is the pool + 0x40). */
 s32 Action_CheckRequiredItem(Pickup *obj_, PickupState *state_, Toucher *toucher_) {
     CGameObjectInstance *obj = (CGameObjectInstance *) obj_;
     CAI *state = (CAI *) state_;
     CGameObjectInstance *toucher = (CGameObjectInstance *) toucher_;
-    PickupInfo *info = &((PickupDef *) obj->header.m_pIntelligence)->info;
+    CActionIntelligence *info = &obj->header.m_pIntelligence->m_Action;
     CPlayer *player;
     void *camera;
 
-    if (info->item == 0 || state->m_Mode != 0 || toucher->header.m_Type != 1 || !(toucher->m_dwFlags & 0x300000)) {
+    if (info->m_GoPickupNeeded == 0 || state->m_Mode != 0 || toucher->header.m_Type != 1 || !(toucher->m_dwFlags & 0x300000)) {
         return 1;
     }
     player = (CPlayer *) toucher->m_AI.m_pParent;
-    if (CPlayer__GetPickupCountLow(player, info->item)) {
-        CPlayer__UseSpecialPickup(player, info->item);
+    if (CPlayer__GetPickupCountLow(player, info->m_GoPickupNeeded)) {
+        CPlayer__UseSpecialPickup(player, info->m_GoPickupNeeded);
         return 1;
     }
-    if (info->message == 0) {
+    if (info->m_GoPickupNeededText == 0) {
         return 0;
     }
     camera = &((CCameraPool *) gEngineApp_m_Game_m_CameraPool)->m_MainCamera;
@@ -64,9 +55,9 @@ s32 Action_CheckRequiredItem(Pickup *obj_, PickupState *state_, Toucher *toucher
         camera = player->m_pCamera;
     }
     CCameraPool__AddMultiLineText(gEngineApp_m_Game_m_CameraPool, camera,
-                  gLevelMessages[info->message].text, obj_, 4.0f);
-    if (gLevelMessages[info->message].speech != 0) {
-        Sound__PlaySpeech(gLevelMessages[info->message].speech);
+                  gLevelMessages[info->m_GoPickupNeededText].text, obj_, 4.0f);
+    if (gLevelMessages[info->m_GoPickupNeededText].speech != 0) {
+        Sound__PlaySpeech(gLevelMessages[info->m_GoPickupNeededText].speech);
     }
     return 0;
 }
@@ -234,25 +225,12 @@ void Action_GoEnter(u8 *actor) {
 #include "structs/game.h"
 #include "globals/game.h"
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x34];
-    /* 0x034 */ s8 unk34;
-    /* 0x035 */ u8 pad35;
-    /* 0x036 */ s8 unk36;
-    /* 0x037 */ u8 pad37[0x90];
-    /* 0x0C7 */ s8 active;
-    /* 0x0C8 */ u8 padC8[0x48];
-    /* 0x110 */ s32 done;
-    /* 0x114 */ s32 tagCleared;
-} ActionState;
 extern CPlayer *CPlayerPool__FindTagged(CPlayerPool *list);
 
-/* The port (round 9 x1): the action's CAI by member. The N64 view's 0x34/0x36 are m_Mode and
- * m_ModeBefore, 0xC7 m_AnimRepeatedCount (the go animation played through), 0x110/0x114
- * m_VarBuffer[1]/[2] (Action_Setup and Action_IdleEnter clear them); on the host those offsets
- * fall elsewhere in CAI (its pointers are wider), so a used switch never left mode 1. */
-void Action_GoUpdate(CGameObjectInstance *actor, ActionState *state_) {
-    CAI *state = (CAI *) state_;
+/* The action's CAI by member (round 9 x1 for the port; round 30 dropped the ActionState view the
+ * parameter was typed with): m_Mode / m_ModeBefore, m_AnimRepeatedCount (the go animation played
+ * through), m_VarBuffer[1]/[2] (Action_Setup and Action_IdleEnter clear them). */
+void Action_GoUpdate(CGameObjectInstance *actor, CAI *state) {
     CDoorIntelligence *info = &actor->header.m_pIntelligence->m_Door;
     CGame *game;
     CPlayer *player;

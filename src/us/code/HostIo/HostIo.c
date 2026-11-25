@@ -432,7 +432,7 @@ void HostIo_CopyCartBytes(u32 dst, u32 src, u32 n) {
     }
 }
 
-extern u8 D_8F128560[];
+extern u8 gHostIoHighAddressBias[];   /* local: an absolute symbol, an address offset (not data) */
 
 /* Split the debugger's memory transfer at permission boundaries. */
 void HostIo_MemoryTransfer(u32 mode) {
@@ -446,7 +446,7 @@ void HostIo_MemoryTransfer(u32 mode) {
         HostIo_ScanTlb();
     }
     if (address > 0xEFFFFFFF) {
-        address += (uptr) D_8F128560;
+        address += (uptr) gHostIoHighAddressBias;
     }
     while (remaining != 0) {
         i = 0;
@@ -653,6 +653,8 @@ s32 HostIo_Call(s32 cmd, s32 arg0, s32 arg1, s32 arg2) {
     } while (HostIo_ReadWord(0xB1FFFFE0) != 0);
     return HostIo_ReadWord(0xB1FFFFDC);
 }
+#else
+s32 HostIo_Call(s32 cmd, s32 arg0, s32 arg1, s32 arg2); /* declared only: no host definition, nothing linked calls it (port/cmake/game.cmake) */
 #endif
 
 /* I/O thread: serve the requests sent through sHostIoRequestQueue (send block, run command, read block, reply). */

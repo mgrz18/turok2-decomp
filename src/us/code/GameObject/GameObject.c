@@ -8,14 +8,10 @@
 #include "structs/player.h"
 #include "globals/game.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ u32 flags;
-} Attachment;
 
 s32 GameObject_IsSolid(CGameObjectInstance *actor) {
     CPlayer *owner;
-    Attachment *attachment;
+    CAIModeInfo *modeInfo;
     u32 flags;
     u32 mask;
 
@@ -48,12 +44,12 @@ s32 GameObject_IsSolid(CGameObjectInstance *actor) {
             }
             return 0;
         case 1:
-            if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x2000) && (attachment = ((Attachment *)actor->m_AI.m_pModeCurrent)) != NULL) {
+            if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x2000) && (modeInfo = (CAIModeInfo *) actor->m_AI.m_pModeCurrent) != NULL) {
                 mask = 0x10000;
-                /* Round 16 merge (n64viewcheck.py's cast kind): m_pModeCurrent is a CAIModeInfo row
-                 * (host layout: its sptr words are 8 bytes, unk_1C at 0x30); Attachment's 0x1C read
+                /* Round 16 merge (n64viewcheck.py's cast kind; round 30 typed the variable): m_pModeCurrent is a CAIModeInfo row
+                 * (host layout: its sptr words are 8 bytes, unk_1C at 0x30); the old Attachment view's 0x1C read
                  * the high half of m_pData on the host (0: always solid). The member instead. */
-                return (((CAIModeInfo *) attachment)->unk_1C & mask) == 0;
+                return (modeInfo->unk_1C & mask) == 0;
             }
             return 0;
         case 4:

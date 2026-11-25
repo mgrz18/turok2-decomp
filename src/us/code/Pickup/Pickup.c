@@ -575,27 +575,15 @@ s32 Pickup_GiveLifeForce(CPlayer *player, CPickupEntry *entry) {
     return 1;
 }
 
-typedef struct PickupParams {
-    char pad0[0xC];
-    f32 amount;     /* 0x0C */
-} PickupParams;
-typedef struct PickupDef {
-    char pad0[0x14];
-    PickupParams params; /* 0x14 */
-} PickupDef;
-typedef struct PickupObject {
-    char pad0[0x14];
-    PickupDef *def; /* 0x14 */
-} PickupObject;
 
 /* Item pickups selected by the entry's id. */
-s32 Pickup_GiveItem(CPlayer *player, CPickupEntry *entry, PickupObject *obj) {
+s32 Pickup_GiveItem(CPlayer *player, CPickupEntry *entry, CGameObjectInstance *obj) {
     void *resource;
     s32 sound;
     s32 callback;
-    PickupParams *params;
+    CPickupIntelligence *params;
 
-    params = &obj->def->params;
+    params = &obj->header.m_pIntelligence->m_Pickup;
     switch (entry->m_Id) {
         case 0x708:
             player->m_InvincibilityTime = 120.0f;
@@ -605,7 +593,7 @@ s32 Pickup_GiveItem(CPlayer *player, CPickupEntry *entry, PickupObject *obj) {
             break;
         case 0x70A:
         case 0x70B:
-            player->m_FlashlightTime += params->amount;
+            player->m_FlashlightTime += params->m_Time;
             break;
         case 0x111C:
         case 0x111D:

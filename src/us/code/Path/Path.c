@@ -1,10 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
+#include "structs/collision.h"
 #include "globals/ai.h"
 #include "globals/path.h"
 
-extern u8 D_800C894C;                   /* bottom of the stack */
+#include "globals/frame.h"     /* MAIN_STACK_GUARD */
 #ifdef TARGET_PORT
 /* the N64 compares the stack pointer with its main stack's bottom; the host asks its own thread's
  * stack (t2os_stack_low, port/runtime/t2os.c: the address comparison depended on the layout) */
@@ -28,7 +29,7 @@ void Path_ExpandNode(PathNode *parent, CGameRegion *region) {
     s8 next[3];
     PathNode *node;
 
-    if (T2_STACK_LOW(&parent, &D_800C894C)) {
+    if (T2_STACK_LOW(&parent, MAIN_STACK_GUARD)) {
         return;
     }
     if (sPathSearch->nodeCount >= 150) {
@@ -255,11 +256,6 @@ CGameRegion *Path_FindFleeRegion(CInstanceHeader *inst, CGameRegion *exclude, CV
     return best;
 }
 
-typedef struct Sphere {
-    /* 0x00 */ CVector3 center;
-    /* 0x0C */ f32 radius;
-    /* 0x10 */ f32 radiusSq;
-} Sphere;
 f32 GameObject_GetSweepRadius(sptr);
 void Sphere_Set(Sphere *sphere, CVector3 *center, f32 radius);
 s32 Cylinder_ContainsPoint(Sphere *sphere, CVector3 *point);

@@ -73,7 +73,12 @@ typedef struct CRegionInfo {
     /* 0x59 */ u8 unk_59[0x2];
     /* 0x5B */ u8 unk_5B;
     /* 0x5C */ u8 m_MapColour;
-    /* 0x5D */ u8 unk_5D[0x7];
+    /* 0x5D */ u8 m_CurrentStrength;               /* a current's push (GameObject_ApplyCurrent, flag 0x100 of m_wFlags52) */
+    /* 0x5E */ u8 unk_5E;
+    /* 0x5F */ s8 m_CurrentX;                        /* its direction, x 1/127 */
+    /* 0x60 */ s8 m_CurrentY;
+    /* 0x61 */ s8 m_CurrentZ;
+    /* 0x62 */ u8 unk_62[0x2];
 } CRegionInfo; /* size 0x64 */
 
 #endif

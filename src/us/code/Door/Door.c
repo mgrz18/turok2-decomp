@@ -11,33 +11,12 @@
 #include "protos/ai.h"
 #include "structs/particle_event.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x40];
-    /* 0x40 */ f32 timer;
-    /* 0x44 */ u8 pad44[0x20];
-    /* 0x64 */ f32 duration;
-    /* 0x68 */ u8 pad68[0x5E];
-    /* 0xC6 */ u8 anim;
-    /* 0xC7 */ s8 active;
-} ActionState;
 extern void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, CImpactEventArg extra);
 
-static __inline__ s32 animReached(CGameObjectInstance *actor, ActionState *state, f32 scale) {
-    if (actor->m_nAnims == 1) return 1;
-    if (actor->m_CurrentAnimation.m_nAnimIndex != (s8) state->anim || actor->m_CurrentAnimation.m_nRequestedAnimIndex != (s8) state->anim) return 0;
-    if (state->active != 0 && !(actor->m_dwFlags & 0x400)) return 1;
-    if (actor->m_CurrentAnimation.m_nFrames < 3 && (actor->m_dwFlags & 0x400)) {
-        return (f32) actor->m_BlendLength * scale <= actor->m_BlendPercent;
-    } else {
-        return (f32) actor->m_CurrentAnimation.m_nFrames * scale <= actor->m_CurrentAnimation.m_AnimationFrame;
-    }
-}
-
-/* Host body (C23): the N64 code reads the door's CAI through ActionState at N64 offsets (the
- * timer m_ModeTime 0x40, the duration m_ConditionTimer 0x64, m_AnimIndex 0xC6,
- * m_AnimRepeatedCount 0xC7). On the host CAI those offsets hold other fields: the "duration ran
- * out" test was true on the first update, so every opened door went straight back to mode 1
- * (closed) and no door ever opened. */
+/* The door's CAI by member (C23; round 30 dropped the unused ActionState view and its
+ * animReached): the timer m_ModeTime (N64 0x40), the duration m_ConditionTimer (0x64),
+ * m_AnimIndex (0xC6), m_AnimRepeatedCount (0xC7). Read at the N64 offsets on the host, the
+ * "duration ran out" test was true on the first update and no door ever opened. */
 static __inline__ s32 animReachedHost(CGameObjectInstance *actor, CAI *ai, f32 scale) {
     if (actor->m_nAnims == 1) return 1;
     if (actor->m_CurrentAnimation.m_nAnimIndex != (s8) ai->m_AnimIndex || actor->m_CurrentAnimation.m_nRequestedAnimIndex != (s8) ai->m_AnimIndex) return 0;

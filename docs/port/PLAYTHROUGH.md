@@ -4212,3 +4212,41 @@ files differ from round 25's only by `--legacy`'s two new lines. The stick combi
 only by the weapon switch before the Cave Totem (`12@…` instead of `9@…`).
 `--legacy` (290,000 frames) still gives **`ac08c89b…`**: END 2 (252,194), 5 totems, 2 lives
 (level 110), as before.
+
+## 48. The round-30 merge: five host fixes, the re-baseline
+
+The round-30 merge typed five N64-offset views as their real structs (STATUS.md, round 30): the
+translucent draw sort, `CMemEntry__Unlock`, `CCameraPool__ReleaseCameraTexts`, EnemyAI's looping
+sound and `StatsMenu_ShowTagsRow_2` now read their members on the host. The N64 code is the same; the
+host's stream is not. Boot + 3 demos still give `6ab97584…`.
+
+**The default** needed no re-tune: **END 2 (level 10 at 262,016), 5 totems, 0 lives lost, 347 hits**,
+det md5 **`b0d4a8ed…`** (600,000 lines; first difference from `af8bd840…` at frame 40,195, level
+133). The lowest health is 39, at the Queen. The one `death:` line, at 276,114, is in the hub after
+the credits, as before.
+
+**The stick combination** lost 4 lives at the Queen (level 2: 476 damage) with her front distance
+at 525 (46), and the game. Up to her the run is the same as with every distance below (124 left
+at 21 health, the hub's pickups back to 121, the Hive Totem's 113 left at 176). One run per
+distance (`T2R24_SQF`):
+
+| `STICK_QUEEN_FRONT` | the Queen (damage / lowest) | the run |
+|---|---|---|
+| 450 | 473 / 1, 3 lives | no END by 300,000 |
+| 525 (before) | 476 / 1, 4 lives | game over |
+| **600** | **113 / 63** | **END 2 (269,062), 0 lives** |
+| 700 | 476 / 1, 4 lives | game over |
+
+With **600** the combination ends on **END 2 (level 10 at 269,062), 5 totems, 0 lives lost (294
+hits)**, det md5 **`6649f48b…`** (two runs: with `T2R24_SQF=600,200` and from the committed
+default). Per fight (damage / lowest): 135 82/118, 112 113/87, the Blind One 34/53, 124 32/21, the
+Hive Totem 24/176, the Queen 113/63, the Mother 124/76, the lair (assisted) 81/95. One sample per
+distance on a chaotic fight: 600 is the best distance seen, not a proven optimum.
+
+**`--legacy`** (290,000 frames) lost a life in 110 and one at the Blind One, then 2 in the
+Primagen's lair (223 damage, 35,000 frames) on the default 90-frame strafe, and the script ran out
+before the ending (no END by 340,000). `--lair-peek 2000`: END 2 at 271,258, 3 lives;
+`--lair-strafe 80`: **END 2 at 266,218, 3 lives**, det md5 **`c9122255…`**. `fullrun.py` now
+strafes on 80 with `--legacy` (as it already did with cheat 4 on); the default and the stick
+combination keep 90.
+

@@ -69,7 +69,7 @@ boot_main:
 /* 1068 80000468 */  li         $t0, 7                    # flags = V|G|D
 /* 106C 8000046C */  jal        STVM_MapTLB
 /* 1070 80000470 */   sw        $t0, 0x14($sp)
-/* 1074 80000474 */  lui        $a0, %hi(main)            # main @ 0x0028D380 (D_28D380)
+/* 1074 80000474 */  lui        $a0, %hi(main)            # main @ 0x0028D380
 /* 1078 80000478 */  addiu      $a0, $a0, %lo(main)
 /* 107C 8000047C */  jalr       $a0
 /* 1080 80000480 */   nop

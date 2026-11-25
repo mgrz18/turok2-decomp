@@ -38,24 +38,10 @@ void TotemDefense_AddKill(void);
 #include "structs/model.h"
 void TotemDefense_DrawTotem(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params);
 void TotemDefense_InitFight(void *arg0, void *arg1);
-typedef struct {
-    /* 0x00 */ u8 pad0[0x46];
-    /* 0x46 */ s16 unk46;
-} Ref00408BFC;
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Ref00408BFC *ref;
-    /* 0x08 */ u8 pad8[0x10 - 0x8];
-    /* 0x10 */ s32 unk10;
-} Unk00408BFC;
-s32 TotemDefense_KillsLeft(Unk00408BFC *arg0);
+struct TotemDefenseState;
+s32 TotemDefense_KillsLeft(struct TotemDefenseState *state);
 #include "structs/twin_totemdefense.h"
-typedef struct {
-    /* 0x0 */ void *target;
-    /* 0x4 */ TargetDef *def;
-    /* 0x8 */ s32 mode;
-} TargetInfo;
-void TotemDefense_RetargetEnemies(TargetInfo *info, s32 force);
+void TotemDefense_RetargetEnemies(struct TotemDefenseState *state, s32 force);
 void TotemDefense_TryHitEnemy(void);
 void TotemDefense_StopEnemies(void);
 void TotemDefense_StopGenerators(void);
@@ -253,19 +239,21 @@ DEFERRED void TotemDefense_InitFight(void *arg0, void *arg1)
 }
 #endif
 
-DEFERRED s32 TotemDefense_KillsLeft(Unk00408BFC *arg0) {
-    return arg0->ref->unk46 - arg0->unk10;
+/* The kills still wanted to save the totem. */
+DEFERRED s32 TotemDefense_KillsLeft(TotemDefenseState *state) {
+    return ((CDestructibleIntelligence *) state->def)->m_EnemiesToKillToSaveTotem - state->kills;
 }
 
 #include "globals/game.h"
 
-/* Point the player actors at a target (mode 0), or back at the player. */
-DEFERRED void TotemDefense_RetargetEnemies(TargetInfo *info, s32 force) {
+/* State 0: up to m_EnemiesAttackingTurok enemies (all with force) go for the player, the others for the
+ * totem; otherwise the ones after the totem go back to the player. */
+DEFERRED void TotemDefense_RetargetEnemies(TotemDefenseState *state, s32 force) {
     CListedInstance *actor;
     void *player;
     s32 count;
 
-    if (info->mode == 1) {
+    if (state->state == 1) {
         return;
     }
     actor = gScene.m_InstancePool.m_ActiveList.m_pHead;
@@ -275,20 +263,20 @@ DEFERRED void TotemDefense_RetargetEnemies(TargetInfo *info, s32 force) {
         if (actor->m_Instance.header.m_pIntelligence->m_Type != 1 || actor->m_Instance.m_AI.m_pTargetOverride != 0) {
             continue;
         }
-        if (info->mode == 0) {
-            if (count < info->def->limit || force) {
+        if (state->state == 0) {
+            if (count < ((CDestructibleIntelligence *) state->def)->m_EnemiesAttackingTurok || force) {
                 count++;
                 actor->m_Instance.m_AI.m_pPathTarget = player;
                 actor->m_Instance.m_AI.m_pSightTarget = player;
                 actor->m_Instance.m_AI.m_dwFlags |= 0x20000000;
                 actor->m_Instance.m_AI.m_dwFlags |= 0x40000000;
             } else {
-                actor->m_Instance.m_AI.m_pSightTarget = info->target;
-                actor->m_Instance.m_AI.m_pPathTarget = info->target;
+                actor->m_Instance.m_AI.m_pSightTarget = state->obj;
+                actor->m_Instance.m_AI.m_pPathTarget = state->obj;
                 actor->m_Instance.m_AI.m_dwFlags |= 0x20000000;
                 actor->m_Instance.m_AI.m_dwFlags |= 0x40000000;
             }
-        } else if (actor->m_Instance.m_AI.m_pSightTarget == info->target) {
+        } else if (actor->m_Instance.m_AI.m_pSightTarget == state->obj) {
             actor->m_Instance.m_AI.m_pPathTarget = player;
             actor->m_Instance.m_AI.m_pSightTarget = player;
             actor->m_Instance.m_AI.m_dwFlags |= 0x20000000;

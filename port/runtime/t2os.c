@@ -477,8 +477,8 @@ void t2os_dump(void) {
     pthread_mutex_unlock(&sLock);
 }
 
-/* Round 18 g2: the game's stack-depth guards (`(uptr) &local < (uptr) &D_800C894C`, D_800C894C =
- * gThreadStackMain + 0xCCC: "less than 0xCCC bytes of the N64 main stack left") compared a host
+/* Round 18 g2: the game's stack-depth guards (`(uptr) &local < (uptr) MAIN_STACK_GUARD`, the mark at
+ * gThreadStackMain + 0xCCC, 0x800C894C: "less than 0xCCC bytes of the N64 main stack left") compared a host
  * stack address with a host data address: the answer depended on the address layout (always "no"
  * with the usual PIE layout, always "yes" with the executable mapped above the thread stacks, e.g.
  * run through ld.so: the region walk of the wall sweep then stopped at its first region). The host

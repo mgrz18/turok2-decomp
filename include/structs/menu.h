@@ -146,7 +146,7 @@ typedef struct MenuTextStyle {
 
 extern MenuTextStyle gMenuTextStyles[9];
 
-/* One of a window's 2x8 colour records, from the table D_800C1CD2. */
+/* One of a window's 2x8 colour records, from the table gMenuColorDefaults (MenuItem). */
 typedef struct MenuColor {
     /* 0x00 */ u16 w0;
     /* 0x02 */ u16 w2;
@@ -243,5 +243,24 @@ typedef struct CharacterSound {
     /* 0x0 */ s16 unk0;
     /* 0x2 */ s16 sound;
 } CharacterSound;
+
+/* gMenuColorDefaults: the colour records a window starts with (Menu colors): 8 records of six
+ * words, of which it reads the low parts: halfwords at 2, 6, 0xA and bytes at
+ * 0xF, 0x13, 0x17 (the ROM reads them at those addresses, 2 bytes into the
+ * table, as halfword and byte loads: a word read and a cast would not match). */
+typedef struct MenuColorInit {
+    /* 0x00 */ u8 pad0[2];
+    /* 0x02 */ u16 a;
+    /* 0x04 */ u8 pad4[2];
+    /* 0x06 */ u16 b;
+    /* 0x08 */ u8 pad8[2];
+    /* 0x0A */ u16 c;
+    /* 0x0C */ u8 padC[3];
+    /* 0x0F */ u8 d;
+    /* 0x10 */ u8 pad10[3];
+    /* 0x13 */ u8 e;
+    /* 0x14 */ u8 pad14[3];
+    /* 0x17 */ u8 f;
+} MenuColorInit; /* size 0x18 */
 
 #endif

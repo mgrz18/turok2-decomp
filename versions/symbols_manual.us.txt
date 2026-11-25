@@ -77,7 +77,7 @@ D_800A5A04 = 0x800A5A04;
 D_800A5A5C = 0x800A5A5C;
 D_800A5CEC = 0x800A5CEC;
 D_800A60D4 = 0x800A60D4;
-D_800A652C = 0x800A652C;
+sSpriteTexelScale = 0x800A652C;
 D_800A66C4 = 0x800A66C4;
 D_800A7FBC = 0x800A7FBC;
 D_800A7FC4 = 0x800A7FC4;
@@ -137,9 +137,9 @@ sCCameraPoolCacheDesc_Cameras = 0x800A9A00; /* "Cameras", CCameraPool__NewGame (
 sCCameraPoolCacheDesc_CameraTexts = 0x800A9A08; /* "Camera Texts", CCameraPool__NewGame (func_0042FBA4); read by CCameraPool__AllocTexts (func_00281FF8) */
 D_800C0570 = 0x800C0570; /* "lit vertices", TotemDefense_DrawTotem (func_004089E0); read by its asm copy TotemDefense_DrawTotem_2 */
 D_800C0EB0 = 0x800C0EB0; /* "unknown weapon", WeaponsMenu_ToggleLabel (func_00417910); read by its asm copy WeaponsMenu_ToggleLabel_2 */
-D_800C1414 = 0x800C1414; /* "%2d", GameNoteMenu_UpdateLives (func_00421F30); read by its asm copy func_0045ADF4 */
-D_800C1418 = 0x800C1418; /* "%3d.%02d.%02d", GameNoteMenu_UpdateTime (func_00422060); read by its asm copy func_0045AF80 */
-D_800C1428 = 0x800C1428; /* "%04d", CharNoteMenu_UpdateFrags (func_00422430); read by its asm copy func_0045B350 */
+sGameNoteMenuFmt_2d = 0x800C1414; /* "%2d", GameNoteMenu_UpdateLives (func_00421F30); read by its asm copy func_0045ADF4 */
+sGameNoteMenuFmt_Time = 0x800C1418; /* "%3d.%02d.%02d", GameNoteMenu_UpdateTime (func_00422060); read by its asm copy func_0045AF80 */
+sCharNoteMenuFmt_04d = 0x800C1428; /* "%04d", CharNoteMenu_UpdateFrags (func_00422430); read by its asm copy func_0045B350 */
 sPakText_MempakReadTempData = 0x800C18B0; /* "Mempak read temp data", readNote in func_00426164; read by Pak_ReadNote (func_004265B0) and its copy func_0045F4D0 */
 
 /* The virtual segment (round 21, docs/SEGMENTS.md "The virtual segment's real start"):
@@ -148,4 +148,17 @@ sPakText_MempakReadTempData = 0x800C18B0; /* "Mempak read temp data", readNote i
  * Absolute symbols (were D_14A000 / D_3CAE0 in undefined_syms_auto). */
 gVirtualRomStart = 0x0014A000;
 gVirtualModule1Size = 0x0003CAE0;
+/* Round 30 s2: the other absolute symbols the game reads (were D_ in undefined_syms_auto).
+ * IsDataPointer / IsCodePointer (code/BinaryRange) test an address against four ranges, each a
+ * start symbol plus a size symbol: the engine data from gHashSize, the VM data from gPrimagenPaths,
+ * the engine code from CList__Construct (0x200500), the VM code from Automap_RevealRegion (0x400000). */
+gCodeDataSize = 0x00011059;
+gVirtualDataSize = 0x0000094F;
+gCodeTextSize = 0x000A4694;
+gVirtualTextSize = 0x00029E60;
+/* The end of the loaded image and its BSS: InitializeSystemResources hands the RAM from here to the
+ * heap, Boot clears up to it. */
+gImageEnd = 0x8014A000;
+/* HostIo_MemoryTransfer adds it to a debugger address at 0xF0000000 or above (not data). */
+gHostIoHighAddressBias = 0x8F128560;
 D_800A9DFC = 0x800A9DFC; /* 60.0f, EngineMode01_Legal_Retrace's literal (code/CEngineApp, func_002893D8); read by func_002C232C (asm) */

@@ -270,14 +270,7 @@ VM_TEXT void Demo_Update(void) {
     updateChecksum();
 }
 
-/* One per player, 0x224 bytes apart. */
-typedef struct Slot {
-    /* 0x00 */ s32 a;
-    /* 0x04 */ u8 pad4[0x12];
-    /* 0x16 */ u8 b;
-    /* 0x17 */ u8 c;
-    /* 0x18 */ u8 pad18[0x224 - 0x18];
-} Slot;
+#include "structs/twin_demo.h"
 extern Slot gControllers_buttons[]; /* local type: globals/controller.h declares it; this view (its type here) is what keeps the ROM's code */
 
 VM_TEXT static __inline__ void fire(DemoStream *t) { t->decode(t); }
@@ -369,14 +362,9 @@ VM_TEXT void DemoStream_Init(DemoStream *t, sptr bits, s32 pos, s32 player, void
     t->unk1C = unk1C;
 }
 
-/* Something with a handler at 0x14 that this calls. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 (*handler)();
-} HandlerHolder;
-
-VM_TEXT void DemoStream_Decode(HandlerHolder *arg0) {
-    arg0->handler();
+/* Reads the stream's next value: its decode callback. */
+VM_TEXT void DemoStream_Decode(DemoStream *arg0) {
+    arg0->decode(arg0);
 }
 
 typedef struct {
@@ -388,13 +376,6 @@ VM_TEXT void DemoStream_CallHandler2(Unk0042F650 *arg0) {
     arg0->callback();
 }
 
-typedef struct {
-    /* 0x00 */ s32 result;
-    /* 0x04 */ u8 pad4[0xC - 0x4];
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ s32 (*func)();
-} Job;
 
 VM_TEXT void DemoStream_RunHandler2(Job *arg0) {
     arg0->result = arg0->func();
@@ -2961,26 +2942,22 @@ CCameraText *CCameraPool__AddMultiLineText(CCameraPool *pool, CCamera *cam, u8 *
     return text;
 }
 
-/* The block at arg0 + 0x40 of CCameraPool__ReleaseAllTexts: a list at 0xE28 whose elements go back to the list at arg0 + 0xF0C. */
-typedef struct {
-    /* 0x000 */ u8 pad0[0xE28];
-    /* 0xE28 */ CList m_List;
-} ListOwner;
-
-void CCameraPool__ReleaseCameraTexts(s32 arg0, ListOwner *arg1) {
+/* The camera's active texts (m_ActiveTextList) go back to the pool's free texts (arg0 + 0xF0C:
+ * CCameraPool.m_FreeTextList); CCameraPool__ReleaseAllTexts passes each camera. */
+void CCameraPool__ReleaseCameraTexts(s32 arg0, CCamera *arg1) {
     s32 *temp_s0;
     s32 *var_s1;
     void *var_a0;
 
-    var_s1 = arg1->m_List.m_pTail;
+    var_s1 = arg1->m_ActiveTextList.m_pTail;
     if (var_s1 != NULL) {
-        var_a0 = &arg1->m_List;
+        var_a0 = &arg1->m_ActiveTextList;
         do {
             temp_s0 = *var_s1;
             CList__Remove(var_a0, var_s1);
             CList__AddHead(arg0 + 0xF0C, var_s1);
             var_s1 = temp_s0;
-            var_a0 = &arg1->m_List;
+            var_a0 = &arg1->m_ActiveTextList;
         } while (var_s1 != NULL);
     }
 }
@@ -3079,29 +3056,17 @@ void CCameraText__Reset(CCameraText *arg0) {
     arg0->m_nId = 0;
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ s32 unk10;
-} Arg0;
 
-void CShakeAxis__Construct(Arg0 *arg0) {
-    arg0->unk4 = 0;
-    arg0->unk8 = 0;
-    arg0->unkC = 0;
-    arg0->unk10 = 0;
+void CShakeAxis__Construct(CShakeAxis *arg0) {
+    arg0->m_Shake = 0.0f;
+    arg0->m_LastShake = 0.0f;
+    arg0->m_Amp = 0.0f;
+    arg0->m_Angle = 0.0f;
 }
 
-typedef struct {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ f32 value;
-} Setting;
-
-void CShakeAxis__Set(Setting *arg0, f32 arg1, s32 arg2) {
-    arg0->type = arg2;
-    arg0->value = (f32) (arg1 * 0.1f);
+void CShakeAxis__Set(CShakeAxis *arg0, f32 arg1, s32 arg2) {
+    arg0->m_Type = arg2;
+    arg0->m_Shake = (f32) (arg1 * 0.1f);
 }
 f32 CShakeAxis__GetOffset(struct Wave *wave);
 

@@ -1207,32 +1207,20 @@ void Quad_SetBoxTop(CollisionQuad *quad, CVector3 *points) {
     quad_normal(quad);
 }
 
-typedef struct Sphere {
-    CVector3 center;     /* 0x00 */
-    f32 radius;      /* 0x0C */
-    f32 radiusSq;    /* 0x10 */
-} Sphere;
-
 void Sphere_Set(Sphere *sphere, CVector3 *center, f32 radius) {
     sphere->center = *center;
     sphere->radius = radius;
     sphere->radiusSq = radius * radius;
 }
 
-/* A vertical cylinder: its centre and its squared radius. */
-typedef struct {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 radiusSq;
-} Cylinder;
-
-s32 Cylinder_ContainsPoint(Cylinder *arg0, CVector3 *arg1) {
+/* Is the point inside the vertical cylinder (the Sphere's centre and squared radius, in XZ)? */
+s32 Cylinder_ContainsPoint(Sphere *arg0, CVector3 *arg1) {
     f32 temp_f0;
     f32 temp_f1;
     s32 var_v0;
 
-    temp_f1 = arg0->pos.x - arg1->x;
-    temp_f0 = arg0->pos.z - arg1->z;
+    temp_f1 = arg0->center.x - arg1->x;
+    temp_f0 = arg0->center.z - arg1->z;
     var_v0 = 1;
     if (!(((temp_f1 * temp_f1) + (temp_f0 * temp_f0)) <= arg0->radiusSq)) {
         var_v0 = 0;

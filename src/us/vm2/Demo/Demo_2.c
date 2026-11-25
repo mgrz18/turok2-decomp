@@ -207,14 +207,6 @@ void Demo_Update_2(void) {
     updateChecksum();
 }
 
-/* One per player, 0x224 bytes apart. */
-typedef struct Slot {
-    /* 0x00 */ s32 a;
-    /* 0x04 */ u8 pad4[0x12];
-    /* 0x16 */ u8 b;
-    /* 0x17 */ u8 c;
-    /* 0x18 */ u8 pad18[0x224 - 0x18];
-} Slot;
 extern Slot gControllers_buttons[]; /* local type: globals/controller.h declares it; this view (its type here) is what keeps the ROM's code */
 
 static __inline__ void fire(DemoStream *t) { t->decode(t); }
@@ -300,22 +292,11 @@ void func_00468520(DemoStream *t, sptr bits, s32 pos, s32 player, void (*decode)
     t->unk1C = unk1C;
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 (*callback)();
-} Arg0;
-
-void DemoStream_Decode_2(Arg0 *arg0) {
-    arg0->callback();
+/* Reads the stream's next value: its decode callback. */
+void DemoStream_Decode_2(DemoStream *arg0) {
+    arg0->decode(arg0);
 }
 
-typedef struct {
-    /* 0x00 */ s32 result;
-    /* 0x04 */ u8 pad4[0xC - 0x4];
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ s32 (*func)();
-} Job;
 
 void DemoStream_CallHandler2_2(Job *arg0) {
     arg0->func();

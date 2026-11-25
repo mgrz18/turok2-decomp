@@ -30,8 +30,6 @@
  * 0x198 bytes at 0x800C0950. The second VM module has a copy of the block at the
  * same link address (Cinema_SplineEval_2, Cinema_DrawLetterbox_2, ...) that reads this pool. */
 
-extern s32 D_800C1BC4;
-extern f32 D_800C1BC8;
 extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */ /* current player */
 /* gScene: a function that reads two of its fields does it through a local CScene * (one register). */
 
@@ -688,8 +686,8 @@ f32 Cinema_GetFadeAlpha_2(f32 t) {
         u = (t - key[-1].time) / (key->time - key[-1].time);
         v = key[-1].value * (1.0f - u) + key->value * u;
     }
-    v *= 2.0f * D_800C1BC8 + 1.0f;
-    v -= D_800C1BC8;
+    v *= 2.0f * gCinemaFadeBias + 1.0f;
+    v -= gCinemaFadeBias;
     if (1.0f < v) {
         v = 1.0f;
     }
@@ -701,12 +699,12 @@ f32 Cinema_GetFadeAlpha_2(f32 t) {
 
 f32 Cinema_GetFOV_2(f32 t) {
     s32 *track;
-    D_800C7470_Pair *key;
+    CinemaKeyPair *key;
     s32 count;
     s32 i;
     f32 u;
     track = CISet__GetBlock(gCinemaPlayerP->resource, 3);
-    key = (D_800C7470_Pair *)(track + 2);
+    key = (CinemaKeyPair *)(track + 2);
     count = track[1];
     for (i = 0; i < count; i++) {
     }
@@ -880,30 +878,13 @@ void Cinema_DrawLetterbox_2(void) {
     Cinema_DrawFrameEdges_2(sh);
 }
 
-#ifdef TARGET_PORT
-/* host: the camera's viewport (CCameraViewport m_Width, m_Height, m_ScreenPosX, m_ScreenPosY) at
- * its host offset; the N64 view below reads it at 0x288, past the host CCamera's pointer fields */
-typedef struct {
-    u8 pad0[__builtin_offsetof(CCamera, m_Viewport)];
-    f32 x;
-    f32 y;
-    f32 width;
-    f32 height;
-} ScreenRectangle;
-#else
-typedef struct {
-    /* 0x000 */ u8 pad0[0x288];
-    /* 0x288 */ f32 x;
-    /* 0x28C */ f32 y;
-    /* 0x290 */ f32 width;
-    /* 0x294 */ f32 height;
-} ScreenRectangle;
-#endif
 
 extern void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 
 /* Fills the cinema's screen rectangle with the colour and alpha of the current time. */
-void Cinema_DrawFade_2(ScreenRectangle *rectangle) {
+/* the rectangle is the camera's viewport (CCameraViewport: its first two words are the
+ * left/top corner here, the next two the size) */
+void Cinema_DrawFade_2(CCamera *camera) {
     CVector3 color;
     CVector3 baseColor;
     u8 rgba[4];
@@ -916,14 +897,14 @@ void Cinema_DrawFade_2(ScreenRectangle *rectangle) {
     f32 value;
 
     if (!gCinemaPlayerP->active) {
-        if (!D_800C1BC4) {
+        if (!gCinemaHoldFade) {
             return;
         }
     } else {
-        width = rectangle->width;
-        height = rectangle->height;
-        right = (f32) width + rectangle->x;
-        bottom = (f32) height + rectangle->y;
+        width = camera->m_Viewport.m_ScreenPosX;
+        height = camera->m_Viewport.m_ScreenPosY;
+        right = (f32) width + camera->m_Viewport.m_Width;
+        bottom = (f32) height + camera->m_Viewport.m_Height;
         baseColor = Cinema_GetFadeColor_2(gCinemaPlayerP->time);
         alpha = Cinema_GetFadeAlpha_2(gCinemaPlayerP->time);
         color = baseColor;

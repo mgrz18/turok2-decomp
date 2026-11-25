@@ -356,7 +356,7 @@ void *PakMenu_GetReturnMenu(Menu *c) {
 
 /* Checks the controller pak in the given slot before a save/load menu:
  * returns the pak status, or -1 after opening the "pak full" dialog; opens the
- * matching warning dialog (templates D_0043xxxx) when the pak is missing,
+ * matching warning dialog (templates in module 1's data, 0x0043xxxx) when the pak is missing,
  * damaged or unformatted. */
 
 
@@ -1366,9 +1366,9 @@ s32 PakMenu_NoteText(MenuItem *item, Menu *c) {
 const char sPakMenuText_Spaces3_def[] __asm__("sPakMenuText_Spaces3") = "   ";
 const char sPakMenuText_Space_def[] __asm__("sPakMenuText_Space") = " ";
 const char sPakMenuFmt_1d_def[] __asm__("sPakMenuFmt_1d") = "%1d";
-const char sGameNoteMenuFmt_2d_def[] __asm__("D_800C1414") = "%2d";
-const char sGameNoteMenuFmt_Time_def[] __asm__("D_800C1418") = "%3d.%02d.%02d";
-const char sCharNoteMenuFmt_04d_def[] __asm__("D_800C1428") = "%04d";
+const char sGameNoteMenuFmt_2d_def[] __asm__("sGameNoteMenuFmt_2d") = "%2d";
+const char sGameNoteMenuFmt_Time_def[] __asm__("sGameNoteMenuFmt_Time") = "%3d.%02d.%02d";
+const char sCharNoteMenuFmt_04d_def[] __asm__("sCharNoteMenuFmt_04d") = "%04d";
 const char sPakMenuFmt_1dDot[] = "%1d."; /* DamagedPakMenu_UpdateLine3's */
 #define PAKMENU_FMT_1D sPakMenuFmt_1d_def
 #define PAKMENU_FMT_2D sGameNoteMenuFmt_2d_def
@@ -1935,21 +1935,6 @@ s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
 /* Menu item handler: depending on the menu state, checks the item (PakMenu_CheckPak) and prints its text, or (states 1
  * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ s8 id;
-} ItemData;
-typedef struct {
-    /* the host Menu's leading fields (structs/menu.h: cursor .. param), pointers 8 bytes wide */
-    s16 cursor, offsetX, offsetY;
-    u8 _pad6[2];
-    void *block, *items;
-    s32 count;
-    void *desc, *param;
-    /* 0x1C */ CPlayer *owner;
-    /* 0x20 */ ItemData *data;
-    /* 0x24 */ void *string;
-} Item;
 
 static __inline__ s32 ItemId(Item *item) {
     s32 id;
@@ -2065,10 +2050,6 @@ char *Pak_GetBufferSize(s32 block) {
     return (char *) (block << 8);
 }
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x684];
-    /* 0x684 */ s32 unk684;
-} Entry;
 
 void Pak_SetBufferSize(s32 arg0, s32 arg1) {
     ((Entry *) (gScene.unk_30 + arg0))->unk684 = arg1;
@@ -3340,10 +3321,6 @@ s32 SavePortalMenu_Poll(Menu *event) {
 }
 
 /* Only the field read here. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ u32 unk10;
-} CallbackArg;
 
 void SavePortalMenu_Close(s32 arg0, CallbackArg *arg1) {
     if ((sSavePortalDone == 0) && (gSavePortalActive != 0) && (arg1->unk10 < 2U)) {

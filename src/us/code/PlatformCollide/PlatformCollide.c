@@ -311,12 +311,9 @@ s32 Platform_CollideBox(Sweep *ctrl, CGameObjectInstance *mover) {
     return result;
 }
 
-typedef struct Cylinder {
-    f32 v[6];
-} Cylinder;
 void Quad_SetBoxTop(CollisionQuad *quad, CVector3 *points);
-void Sphere_Set(Cylinder *cyl, CVector3 *center, f32 radius);
-s32 Cylinder_ContainsPoint(Cylinder *cyl, CVector3 *point);
+void Sphere_Set(Sphere *cyl, CVector3 *center, f32 radius);
+s32 Cylinder_ContainsPoint(Sphere *cyl, CVector3 *point);
 #ifdef TARGET_PORT /* ABI (docs/port/ABI.md, abicheck struct_scalar/float_int) */
 #define Sweep_HitCylinder Sweep_HitCylinder_i
 #endif
@@ -330,7 +327,7 @@ s32 Platform_CollideCylinder(Sweep *ctrl, CGameObjectInstance *mover) {
     CPlatformIntelligence *info;
     CVector3 points[8];
     CollisionQuad quad;
-    Cylinder cyl;
+    Sphere cyl;
     CVector3 hit;
     s32 result;
     f32 radius;

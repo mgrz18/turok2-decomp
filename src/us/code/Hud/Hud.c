@@ -1005,19 +1005,9 @@ void Hud_DrawImageFrame(void *table, s32 frame, s32 x, s32 y, f32 scaleX, f32 sc
     }
 }
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 pad4[4];
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ u8 padC[4];
-    /* 0x10 */ f32 x;
-    /* 0x14 */ f32 y;
-    /* 0x18 */ u8 pad18[0x38 - 0x18];
-    /* 0x38 */ s32 index;
-} Cursor;
-#ifdef TARGET_PORT /* COverlay's members (structs/player.h): its m_pScript is pointer-wide, so the
-                    * N64 offsets of the view put the position in m_Mode/m_Time (no HUD drew) */
 #include "structs/player.h"
+/* Off screen, no script, value -1, at (arg1, arg2). (The N64 view this replaced put the position
+ * in m_Mode/m_Time on the host, its m_pScript being pointer-wide: no HUD drew.) */
 void COverlay__Construct(COverlay *arg0, s16 arg1, s16 arg2) {
     arg0->m_Value = -1;
     arg0->m_PositionX = arg1;
@@ -1025,15 +1015,6 @@ void COverlay__Construct(COverlay *arg0, s16 arg1, s16 arg2) {
     arg0->m_Mode = 0;
     arg0->m_PositionY = arg2;
 }
-#else
-void COverlay__Construct(Cursor *arg0, s16 arg1, s16 arg2) {
-    arg0->index = -1;
-    arg0->x = arg1;
-    arg0->unk0 = 0;
-    arg0->unk8 = 0;
-    arg0->y = arg2;
-}
-#endif
 
 void COverlay__StartScript(COverlay *arg0, s32 *arg1) {
     arg0->m_pScript = arg1;
@@ -1301,9 +1282,7 @@ typedef struct {
     /* 0x02 */ u8 pad2[6];
     /* 0x08 */ ChunkEntry entries[1];
 } ChunkTable;
-typedef struct {
-    /* 0x00 */ ChunkTable *table;
-} Resource;
+#include "structs/cache.h"
 typedef struct {
     /* 0x00 */ u8 *data;
     /* 0x04 */ u8 flag;
@@ -1313,7 +1292,7 @@ void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
 /* Loads the 0x90-byte block of chunk 42 of resource 2 into sOnScreenFontTextureBuffer and
  * points sOnScreenFontTexture at it (NULL until it is loaded). */
 void COnScreen__LoadFontTexture(void) {
-    Resource *res;
+    CMemEntry *res;
     FontChunk chunk;
     ChunkTable *table;
     ChunkEntry *entries;
@@ -1323,7 +1302,7 @@ void COnScreen__LoadFontTexture(void) {
     sOnScreenFontTexture = NULL;
     res = CScene__LoadGraphicSet(&gScene, 2, 0, 1);
     if (res != NULL) {
-        table = res->table;
+        table = res->data;
         index = 42 % table->count;
         chunk.data = NULL;
         entries = table->entries;

@@ -1077,7 +1077,7 @@ SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, s32 ta
     v->soundId = m->cueId;
     v->reset = m->unk2BAC;
     v->hasTrack = 0;
-    /* Until round 25 the two id tables reached the host as raw N64 bytes (D_800B2A34/D_800B2A44
+    /* Until round 25 the two id tables reached the host as raw N64 bytes (sVoiceTrackSounds/sVoiceNoUnkC4Sounds
      * had no type), so every id read byte-swapped (0x78 as 0x78000000) and no voice matched.
      * Round 25 n4 typed them (globals/audio.h): the host does what the N64 does (the track voices
      * stop with the music). Round 26 o3 made that the default; T2_LEGACY_VOICE=1 (DEBUG-ONLY,

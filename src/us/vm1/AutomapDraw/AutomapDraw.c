@@ -4,7 +4,7 @@
 #include "protos/scene.h"
 #include "globals/game.h"
 
-extern u8 D_800C894C; /* bottom of the stack */
+#include "globals/frame.h"     /* MAIN_STACK_GUARD */
 #ifdef TARGET_PORT
 /* the N64 compares the stack pointer with its main stack's bottom; the host asks its own thread's
  * stack (t2os_stack_low, port/runtime/t2os.c: the address comparison depended on the layout) */
@@ -19,7 +19,7 @@ int t2os_stack_low(const void *local);
 /* Marks the regions around the camera, recursing into neighbours that have
  * a corner within ~410 units of it. */
 void Automap_RevealRegion(CGameRegion *region) {
-    if (region == NULL || T2_STACK_LOW(&region, &D_800C894C)) {
+    if (region == NULL || T2_STACK_LOW(&region, MAIN_STACK_GUARD)) {
         return;
     }
     if (!(region->m_wFlags & 0x400)) {
@@ -793,32 +793,27 @@ void Automap_SetPlayer(Obj00401B30 *obj, sptr a, s32 b, Triple c) {
     Automap_RevealAroundPlayer(obj);
 }
 #endif
-#ifdef TARGET_PORT
-/* The port: the region Automap_SetPlayer keeps pointer-wide (CAutomap.m_pHostRegion). */
 #include "structs/game.h"
-typedef struct {
-    u8 pad0[__builtin_offsetof(CAutomap, m_pHostRegion)];
-    CGameRegion *node;
-} Arg0;
+/* The region Automap_SetPlayer keeps: on the N64 the word at 0xC (m_bHasRegion's: a region pointer is
+ * non-zero), on the host CAutomap.m_pHostRegion (no room for a host pointer there). */
+#ifdef TARGET_PORT
+#define AUTOMAP_REGION(a) ((a)->m_pHostRegion)
 #else
-typedef struct {
-    /* 0x0 */ u8 pad0[0xC];
-    /* 0xC */ CGameRegion *node;
-} Arg0;
+#define AUTOMAP_REGION(a) (*(CGameRegion **) &(a)->m_bHasRegion)
 #endif
 
 void Automap_ClearVisited(CGameRegion *arg0);
 
-/* The caller's CAutomap (structs/game.h), through the view above. */
+/* The caller's CAutomap (structs/game.h): around the region Automap_SetPlayer keeps (AUTOMAP_REGION). */
 void Automap_RevealAroundPlayer(void *automap) {
-    Arg0 *arg0 = automap;
+    CAutomap *arg0 = automap;
     CGameRegion *temp_s0;
     CGameRegion *temp_a0;
     CGameRegion *temp_a0_2;
     CGameRegion *temp_a0_3;
 
-    Automap_RevealRegion((sptr) arg0->node);
-    temp_s0 = arg0->node;
+    Automap_RevealRegion((sptr) AUTOMAP_REGION(arg0));
+    temp_s0 = AUTOMAP_REGION(arg0);
     if (temp_s0 != 0) {
         temp_a0 = temp_s0->m_pNeighbours[0];
         temp_s0->m_wFlags = (u16) (temp_s0->m_wFlags & 0x7FFF);
