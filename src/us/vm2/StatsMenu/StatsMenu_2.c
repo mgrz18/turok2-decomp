@@ -144,18 +144,22 @@ s32 StatsMenu_PlayerRowText_2(MenuItem *item, Menu *event) {
     return 0;
 }
 
+typedef struct {
+    /* 0x000 */ u8 pad0[0x120];
+    /* 0x120 */ s32 flags;
+} Target;
 
 void StatsMenu_ShowTagsRow_2(Menu *arg0) {
-    MenuItem *temp_a0;
-    MenuItem *temp_v0;
+    Target *temp_a0;
+    Target *temp_v0;
 
     if (gEngineApp_m_Settings.match.tag != 0) {
-        temp_v0 = arg0->items;
-        temp_v0[7].flags = (s32) (temp_v0[7].flags | 0x01000000);
+        temp_v0 = (Target *) arg0->items;
+        temp_v0->flags = (s32) (temp_v0->flags | 0x01000000);
         return;
     }
-    temp_a0 = arg0->items;
-    temp_a0[7].flags = (s32) (temp_a0[7].flags & 0xFEFFFFFF);
+    temp_a0 = (Target *) arg0->items;
+    temp_a0->flags = (s32) (temp_a0->flags & 0xFEFFFFFF);
 }
 
 /* The window's item records are 0x28 bytes apart, item i's flags word at
